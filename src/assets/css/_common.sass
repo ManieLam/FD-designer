@@ -1,0 +1,312 @@
+/** 记录常用样式，可以单用，粒度保持很小; **/
+.d-inline-block
+  display: inline-block
+.d-block
+  display: block
+.d-flex
+  display: flex
+.d-flex-column
+  display: flex
+  flex-direction: column
+.d-flex-row
+  display: flex
+  flex-direction: row
+.d-flex-1
+  flex: 1
+.align-items-center
+  align-items: center
+
+.d-flex-row-between
+  display: flex
+  justify-content: space-between
+.d-flex-v-center
+  display: flex
+  align-items: center
+
+.p-primary
+  padding: $--padding-size-medium $--padding-size-large
+
+.pad-0
+  padding: 0!important
+.pad-l-0
+  padding-left: 0 !important
+.pad-r-0
+  padding-right: 0 !important
+.pad-b-0
+  padding-bottom: 0 !important
+.pad-t-0
+  padding-top: 0 !important
+.mar-l-0
+  margin-left: 0 !important
+.p-8
+  padding: $--padding-primary
+.p-t-8
+  padding-top: $--padding-primary
+.p-r-8
+  padding-right: $--padding-primary
+.p-b-8
+  padding-bottom: $--padding-primary
+.p-l-8
+  padding-left: $--padding-primary
+.p-16
+  padding: $--padding-size-medium
+.p-t-16
+  padding-top: $--padding-size-medium
+.p-r-16
+  padding-right: $--padding-size-medium
+.p-b-16
+  padding-bottom: $--padding-size-medium
+.p-l-16
+  padding-left: $--padding-size-medium
+
+.m-8
+  margin: $--margin-primary
+.m-t-8
+  margin-top: $--margin-primary
+.m-r-8
+  margin-right: $--margin-primary
+.m-b-8
+  margin-bottom: $--margin-primary
+.m-l-8
+  margin-left: $--margin-primary
+.m-16
+  margin: $--margin-size-medium
+.m-t-16
+  margin-top: $--margin-size-medium
+.m-r-16
+  margin-right: $--margin-size-medium
+.m-b-16
+  margin-bottom: $--margin-size-medium
+.m-l-16
+  margin-left: $--margin-size-medium
+
+.color-item-base
+  color: #2c3e50
+.color-primary
+  color: $--color-primary !important
+.color-disabled
+  color: $--color-text-placeholder !important
+
+.border-top
+  border-top: 1px solid $--border-color-base
+.border-bottom
+  border-bottom: 1px solid $--border-color-base
+
+// .table-padding
+//   padding: $--table-space-size-default
+// .table-padding-leftright
+//   padding: 0 $--table-space-size-default
+
+.bgcolor-fff
+  background: #fff
+.bgcolor-primary
+  background-color: $--color-primary
+.bgcolor-success
+  background-color: $--color-success
+.bgcolor-warning
+  background-color: $--color-warning
+.bgcolor-danger
+  background-color: $--color-danger
+
+/** ===== 公用一些自定义样式 START ===== **/
+.font-size-larger
+  font-size: 24px
+.font-size-medium
+  font-size: 18px
+.font-size-base
+  font-size: $--font-size-base
+.font-size-small
+  font-size: $--font-size-small
+.font-size-large
+  font-size: $--font-size-large
+
+// 列表页头部标题
+.header-label__primary
+  font-size: $--font-size-large
+  line-height: 22px
+  color: $--color-text-primary
+  font-weight: 600
+
+// 标识状态的小圈圈
+.flag-circle__mini
+  display: inline-block
+  width: 10px
+  height: 10px
+  margin-right: 5px
+  border-radius: 50%
+
+// 禁用文字
+.disabled-text
+  color: $--color-text-placeholder !important
+  cursor: not-allowed !important
+
+// 链接文字
+.link-text
+  cursor: pointer
+  color: $--color-primary
+  text-decoration: none
+  &:hover
+    text-decoration: underline
+.is-link
+  cursor: pointer
+  text-decoration: none
+  &:hover
+    text-decoration: underline
+.link-text[disabled]
+  color: $--color-text-primary
+.is-link[disabled]
+  color: $--color-text-placeholder !important
+.link-text[disabled], .is-link[disabled]
+  cursor: not-allowed !important 
+  pointer-events: none
+  &:hover
+    text-decoration: none
+
+
+// 重点文字-加粗
+.blod-text
+  font-weight: bold
+.primary-text
+  @include font-large
+  // font-weight: bold
+  // color: $--color-text-secondary
+  color: $--color-text-primary
+  padding-bottom: 8px
+.primary-text-box
+  padding: $--padding-size-medium $--padding-size-large 0
+  background: #fff
+
+// 描述性文字-灰色
+.secondary-text
+  color: $--color-text-regular
+  @include font-primary
+// 默认字号
+.default-text
+  @include font-primary
+
+// 带下划线自定义一条蓝蓝的线
+.text-underline__blue
+  padding: 0
+  position: relative
+  &::after
+    content: ''
+    height: 8px
+    width: 100%
+    position: absolute
+    bottom: 0
+    right: 0
+    background: $--color-primary
+    opacity: 0.2
+
+
+// 弹性不垂直滚动页面
+.flex-height-100
+  display: flex
+  flex-direction: column
+  height: 100%
+.w-100
+  width: 100%
+.h-100
+  height: 100%
+
+// 鼠标状态
+.cursor-pointer
+  cursor: pointer
+.cursor-disable
+  cursor: not-allowed
+
+// 颜色
+.color-primary
+  color: $--color-primary
+.color-success
+  color: $--color-success
+.color-warning
+  color: $--color-warning
+.color-danger
+  color: $--color-danger
+.color-text-primary
+  color: $--color-text-primary
+.color-text-secondary
+  color: $--color-text-regular
+.color-text-info
+  color: $--color-text-placeholder
+.color-text-fff
+  color: #fff
+
+// 文字对齐
+.text-right
+  text-align: right
+.text-left
+  text-align: left
+.text-center
+  text-align: center
+
+// 悬浮
+.float-left
+  float: left
+.float-right
+  float: right
+
+// 元文件框
+.meta-box
+  border: 1px solid $--border-color-base
+  padding: 16px !important
+  border-radius: 0
+
+.customDialogCenter
+  // margin: 50% auto
+  // transform: translate(-50%,-50%)
+
+.fixed-button-wrap
+  position: fixed
+  bottom: 1px
+  right: 0
+  z-index: 1
+  padding: $--padding-size-medium
+  background: #fff
+  width: 100%
+  text-align: right
+  // line-height: 72px
+  box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.15)
+.layout-with-fiexed-button
+  margin-bottom: 32px
+
+.readonly-grid-form
+  .form-body__container .inline-cell
+    padding-top: $--padding-primary !important
+    padding-bottom: $--padding-primary !important
+
+
+/* 常用的几种颜色的小标签 */
+.flag-block-primary-light
+  @include flag-block(#ecf5ff, $--color-primary)
+.flag-block-primary
+  @include flag-block($--color-primary, #fff)
+.flag-block-warning
+  @include flag-block($--color-warning, #fff)
+.flag-block-danger
+  @include flag-block($--color-danger, #fff)
+.flag-block-success
+  @include flag-block($--color-success, #fff)
+.flag-block-disabled
+  @include flag-block($--color-text-placeholder, #fff)
+
+/* 分隔符 */
+.split-after::after
+  // content: ''
+  // border: 1px solid $--border-color-base
+  // margin: 0 8px
+  content: '|'
+  margin: 0 8px
+  width: 1px
+  height: inherit
+  color: $--border-color-base
+  display: inline-block
+
+// 聚焦的按钮
+.btn-focus.el-button--primary:focus
+  border: 1px dashed
+  .el-button--primary:focus
+    border: 1px dashed
+
+/** ===== 公用一些自定义样式 END ===== **/
