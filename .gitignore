@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
+/.yalc
 /dist
+yalc.lock
 
 
 # local env files
