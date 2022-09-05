@@ -1,29 +1,36 @@
 <template lang='pug'>
 .container-wrap
   .left-panel
-    WidgetPanel
+    WidgetPanel(@onDragged="onDragged")
   .center-panel
-    CanvasPanel
+    //- TODO 支持多个画布
+    router-view
   .right-panel
     SettingPanel
 </template>
 
 <script>
 /** */
-import WidgetPanel from '../WidgetPanel'
-import CanvasPanel from '../CanvasPanel'
+import WidgetPanel from './WidgetPanel'
+// import CanvasPanel from '../CanvasPanel'
 import SettingPanel from '../SettingPanel'
 import draggable from 'vuedraggable'
+import { debounce } from 'lodash'
 export default {
   name: 'AppContainer',
   components: {
     draggable,
     WidgetPanel,
-    CanvasPanel,
     SettingPanel
   },
   data () {
-    return {}
+    return {
+    }
+  },
+  methods: {
+    onDragged: debounce(({ from, to }) => {
+      // console.info('on Dragged', from, to)
+    }, 800)
   }
 }
 </script>
@@ -47,6 +54,7 @@ export default {
     max-width: 300px
   .center-panel
     flex: 4 0 auto
-  // padding: $--padding-size-medium
+    // .tool-panel
+    //   background: #ff
 
 </style>

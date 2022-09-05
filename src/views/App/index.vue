@@ -26,11 +26,11 @@ export default {
           label: '全局配置',
           name: 'globalSetting',
           func: this.globalSetting
-        },
-        {
-          label: '导出全部画布',
-          name: 'export',
-          func: this.export
+        // },
+        // {
+        //   label: '导出全部画布',
+        //   name: 'export',
+        //   func: this.export
         }
       ]
     }

@@ -1,5 +1,5 @@
 <template lang='pug'>
-.widget-panel
+.widget-panel.d-flex-column.h-100
   .panel-title.d-flex-row-between.align-items-center
     span  控件区
     el-button-group.tool-wrap
@@ -12,12 +12,13 @@
     .content-block(v-for="widget in widgetGroups", :key="widget.name")
       .title {{widget.label}}
       draggable(
-        v-model="widget.components"
-        group="p"
-        class="list-group"
-        :move="checkMove")
+        class="list-group dragArea"
+        :list="widget.components"
+        :group="{ name: 'p', pull: 'clone', put: 'clone' }"
+        :move="checkMove"
+        @change="change")
         .list-empty.secondary-text(v-if="!widget.components?.length") -- 暂无控件 --
-        .list-group-item(v-for="item in widget.components", :key="item.name") {{item.name}}
+        .list-group-item(v-for="(item, index) in widget.components", :key="`${item.name}_${index}`") {{item.name}}
 </template>
 
 <script>
@@ -29,7 +30,6 @@ export default {
     draggable
   },
   data () {
-    console.info(this.$Widget)
     return {
       toolAttr: {
         underline: false,
@@ -47,16 +47,28 @@ export default {
   },
   methods: {
     checkMove (evt) {
-      console.info(evt)
       const { relatedContext, draggedContext } = evt
-      console.log('1--', draggedContext.element)
-      console.log('2--', relatedContext)
+
+      const isDragPage = Array.from(relatedContext?.component?.$el.classList)?.includes('drag-page-container')
+
+      if (isDragPage) {
+        console.info('from:', draggedContext?.element?.name)
+        this.$emit('onDragged', { from: draggedContext.element, to: relatedContext })
+      }
+      // 控制只允许拖拽到中间面板
+      return isDragPage
+    },
+    change (log) {
+      console.info('change:', log)
     }
   }
 }
 </script>
 
 <style lang='sass' scoped>
+.panel-content
+  overflow-y: auto
+  flex: 1
 .panel-title
   margin-left: -8px
   margin-top: -8px
@@ -67,4 +79,16 @@ export default {
     margin-bottom: 4px
   & + .content-block
     margin-top: 16px
+
+.list-group-item
+  color: #2c3e50
+  text-indent: 8px
+  cursor: move
+  padding-top: 4px
+  padding-bottom: 4px
+  line-height: 1.8
+  & + .list-group-item
+    border-top: 1px solid #f5f5f5
+  &:hover
+    background: #d7e7ff
 </style>

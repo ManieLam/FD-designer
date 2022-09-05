@@ -8,7 +8,6 @@ import { groupBy } from 'lodash'
 const groups = groupBy(ansoComps, (ele) => {
   return ele.name.match(/^AnsoDataform(\w+)/ig) && !['AnsoDataformGroup', 'AnsoDataformCompared'].includes(ele.name) ? 'formItem' : ele.name
 })
-console.info(groups)
 export default [
   /* 基础组件 */
   {
