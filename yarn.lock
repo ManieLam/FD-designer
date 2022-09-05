@@ -2341,10 +2341,8 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
   dependencies:
     color-convert "^2.0.1"
 
-anso-ui@^1.0.35:
-  version "1.0.35"
-  resolved "https://registry.yarnpkg.com/anso-ui/-/anso-ui-1.0.35.tgz#59f0bc4b992e111a8cabb3cf16e40306732fde26"
-  integrity sha512-n+bYDs+B01tM+27lSvp65TqgBVi7RmgEPM529injR80DrrS2b+uG7hvmEG6JRWFnUbngzZlFEQUpCFF44aBh5w==
+"anso-ui@file:.yalc/anso-ui":
+  version "1.0.37"
   dependencies:
     "@amap/amap-jsapi-loader" "^1.0.1"
     "@antv/g2plot" "^2.3.26"

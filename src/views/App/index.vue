@@ -28,7 +28,7 @@ export default {
           func: this.globalSetting
         },
         {
-          label: '导出全部配置',
+          label: '导出全部画布',
           name: 'export',
           func: this.export
         }
@@ -51,10 +51,13 @@ export default {
   color: #2c3e50
   background: #DFDEDD
   .app-header
-    color: #fff
-    background: #009EFA
+    color: #2c3e50
+    background-image: url('~@/assets/imgs/cool-background.png')
+    background-size: cover
+    background-position: 80% 70%
     padding: $--padding-primary
     display: flex
     justify-content: space-between
     align-items: center
+    font-weight: bold
 </style>

@@ -6,13 +6,18 @@
       el-button(v-bind="toolAttr", icon="el-icon-receiving", title="注册业务组件")
       el-button(
         v-bind="toolAttr"
-        :icon="isCollapse? 'el-icon-s-unfold': 'el-icon-s-fold' "
-        :title="isCollapse? '展开' : '收缩'" )
-  draggable(
-    v-model="rows"
-    group="p"
-    class="list-group")
-    div.list-group-item(v-for="item in rows",:key="item.id") {{item.name}}
+        :title="isCollapse? '展开' : '收缩'"
+        :icon="isCollapse? 'el-icon-s-unfold': 'el-icon-s-fold'")
+  .panel-content
+    .content-block(v-for="widget in widgetGroups", :key="widget.name")
+      .title {{widget.label}}
+      draggable(
+        v-model="widget.components"
+        group="p"
+        class="list-group"
+        :move="checkMove")
+        .list-empty.secondary-text(v-if="!widget.components?.length") -- 暂无控件 --
+        .list-group-item(v-for="item in widget.components", :key="item.name") {{item.name}}
 </template>
 
 <script>
@@ -24,13 +29,14 @@ export default {
     draggable
   },
   data () {
+    console.info(this.$Widget)
     return {
       toolAttr: {
         underline: false,
         size: 'mini'
       },
       isCollapse: false,
-      widgets: [], // 分组、标题、模块、组件
+      widgetGroups: this.$Widget, // 分组、标题、模块、组件
       /* 假数据 */
       rows: [
         { name: 'Jesus', id: 1 },
@@ -40,6 +46,12 @@ export default {
     }
   },
   methods: {
+    checkMove (evt) {
+      console.info(evt)
+      const { relatedContext, draggedContext } = evt
+      console.log('1--', draggedContext.element)
+      console.log('2--', relatedContext)
+    }
   }
 }
 </script>
@@ -49,4 +61,10 @@ export default {
   margin-left: -8px
   margin-top: -8px
   margin-right: -8px
+
+.content-block
+  .title
+    margin-bottom: 4px
+  & + .content-block
+    margin-top: 16px
 </style>

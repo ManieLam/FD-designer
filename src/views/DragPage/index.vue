@@ -2,6 +2,7 @@
 draggable(
   v-model="rows"
   group="p"
+  name="dragPage"
   class="list-group")
   div.list-group-item(v-for="item in rows",:key="item.id") {{item.name}}
 </template>
