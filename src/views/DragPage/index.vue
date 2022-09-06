@@ -3,21 +3,28 @@
   .tool-panel.d-flex-row-between
     el-button-group.tool-wrap__left
       el-button() 切换画布
+      el-button() 查看配置数据
     el-button-group.tool-wrap__right
       el-button() 导出
       el-button(@click="clear") 清空
       el-button() 预览
       el-button(type="primary") 保存
   draggable.list-group.drag-page-container(
-    v-model="fieldList"
+    :value="fieldList"
     group="form"
-    @end="handleMoveEnd"
+    animation="150"
     @add="handleWidgetAdd")
     //- div.list-group-item(v-for="item in rows",:key="item.id") {{item.name}}
     //- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList")
-    transition-group(name="fade", tag="div", class="widget-form-list")
+    transition-group.widget-form-list.h-100(name="fade", tag="div")
       //- 当前先做一个
-      WidgetForm(ref="form", :fullField="fieldList", :added="newField", key="widgetForm")
+      WidgetForm.h-100(
+        ref="form"
+        :fields="fieldList"
+        :added="newField"
+        key="widgetForm"
+        v-on="$listeners"
+        v-bind="$attrs")
       //- 可能多个表单
       //- el-form.form-designer_default()
 
@@ -40,8 +47,31 @@ export default {
   data () {
     return {
       keyName: '',
-      formSetting: {},
+      // formSetting: {},
       fieldList: [],
+      formItemTags: {
+        AnsoDataformText: 'text',
+        AnsoDataformInput: 'input',
+        AnsoDataformTextRange: 'textRange',
+        AnsoDataformNumber: 'number',
+        AnsoDataformNumRange: 'numberRange',
+        AnsoDataformSelect: 'select',
+        AnsoDataformSwitch: 'switch',
+        AnsoDataformSlider: 'slider',
+        AnsoDataformCheckbox: 'checkbox',
+        AnsoDataformRadio: 'radio',
+        AnsoDataformCascader: 'cascader',
+        AnsoDataformTime: 'time',
+        AnsoDataformTimeRange: 'timeRange',
+        AnsoDataformDate: 'date',
+        AnsoDataformUpload: 'file',
+        // AnsoDataformIcon: 'icon',
+        InfoRender: 'render',
+        AnsoButtonGroup: 'button',
+        AnsoLink: 'link',
+        AnsoDataformTransfer: 'transfer',
+        AnsoDataformTree: 'tree'
+      },
       newField: {}
     }
   },
@@ -50,16 +80,31 @@ export default {
       this.fieldList = []
       this.newField = {}
     },
+    formatField ({ tag }) {
+      if (!tag) return {}
+      return {
+        name: `${tag}_${new Date().getTime()}`,
+        compTag: tag,
+        label: '自定义字段',
+        form: {
+          tag: this.formItemTags[tag]
+        }
+      }
+    },
     handleWidgetAdd (evt) {
       // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
       const tag = evt.clone?.dataset?.name
+      // console.info('add-', tag)
+      const newIndex = evt.newIndex
+      const element = this.formatField({ tag: evt.clone?.dataset?.name })
       this.newField = tag ? {
-        element: { tag: evt.clone?.dataset?.name },
-        newIndex: evt.newIndex
+        element,
+        newIndex
       } : {}
-    },
-    handleMoveEnd ({ newIndex, oldIndex }) {
-      console.log('index', newIndex, oldIndex)
+      if (tag) {
+        this.fieldList.splice(newIndex, 0, element)
+        this.$emit('onSelect', element)
+      }
     }
   }
 }

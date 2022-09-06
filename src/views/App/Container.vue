@@ -4,33 +4,58 @@
     WidgetPanel(@onDragged="onDragged")
   .center-panel
     //- TODO 支持多个画布
-    router-view
-  .right-panel
-    SettingPanel
+    //- router-view
+    DragPage(
+      :formConfig="formConfig"
+      :formItemConfig="formItemConfig"
+      @onSelect="selectFormitem")
+  .right-panel(v-if="toggleSettingOpen")
+    SettingPanel(
+      :formItemConfig="formItemConfig"
+      :formConfig="formConfig"
+      @change="change")
 </template>
 
 <script>
 /** */
 import WidgetPanel from './WidgetPanel'
+import DragPage from '../DragPage'
 // import CanvasPanel from '../CanvasPanel'
 import SettingPanel from '../SettingPanel'
-import draggable from 'vuedraggable'
+// import Draggable from 'vuedraggable'
 import { debounce } from 'lodash'
 export default {
   name: 'AppContainer',
   components: {
-    draggable,
+    // Draggable,
+    DragPage,
     WidgetPanel,
     SettingPanel
   },
   data () {
     return {
+      formItemConfig: {},
+      formConfig: {},
+      toggleSettingOpen: false // 切换配置区
     }
   },
   methods: {
     onDragged: debounce(({ from, to }) => {
       // console.info('on Dragged', from, to)
-    }, 800)
+    }, 800),
+    selectFormitem (ele) {
+      console.info('某个子元素点击了：', ele)
+      this.toggleSettingOpen = true
+      this.formItemConfig = ele
+    },
+    change (type, attrs) {
+      if (type === 'form') {
+        console.info('更改表单数值')
+        this.formConfig = attrs
+      } else if (type === 'formitem') {
+        this.formItemConfig = attrs
+      }
+    }
   }
 }
 </script>

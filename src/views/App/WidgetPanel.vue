@@ -13,12 +13,13 @@
       .title {{widget.label}}
       draggable(
         class="list-group dragArea"
-        :list="widget.components"
-        :group="{ name: 'p', pull: 'clone', put: 'clone' }"
-        :move="checkMove"
-        @change="change")
+        v-model="widget.components"
+        :data-name="widget.name"
+        :key="widget.name"
+        :group="{ name: 'form', pull: 'clone', put: false }"
+        :move="checkMove")
         .list-empty.secondary-text(v-if="!widget.components?.length") -- 暂无控件 --
-        .list-group-item(v-for="(item, index) in widget.components", :key="`${item.name}_${index}`") {{item.name}}
+        .list-group-item(v-for="(item, index) in widget.components", :key="index", :data-name="item.name") {{item.name}}
 </template>
 
 <script>
@@ -39,21 +40,23 @@ export default {
       widgetGroups: this.$Widget, // 分组、标题、模块、组件
       /* 假数据 */
       rows: [
-        { name: 'Jesus', id: 1 },
-        { name: 'Paul', id: 2 },
-        { name: 'Peter', id: 3 }
+        { name: 'Jesus', id: 1, key: 1 },
+        { name: 'Paul', id: 2, key: 2 },
+        { name: 'Peter', id: 3, key: 3 }
       ]
     }
   },
   methods: {
     checkMove (evt) {
-      const { relatedContext, draggedContext } = evt
+      const { to } = evt
 
-      const isDragPage = Array.from(relatedContext?.component?.$el.classList)?.includes('drag-page-container')
+      const isDragPage = Array.from(to.classList)?.includes('widget-form-list')
 
       if (isDragPage) {
-        console.info('from:', draggedContext?.element?.name)
-        this.$emit('onDragged', { from: draggedContext.element, to: relatedContext })
+        // draggedContext.element 对象总是实际拖拽的对象下一个
+        // console.info('from:', draggedContext)
+        // console.info('to:', relatedContext)
+        // this.$emit('onDragged', { from: draggedContext.element, to: relatedContext })
       }
       // 控制只允许拖拽到中间面板
       return isDragPage

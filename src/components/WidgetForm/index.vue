@@ -1,5 +1,28 @@
 <template lang='pug'>
-AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList", key="form")
+//- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList", key="form")
+.widget-form-container
+  .empty-wrap(v-if="!fieldList.length") 支持拖拽元素进入
+  el-form(v-else, v-bind="formConfig")
+    Draggable.list-group.drag-page-container(
+      v-model="fieldList"
+      group="form-inside")
+      transition-group(name="fade" tag="div" class="widget-form-list")
+        template(v-for="(ele, index) in fieldList")
+          WidgetFormItem.widget-form-item(
+            v-if="ele && ele.compTag"
+            :key="ele.name"
+            :name="ele.name"
+            :compTag="ele.compTag"
+            :index="index"
+            :config="ele"
+            @click.native="$emit('onSelect', ele)")
+    el-form-item
+      el-button(
+        v-for="button in buttonList"
+        v-bind="button"
+        :key="button.name"
+        @click="button.func") {{ button.label }}
+
 </template>
 
 <script>
@@ -8,85 +31,78 @@ AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList
  * TODO 支持表单多种布局
  */
 // import { isEqual, difference } from 'lodash'
+import Draggable from 'vuedraggable'
+import WidgetFormItem from './WidgetFormItem'
 export default {
   name: 'WidgetForm',
-  props: ['fullField', 'added', 'layout', 'groupBy'],
-  watch: {
+  props: {
+    fields: {
+      type: Array,
+      default: () => ([])
+    },
     added: {
-      handler ({ element, newIndex }) {
-        if (!element) {
-          this.fields = []
-          return
-        }
-        if (element) {
-          this.fields.splice(newIndex, 0, this.formatField(element))
-          console.info('this.fields:', this.fields)
-        }
-      }
+      type: Object,
+      default: () => ({})
+    },
+    formConfig: {
+      type: Object,
+      default: () => ({})
     }
+  },
+  components: {
+    Draggable,
+    WidgetFormItem
   },
   data () {
     return {
       formSetting: {},
-      fields: [],
+      fieldList: this.fields,
+      // fields: [],
       buttonList: [
         { label: '取消', name: 'cancel', func: () => {} },
         { label: '提交', name: 'submit', type: 'primary', func: () => {} }
-      ],
-      formItemTags: {
-        AnsoDataformText: 'text',
-        AnsoDataformInput: 'input',
-        AnsoDataformTextRange: 'textRange',
-        AnsoDataformNumber: 'number',
-        AnsoDataformNumRange: 'numberRange',
-        AnsoDataformSelect: 'select',
-        AnsoDataformSwitch: 'switch',
-        AnsoDataformSlider: 'slider',
-        AnsoDataformCheckbox: 'checkbox',
-        AnsoDataformRadio: 'radio',
-        AnsoDataformCascader: 'cascader',
-        AnsoDataformTime: 'time',
-        AnsoDataformTimeRange: 'timeRange',
-        AnsoDataformDate: 'date',
-        AnsoDataformUpload: 'file',
-        // AnsoDataformIcon: 'icon',
-        InfoRender: 'render',
-        AnsoButtonGroup: 'button',
-        AnsoLink: 'link',
-        AnsoDataformTransfer: 'transfer',
-        AnsoDataformTree: 'tree'
-      }
+      ]
+      // formItemTags: {
+      //   AnsoDataformText: 'text',
+      //   AnsoDataformInput: 'input',
+      //   AnsoDataformTextRange: 'textRange',
+      //   AnsoDataformNumber: 'number',
+      //   AnsoDataformNumRange: 'numberRange',
+      //   AnsoDataformSelect: 'select',
+      //   AnsoDataformSwitch: 'switch',
+      //   AnsoDataformSlider: 'slider',
+      //   AnsoDataformCheckbox: 'checkbox',
+      //   AnsoDataformRadio: 'radio',
+      //   AnsoDataformCascader: 'cascader',
+      //   AnsoDataformTime: 'time',
+      //   AnsoDataformTimeRange: 'timeRange',
+      //   AnsoDataformDate: 'date',
+      //   AnsoDataformUpload: 'file',
+      //   // AnsoDataformIcon: 'icon',
+      //   InfoRender: 'render',
+      //   AnsoButtonGroup: 'button',
+      //   AnsoLink: 'link',
+      //   AnsoDataformTransfer: 'transfer',
+      //   AnsoDataformTree: 'tree'
+      // }
     }
   },
-  methods: {
-    /* {
-      name: '',
-      label: '自定义字段',
-      form: {
-        tag: '',
-        rules: [],
-        options: [],
-        chains: ({chains, values, value}) => {},
-        ...setting
+  watch: {
+    fields: {
+      deep: true,
+      handler (list) {
+        this.fieldList = list
       }
-    } */
-    formatField (ele) {
-      const { name } = ele
-      return {
-        name: `${name}_${new Date().getTime()}`,
-        label: '自定义字段',
-        form: {
-          tag: this.formItemTags[name]
-        }
-      }
-    },
-    clear () {
-      this.fields = []
     }
   }
 }
 </script>
 
 <style lang='sass' scoped>
-
+.widget-form-item
+  border: 1px solid #f5f5f5
+  padding: 8px
+  &:hover
+    border: 1px dashed #0A4078
+    background: rgb(87, 168, 206, 0.2)
 </style>

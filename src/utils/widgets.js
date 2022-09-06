@@ -8,12 +8,19 @@ import { groupBy } from 'lodash'
 const groups = groupBy(ansoComps, (ele) => {
   return ele.name.match(/^AnsoDataform(\w+)/ig) && !['AnsoDataformGroup', 'AnsoDataformCompared'].includes(ele.name) ? 'formItem' : ele.name
 })
+
+const formatGroup = (list) => {
+  return list.map(item => {
+    return { ...item, id: item.name, key: item.name }
+  })
+}
+
 export default [
   /* 基础组件 */
   {
     label: '按钮',
     name: 'button',
-    components: [...groups.AnsoButtonGroup]
+    components: formatGroup([...groups.AnsoButtonGroup])
   },
   // {
   //   label: '表单布局',
@@ -23,7 +30,7 @@ export default [
   {
     label: '表单录入元素',
     name: 'formItem',
-    components: [...groups.formItem]
+    components: formatGroup([...groups.formItem])
   },
   /* 外部注册业务组件 */
   {
