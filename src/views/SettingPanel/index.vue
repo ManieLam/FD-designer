@@ -1,11 +1,14 @@
 <template lang='pug'>
 .setting-panel
-  el-tabs
-    el-tab-pane(
+  el-tabs.setting-tab
+    el-tab-pane.tab-component(
       v-for="tab in tabList"
       :key="tab.name"
       :label="tab.label")
-      component(:is="tab.components")
+      component(
+        :is="tab.components"
+        v-bind="$attrs"
+        v-on="$listeners")
 </template>
 
 <script>
@@ -29,5 +32,16 @@ export default {
 </script>
 
 <style lang='sass' scoped>
-
+.setting-panel
+  display: flex
+  flex-direction: column
+  height: 100%
+  .setting-tab
+    height: 100%
+    flex: 1
+    display: flex
+    flex-direction: column
+    ::v-deep .el-tabs__content
+      height: 100%
+      overflow-y: auto
 </style>
