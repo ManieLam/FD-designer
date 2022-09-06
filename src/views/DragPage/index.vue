@@ -9,15 +9,15 @@
       el-button() 预览
       el-button(type="primary") 保存
   draggable.list-group.drag-page-container(
-    v-model="fieldVMs"
-    group="p"
-    name="dragPage"
-    @change="change")
+    v-model="fieldList"
+    group="form"
+    @end="handleMoveEnd"
+    @add="handleWidgetAdd")
     //- div.list-group-item(v-for="item in rows",:key="item.id") {{item.name}}
     //- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList")
     transition-group(name="fade", tag="div", class="widget-form-list")
       //- 当前先做一个
-      WidgetForm(ref="form", :fullField="fieldVMs", :added="newField", key="widgetForm")
+      WidgetForm(ref="form", :fullField="fieldList", :added="newField", key="widgetForm")
       //- 可能多个表单
       //- el-form.form-designer_default()
 
@@ -27,6 +27,7 @@
 /** 拖拽的面板页面，多个画布，通过复制这个组件生成 */
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
+
 export default {
   name: 'DragPage',
   components: {
@@ -39,19 +40,26 @@ export default {
   data () {
     return {
       keyName: '',
-      formSetting: {
-      },
-      fieldVMs: [],
+      formSetting: {},
+      fieldList: [],
       newField: {}
     }
   },
   methods: {
     clear () {
-      this.fieldVMs = []
+      this.fieldList = []
       this.newField = {}
     },
-    change (log) {
-      this.newField = log.added
+    handleWidgetAdd (evt) {
+      // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
+      const tag = evt.clone?.dataset?.name
+      this.newField = tag ? {
+        element: { tag: evt.clone?.dataset?.name },
+        newIndex: evt.newIndex
+      } : {}
+    },
+    handleMoveEnd ({ newIndex, oldIndex }) {
+      console.log('index', newIndex, oldIndex)
     }
   }
 }
