@@ -3,12 +3,12 @@
   .tool-panel.d-flex-row-between
     el-button-group.tool-wrap__left
       el-button() 切换画布
-      el-button() 查看配置数据
+      el-button() 查看配置文件
     el-button-group.tool-wrap__right
       el-button() 导出
       el-button(@click="clear") 清空
       el-button() 预览
-      el-button(type="primary") 保存
+      el-button(type="primary", @click="save") 保存
   draggable.list-group.drag-page-container(
     :value="fieldList"
     group="form"
@@ -24,7 +24,8 @@
         :added="newField"
         key="widgetForm"
         v-on="$listeners"
-        v-bind="$attrs")
+        v-bind="$attrs"
+        @remove="removeWidget")
       //- 可能多个表单
       //- el-form.form-designer_default()
 
@@ -34,6 +35,7 @@
 /** 拖拽的面板页面，多个画布，通过复制这个组件生成 */
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
+// import { mapGetters } from 'vuex'
 
 export default {
   name: 'DragPage',
@@ -72,14 +74,28 @@ export default {
         AnsoDataformTransfer: 'transfer',
         AnsoDataformTree: 'tree'
       },
-      newField: {}
+      newField: {},
+      // 画布配置
+      canvasIndex: 0
     }
   },
+  // computed: {
+  //   fieldList () {
+  //     // return this.$store.getters.canvasViews
+  //     console.info('this.$store.getters；', this.$store.getters.getCanvasView)
+  //     return this.$store.getters.getCanvasView(`canvas_${this.canvasIndex}`)
+  //   }
+  //   // ...mapGetters({
+  //   //   fieldList: getCanvasView(`canvas_${this.canvasIndex}`)
+  //   // })
+  // },
   methods: {
     clear () {
       this.fieldList = []
       this.newField = {}
+      this.$store.commit('canvas/clear', `canvas_${this.canvasIndex}`)
     },
+    save () {},
     formatField ({ tag }) {
       if (!tag) return {}
       return {
@@ -103,8 +119,20 @@ export default {
       } : {}
       if (tag) {
         this.fieldList.splice(newIndex, 0, element)
+
+        this.$store.commit('canvas/add', {
+          name: `canvas_${this.canvasIndex}`,
+          eIndex: newIndex,
+          element
+          // elements: this.fieldList
+        })
+        // console.info('vuex:', this.$store.state.canvas)
+
         this.$emit('onSelect', element)
       }
+    },
+    removeWidget (ele, index) {
+      this.$delete(this.fieldList, index)
     }
   }
 }
