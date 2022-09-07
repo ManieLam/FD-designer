@@ -1,9 +1,10 @@
 <template lang='pug'>
 .setting-panel
-  el-tabs.setting-tab
+  el-tabs.setting-tab(v-model="activeName")
     el-tab-pane.tab-component(
       v-for="tab in tabList"
       :key="tab.name"
+      :name="tab.name"
       :label="tab.label")
       component(
         :is="tab.components"
@@ -17,6 +18,7 @@ export default {
   name: 'SettingPanel',
   data () {
     return {
+      activeName: 'form',
       tabList: [{
         label: '组件配置区',
         name: 'component',

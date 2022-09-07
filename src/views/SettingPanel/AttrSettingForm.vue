@@ -44,10 +44,19 @@ export default {
   },
   data () {
     return {
-      data: this.value
+      inputed: {}
+      // data: this.value
     }
-  }
-  // computed: {
+  },
+  computed: {
+    data: {
+      get () {
+        return this.inputed
+      },
+      set (value) {
+        this.$emit('input', this.inputed)
+      }
+    }
   //   data: {
   //     get () {
   //       return { ...this.inputed }
@@ -58,7 +67,10 @@ export default {
   //       this.$emit('input', values)
   //     }
   //   }
-  // }
+  },
+  mounted () {
+    this.inputed = this.value
+  }
 }
 </script>
 

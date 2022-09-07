@@ -5,7 +5,7 @@
       AttrSettingForm(
         v-bind="$attrs"
         v-on="$listeners"
-        v-model="data"
+        v-model="attrsData"
         :attrs="attrs"
         :actions="actions")
     el-collapse-item.label.m-b-8.primary-text(title="行为配置", name="action")
@@ -18,19 +18,20 @@ import AttrSettingForm from './AttrSettingForm.vue'
 import { debounce } from 'lodash'
 export default {
   name: 'FormSetting',
-  props: ['formConfig'],
+  props: {
+    canvas: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   components: {
     AttrSettingForm
   },
-  // model: {
-  //   prop: 'formConfig',
-  //   event: 'change'
-  // },
   data () {
     return {
       activeNames: ['attr', 'action'],
+      // 表单的默认属性设置
       data: {
-        ...this.formConfig,
         layout: 'default',
         labelHidden: false,
         labelWidth: 80,
@@ -38,6 +39,7 @@ export default {
         readonly: false,
         keepAliveData: true
       },
+      attrsData: {},
       attrs: [
         {
           label: '是否只读',
@@ -108,18 +110,50 @@ export default {
     }
   },
   watch: {
-    data: {
-      deep: true,
-      handler (data, oldData) {
-        debounce(() => {
-          this.$emit('change', 'form', data)
-        }, 1000)
+    canvas: {
+      immediate: true,
+      // deep: true,
+      handler (canvas, oldData) {
+        if (canvas) {
+          const { form } = canvas
+          this.attrsData = form?.attrs || this.data
+          // this.data = form?.attrs || {}
+        }
+        // debounce(() => {
+        //   this.$emit('change', 'form', data)
+        // }, 1000)
       }
+    },
+    attrsData: {
+      immediate: true,
+      deep: true,
+      handler: debounce(function (value, oldValue) {
+        console.info('attrs watch:', value)
+        this.$emit('change', 'form', value)
+      // console.info('attrs watch:', value, oldValue)
+      // if (!isEqual(value, oldValue)) {
+      //   console.info('changeAttrs')
+      //   debounce(() => {
+      //     this.$emit('change', 'form', value)
+      //   }, 1000)
+      // }
+      }, 1000)
     }
-  },
-  updated () {
-    console.info('表单设置区 更新')
   }
+  // computed: {
+  //   attrsData: {
+  //     get () {
+  //       console.info('get attrsData--- ')
+  //       return this.data
+  //     },
+  //     set () {
+
+  //     }
+  //   }
+  // // },
+  // // updated () {
+  // //   console.info('表单设置区 更新')
+  // }
 }
 </script>
 

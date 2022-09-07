@@ -1,33 +1,24 @@
 <template lang='pug'>
-.canvas-panel
-  .tool-panel.d-flex-row-between
-    el-button-group.tool-wrap__left
-      el-button() 切换画布
-      el-button() 查看配置文件
-    el-button-group.tool-wrap__right
-      el-button() 导出
-      el-button(@click="clear") 清空
-      el-button() 预览
-      el-button(type="primary", @click="save") 保存
-  draggable.list-group.drag-page-container(
-    :value="fieldList"
-    group="form"
-    animation="150"
-    @add="handleWidgetAdd")
-    //- div.list-group-item(v-for="item in rows",:key="item.id") {{item.name}}
-    //- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList")
-    transition-group.widget-form-list.h-100(name="fade", tag="div")
-      //- 当前先做一个
-      WidgetForm.h-100(
-        ref="form"
-        :fields="fieldList"
-        :added="newField"
-        key="widgetForm"
-        v-on="$listeners"
-        v-bind="$attrs"
-        @remove="removeWidget")
-      //- 可能多个表单
-      //- el-form.form-designer_default()
+draggable.list-group.drag-page-container(
+  :value="fieldList"
+  group="form"
+  animation="150"
+  @add="handleWidgetAdd")
+  //- div.list-group-item(v-for="item in rows",:key="item.id") {{item.name}}
+  //- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList")
+  transition-group.widget-form-list.h-100(name="fade", tag="div")
+    //- 当前先做一个
+    WidgetForm.h-100(
+      ref="form"
+      :fields="fieldList"
+      :added="newField"
+      key="widgetForm"
+      v-on="$listeners"
+      v-bind="$attrs"
+      @remove="removeWidget"
+      @update="updateCanvas")
+    //- 可能多个表单
+    //- el-form.form-designer_default()
 
 </template>
 
@@ -43,8 +34,22 @@ export default {
     draggable,
     WidgetForm
   },
+  // TODO 根据配置属性同步field.form配置
   props: {
-    setting: {}
+    // formConfig:,
+    // formItemConfig,
+    canvasName: {
+      type: String,
+      default: ''
+    },
+    actIndex: {
+      type: [Number, String],
+      default: 0
+    },
+    canvas: {
+      type: Object,
+      default: () => ({})
+    }
   },
   data () {
     return {
@@ -74,28 +79,40 @@ export default {
         AnsoDataformTransfer: 'transfer',
         AnsoDataformTree: 'tree'
       },
-      newField: {},
-      // 画布配置
-      canvasIndex: 0
+      newField: {}
     }
   },
   // computed: {
-  //   fieldList () {
-  //     // return this.$store.getters.canvasViews
-  //     console.info('this.$store.getters；', this.$store.getters.getCanvasView)
-  //     return this.$store.getters.getCanvasView(`canvas_${this.canvasIndex}`)
+  //   canvasName () {
+  //     return `canvas_${this.actIndex}`
   //   }
-  //   // ...mapGetters({
-  //   //   fieldList: getCanvasView(`canvas_${this.canvasIndex}`)
-  //   // })
+  //   // fieldList如果读取的是store里面的会不同步
+  //   //   fieldList () {
+  //   //     // return this.$store.getters.canvasViews
+  //   //     console.info('this.$store.getters；', this.$store.getters.getCanvasView)
+  //   //     return this.$store.getters.getCanvasView(`canvas_${this.canvasIndex}`)
+  //   //   }
+  //   //   // ...mapGetters({
+  //   //   //   fieldList: getCanvasView(`canvas_${this.canvasIndex}`)
+  //   //   // })
   // },
+  watch: {
+    canvas: {
+      immediate: true,
+      deep: true,
+      handler (canvas) {
+        if (canvas) {
+          this.fieldList = canvas?.fields || []
+        }
+      }
+    }
+  },
   methods: {
     clear () {
       this.fieldList = []
       this.newField = {}
-      this.$store.commit('canvas/clear', `canvas_${this.canvasIndex}`)
+      this.$store.commit('canvas/clear', this.canvasName)
     },
-    save () {},
     formatField ({ tag }) {
       if (!tag) return {}
       return {
@@ -118,10 +135,10 @@ export default {
         newIndex
       } : {}
       if (tag) {
-        this.fieldList.splice(newIndex, 0, element)
+        // this.fieldList.splice(newIndex, 0, element)
 
         this.$store.commit('canvas/add', {
-          name: `canvas_${this.canvasIndex}`,
+          name: this.canvasName,
           eIndex: newIndex,
           element
           // elements: this.fieldList
@@ -132,24 +149,41 @@ export default {
       }
     },
     removeWidget (ele, index) {
-      this.$delete(this.fieldList, index)
+      // this.$delete(this.fieldList, index)
+      this.$store.commit('canvas/deleteWidget', {
+        name: this.canvasName,
+        eIndex: index
+      })
+    },
+    updateCanvas (list) {
+      // console.log('update--', list)
+      // this.fieldList = list
+      this.$store.commit('canvas/update', {
+        name: this.canvasName,
+        elements: list
+      })
     }
+  // },
+  // mounted () {
+  //   console.info('drag page init---')
+  //   this.initCanvas()
   }
 }
 </script>
 
 <style lang='sass' scoped>
-.canvas-panel
-  height: 100%
-  display: flex
-  flex-direction: column
+// .canvas-panel
+//   height: 100%
+//   display: flex
+//   flex-direction: column
 
   // background: #F5F5F5
-  .drag-page-container
-    padding: 16px
-    border: 1px solid $--border-color-base
-    box-shadow: 0 2px 5px 1px $--border-color-base
-    background: #fff
-    flex: 1
-    margin-top: 6px
+.drag-page-container
+  padding: 16px
+  border: 1px solid $--border-color-base
+  box-shadow: 0 2px 5px 1px $--border-color-base
+  background: #fff
+  flex: 1
+  margin-top: 6px
+  overflow-y: auto
 </style>

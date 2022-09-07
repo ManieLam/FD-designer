@@ -1,30 +1,68 @@
-/* 记录画布, 同步记录在localstorage */
-// const {} from 'lodash'
+/** 记录画布, 同步记录在localstorage
+ * 画布包括：字段fields(name,label,form,compTag), 表单form(attrs,actions)
+ * */
+
 const state = () => ({
-  collects: {} // name: [...fieldList]
+  collects: {}, // {name: {fields: []}, form: {attrs, ctions}}
+  editingName: '' // 正在编辑的画布名称
   // count: 1
 })
+
 const mutations = {
+  /* 初始化 */
+  init (states) {
+    // console.info('初始化:', localStorage.getItem('Canvas-all'))
+    const storages = localStorage.getItem('Canvas-all')
+    states.collects = storages ? JSON.parse(storages) : {}
+    states.editingName = localStorage.getItem('Canvas-editing') || ''
+  },
   /* 切换画布 */
   toggle (states, name) {},
   /* 新增画布 */
   add (states, { name, element = {}, eIndex = 0 }) {
     // console.info('画布vuex新增:', name, element)
-    const canvasList = states.collects[name]
-    if (canvasList) {
-      canvasList.splice(eIndex, 0, element)
+    const elements = states.collects[name]?.fields
+    if (elements) {
+      elements.splice(eIndex, 0, element)
     } else {
-      states.collects[name] = [element]
+      states.collects[name] = {
+        fields: [element],
+        form: {
+          attrs: {},
+          actions: {}
+        }
+      }
+      // states.collects[name].fields = [element]
     }
   },
   /* 删除 */
-  delete (states, name) {},
+  deleteWidget (states, { name, eIndex }) {
+    const elements = states.collects[name]?.fields
+    if (elements) {
+      elements.splice(eIndex, 1)
+    }
+  },
   /* 清空 */
   clear (states, name) {
-    delete states.collects[name]
+    // delete states.collects[name]
+    delete states.collects[name].fields
+    delete states.collects[name].form
   },
   /* 更新 */
-  update (states, { name, element = [] }) {},
+  update (states, { name, element = {}, eIndex, elements }) {
+    states.collects[name].fields = elements
+  },
+  // 更新表单属性
+  updateConfig (states, { name, attrs, actions }) {
+    const canvas = states.collects[name]
+    if (canvas && (attrs || actions)) {
+      const form = canvas.form
+      states.collects[name].form = {
+        attrs: { ...form.attrs, ...attrs },
+        actions: { ...form.actions, ...actions }
+      }
+    }
+  },
   /* 导出、全部导出 */
   export (states, name, isAll = false) {}
 }

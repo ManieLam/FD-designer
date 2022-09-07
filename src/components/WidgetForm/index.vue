@@ -5,19 +5,18 @@
   el-form(v-else, v-bind="formConfig", label-width="100px")
     Draggable.list-group.drag-page-container(
       v-model="fieldList"
-      group="form-inside")
+      animation="150")
       transition-group(name="fade" tag="div" class="widget-form-list")
-        template(v-for="(ele, index) in fieldList")
-          .widget-form-item-wrap(:key="ele.name")
-            WidgetFormItem.widget-form-item(
-              v-if="ele && ele.compTag"
-              :name="ele.name"
-              :compTag="ele.compTag"
-              :index="index"
-              :config="ele"
-              @click.native="$emit('onSelect', ele)")
-            .tool-wrap
-              .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
+        .widget-form-item-wrap(v-for="(ele, index) in fieldList", :key="ele.name")
+          WidgetFormItem.widget-form-item(
+            v-if="ele && ele.compTag"
+            :name="ele.name"
+            :compTag="ele.compTag"
+            :index="index"
+            :config="ele"
+            @click.native="$emit('onSelect', ele)")
+          .tool-wrap
+            .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
 
     el-form-item.m-t-16.widget-form-item
       el-button(
@@ -59,42 +58,23 @@ export default {
   data () {
     return {
       formSetting: {},
-      fieldList: this.fields,
+      // fieldList: this.fields,
       // fields: [],
       buttonList: [
         { label: '取消', name: 'cancel', func: () => {} },
         { label: '提交', name: 'submit', type: 'primary', func: () => {} }
       ]
-      // formItemTags: {
-      //   AnsoDataformText: 'text',
-      //   AnsoDataformInput: 'input',
-      //   AnsoDataformTextRange: 'textRange',
-      //   AnsoDataformNumber: 'number',
-      //   AnsoDataformNumRange: 'numberRange',
-      //   AnsoDataformSelect: 'select',
-      //   AnsoDataformSwitch: 'switch',
-      //   AnsoDataformSlider: 'slider',
-      //   AnsoDataformCheckbox: 'checkbox',
-      //   AnsoDataformRadio: 'radio',
-      //   AnsoDataformCascader: 'cascader',
-      //   AnsoDataformTime: 'time',
-      //   AnsoDataformTimeRange: 'timeRange',
-      //   AnsoDataformDate: 'date',
-      //   AnsoDataformUpload: 'file',
-      //   // AnsoDataformIcon: 'icon',
-      //   InfoRender: 'render',
-      //   AnsoButtonGroup: 'button',
-      //   AnsoLink: 'link',
-      //   AnsoDataformTransfer: 'transfer',
-      //   AnsoDataformTree: 'tree'
-      // }
     }
   },
-  watch: {
-    fields: {
-      deep: true,
-      handler (list) {
-        this.fieldList = list
+  computed: {
+    fieldList: {
+      get () {
+        return this.fields
+      },
+      set (list) {
+        this.$nextTick(() => {
+          this.$emit('update', list)
+        })
       }
     }
   }
