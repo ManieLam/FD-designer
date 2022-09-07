@@ -1,13 +1,14 @@
 <template lang='pug'>
 .setting-form-wrap
-  .setting-wrap
-    .label.m-b-8.primary-text 属性配置
-    AttrSettingForm(
-      v-bind="$attrs"
-      v-on="$listeners"
-      v-model="data"
-      :attrs="attrs"
-      :actions="actions")
+  el-collapse.setting-wrap(v-model="activeNames")
+    el-collapse-item.label.m-b-8.primary-text(title="属性配置", name="attr")
+      AttrSettingForm(
+        v-bind="$attrs"
+        v-on="$listeners"
+        v-model="data"
+        :attrs="attrs"
+        :actions="actions")
+    el-collapse-item.label.m-b-8.primary-text(title="行为配置", name="action")
 
 </template>
 
@@ -21,12 +22,13 @@ export default {
   components: {
     AttrSettingForm
   },
-  model: {
-    prop: 'formConfig',
-    event: 'change'
-  },
+  // model: {
+  //   prop: 'formConfig',
+  //   event: 'change'
+  // },
   data () {
     return {
+      activeNames: ['attr', 'action'],
       data: {
         ...this.formConfig,
         layout: 'default',
@@ -122,5 +124,6 @@ export default {
 </script>
 
 <style lang='sass' scoped>
-
+.setting-wrap
+  border: 0
 </style>
