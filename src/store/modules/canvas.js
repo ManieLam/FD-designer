@@ -2,6 +2,7 @@
  * 画布包括：字段fields(name,label,form,compTag), 表单form(attrs,actions)
  * */
 import { formAttrs } from '@/utils/defaultConfig'
+import { isEqual, omit } from 'lodash'
 const state = () => ({
   collects: {}, // {name: {fields: []}, form: {attrs, ctions}}
   editingName: '' // 正在编辑的画布名称
@@ -53,7 +54,7 @@ const mutations = {
     states.collects[name].fields = elements
   },
   // 更新表单属性
-  updateConfig (states, { name, attrs, actions }) {
+  updateConfig (states, { name, attrs = null, actions = null }) {
     const canvas = states.collects[name]
     if (canvas && (attrs || actions)) {
       const form = canvas.form
@@ -61,6 +62,17 @@ const mutations = {
         attrs: { ...form.attrs, ...(attrs || {}) },
         actions: { ...form.actions, ...(actions || {}) }
       }
+    }
+  },
+  updateField (states, { name, fName, findex = null, attrs = null, actions = null }) {
+    const canvas = states.collects[name]
+    if (canvas && findex !== null && (attrs || actions)) {
+      console.info('更新vuex中的字段', name, findex)
+      const field = canvas.fields[findex]
+      const { form } = attrs
+      if (!isEqual(form.label, field.label)) canvas.fields[findex].label = field.label
+      if (!isEqual(form.name, field.name)) canvas.fields[findex].name = field.name
+      canvas.fields[findex].form = omit(form, ['label', 'name'])
     }
   },
   /* 导出、全部导出 */

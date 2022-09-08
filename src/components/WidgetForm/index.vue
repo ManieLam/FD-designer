@@ -96,7 +96,7 @@ export default {
       // 表单子元素的属性配置在vuex中已经读取
       const customSet = {
         form: {
-          ...omit(fset, ['labelWidth'])
+          ...omit(fset, ['labelWidth', 'keepAliveData', 'layout'])
         }
       }
       // labelHidden， labelWidth， errorToptip

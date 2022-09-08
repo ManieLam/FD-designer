@@ -1,20 +1,20 @@
 <template lang='pug'>
 .setting-form-wrap
   el-collapse.setting-wrap(v-model="activeNames")
-    el-collapse-item.label.m-b-8.primary-text(title="属性配置", name="attr")
+    el-collapse-item.collapse-item(title="属性配置", name="attr")
       AttrSettingForm(
         v-bind="$attrs"
         v-on="$listeners"
         :value="attrsData"
         :attrs="attrs"
         @input="getAttrs")
-    el-collapse-item.label.m-b-8.primary-text(title="行为配置", name="action")
+    el-collapse-item.collapse-item(title="行为配置", name="action")
 
 </template>
 
 <script>
 /** */
-import AttrSettingForm from './AttrSettingForm.vue'
+import AttrSettingForm from '@/components/AttrSettingForm'
 import { isEmpty } from 'lodash'
 export default {
   name: 'FormSetting',
@@ -136,4 +136,13 @@ export default {
 <style lang='sass' scoped>
 .setting-wrap
   border: 0
+.collapse-item
+  ::v-deep >div:first-child > .el-collapse-item__header
+    color: $--color-primary
+  &.is-active ::v-deep >div:first-child > .el-collapse-item__header
+    border-bottom: 1px dotted $--border-active
+    // &.is-active
+      // box-shadow: 0 0 1px 5px #ddd
+  ::v-deep .el-collapse-item__content
+    padding-bottom: 0
 </style>

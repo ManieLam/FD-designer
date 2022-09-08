@@ -93,5 +93,5 @@ export default {
   & + .list-group-item
     border-top: 1px solid #f5f5f5
   &:hover
-    background: #d7e7ff
+    background: $--bgcolor-secondary
 </style>

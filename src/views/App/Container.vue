@@ -137,6 +137,7 @@ export default {
     max-width: 300px
   .right-panel
     flex: 15%
+    min-width: 300px
   .center-panel
     flex: 4 0 auto
     height: 100%
