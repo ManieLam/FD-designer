@@ -4,6 +4,8 @@ import router from './router'
 import store from './store'
 // import './plugins/element.js'
 import Element from 'element-ui'
+import CustomList from '@/components/CustomList'
+
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/css/index.sass'
 import 'anso-ui/assets/customTheme/index.sass'
@@ -19,6 +21,7 @@ Vue.use(Element, {
   size: 'small'
 })
 Vue.use(AnsoUI)
+Vue.component('custom-list', CustomList)
 Vue.prototype.$Widget = Widgets
 Vue.prototype.$defValue = defaultValueSet
 
