@@ -10,6 +10,7 @@ import 'anso-ui/assets/customTheme/index.sass'
 import 'anso-ui/lib/anso-ui.css'
 
 import Widgets from '@/utils/widgets'
+import defaultValueSet from '@/utils/defaultConfig'
 import AnsoUI from 'anso-ui'
 
 Vue.config.productionTip = false
@@ -19,6 +20,7 @@ Vue.use(Element, {
 })
 Vue.use(AnsoUI)
 Vue.prototype.$Widget = Widgets
+Vue.prototype.$defValue = defaultValueSet
 
 new Vue({
   router,
