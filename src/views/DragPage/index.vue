@@ -10,11 +10,12 @@ draggable.list-group.drag-page-container(
     //- 当前先做一个
     WidgetForm.h-100(
       ref="form"
-      :fields="fieldList"
-      :added="newField"
       key="widgetForm"
       v-on="$listeners"
       v-bind="$attrs"
+      :fields="fieldList"
+      :added="newField"
+      :formConfig="formConfig"
       @remove="removeWidget"
       @update="updateCanvas")
     //- 可能多个表单
@@ -28,7 +29,6 @@ import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
 import { cloneDeep } from 'lodash'
 // import { mapGetters } from 'vuex'
-
 export default {
   name: 'DragPage',
   components: {
@@ -83,6 +83,11 @@ export default {
       newField: {}
     }
   },
+  computed: {
+    formConfig () {
+      return this.canvas?.form || {}
+    }
+  },
   watch: {
     actIndex: {
       immediate: true,
@@ -98,6 +103,15 @@ export default {
       this.fieldList = []
       this.newField = {}
     },
+    // TODO 改造对接配置的数据源
+    checkFieldOption (tag) {},
+    // 判断类型是否为枚举，默认添加options属性
+    checkEnumerated (tag) {
+      if (tag === 'switch') {
+        return [{ label: '是', value: true }, { label: '否', value: false }]
+      }
+      return ['select', 'checkbox', 'radio', 'cascader', 'tree'].includes(tag) ? this.$defValue?.defaultOptions : null
+    },
     formatField ({ tag }) {
       if (!tag) return {}
       return {
@@ -105,7 +119,8 @@ export default {
         compTag: tag,
         label: '自定义字段',
         form: {
-          tag: this.formItemTags[tag]
+          tag: this.formItemTags[tag],
+          options: this.checkEnumerated(this.formItemTags[tag])
         }
       }
     },

@@ -2,7 +2,12 @@
 //- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList", key="form")
 .widget-form-container
   .empty-wrap.color-secondary.text-center(v-if="!fieldList.length") 支持拖拽元素进入
-  el-form(v-else, v-bind="formConfig", label-width="100px")
+  el-form(
+    v-else
+    v-bind="formConfig"
+    :label-width="`${formAttrs.labelWidth}px`"
+    :label-position="formAttrs.labelPosition"
+    :disabled="formAttrs.readOnly")
     Draggable.list-group.drag-page-container(
       v-model="fieldList"
       animation="150")
@@ -14,7 +19,7 @@
             :name="ele.name"
             :compTag="ele.compTag"
             :index="index"
-            :config="ele"
+            :config="ele|setFormitemConfig(formConfig.attrs)"
             @click.native="$emit('onSelect', ele)")
           .tool-wrap
             .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
@@ -33,7 +38,7 @@
  * 默认只支持常规表单
  * TODO 支持表单多种布局
  */
-// import { isEqual, difference } from 'lodash'
+import { merge, omit } from 'lodash'
 import Draggable from 'vuedraggable'
 import WidgetFormItem from './WidgetFormItem'
 export default {
@@ -62,7 +67,7 @@ export default {
   },
   data () {
     return {
-      formSetting: {},
+      // formAttrs: {},
       // fieldList: this.fields,
       // fields: [],
       buttonList: [
@@ -81,7 +86,28 @@ export default {
           this.$emit('update', list)
         })
       }
+    },
+    formAttrs () {
+      return this.formConfig?.attrs || {}
     }
+  },
+  filters: {
+    setFormitemConfig (set, fset) {
+      // 表单子元素的属性配置在vuex中已经读取
+      const customSet = {
+        form: {
+          ...omit(fset, ['labelWidth'])
+        }
+      }
+      // labelHidden， labelWidth， errorToptip
+      // return mergeWith(set, customSet, (objValue, srcValue) => {
+      // })
+      return merge(set, customSet)
+    }
+  },
+  methods: {
+    setFormitemAttrs () {},
+    setFormAttrs () {}
   }
 }
 </script>

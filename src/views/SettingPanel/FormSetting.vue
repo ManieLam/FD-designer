@@ -33,23 +33,15 @@ export default {
   data () {
     return {
       activeNames: ['attr', 'action'],
-      // 表单的默认属性设置
-      dataDefault: {
-        layout: 'default',
-        labelHidden: false,
-        labelWidth: 80,
-        labelPosition: 'right',
-        readonly: false,
-        keepAliveData: true
-      },
       attrsData: {},
       attrs: [
         {
           label: '是否只读',
-          key: 'readonly',
+          key: 'readOnly',
           tag: 'el-switch'
         },
         {
+          // Anso-ui没有支持表单标题展示
           label: '表单标题',
           key: 'title',
           tag: 'el-input',
@@ -73,11 +65,11 @@ export default {
           label: '标签',
           key: 'label',
           group: [
-            {
-              label: '是否隐藏文本标签',
-              key: 'labelHidden',
-              tag: 'el-switch'
-            },
+            // {
+            //   label: '是否隐藏文本标签',
+            //   key: 'labelHidden',
+            //   tag: 'el-switch'
+            // },
             {
               label: '文本标签宽度',
               key: 'labelWidth',
@@ -94,12 +86,12 @@ export default {
                 { label: '居右', value: 'right' },
                 { label: '居中', value: 'center' }
               ]
-            },
-            {
-              label: '辅助性提示',
-              key: 'labelTip',
-              tip: '带提示辅助性标签, 小图标在标签盘显示，hover显示辅助内容',
-              tag: 'el-input'
+            // },
+            // {
+            //   label: '辅助性提示',
+            //   key: 'labelTip',
+            //   tip: '带提示辅助性标签, 小图标在标签盘显示，hover显示辅助内容',
+            //   tag: 'el-input'
             }
           ]
         },
@@ -120,7 +112,7 @@ export default {
       handler (form, oldData) {
         if (form) {
           // console.info('form change--', form)
-          this.attrsData = !form?.attrs || isEmpty(form.attrs) ? { ...this.dataDefault } : form?.attrs
+          this.attrsData = !form?.attrs || isEmpty(form.attrs) ? { ...this.$defVal?.formAttrs } : form?.attrs
           this.actionsData = !form.actions || isEmpty(form.actions) ? {} : form.actions
         }
       }
