@@ -5,9 +5,9 @@
       AttrSettingForm(
         v-bind="$attrs"
         v-on="$listeners"
-        v-model="attrsData"
+        :value="attrsData"
         :attrs="attrs"
-        :actions="actions")
+        @input="getAttrs")
     el-collapse-item.label.m-b-8.primary-text(title="行为配置", name="action")
 
 </template>
@@ -15,13 +15,16 @@
 <script>
 /** */
 import AttrSettingForm from './AttrSettingForm.vue'
-import { debounce } from 'lodash'
+import { isEmpty } from 'lodash'
 export default {
   name: 'FormSetting',
   props: {
     canvas: {
       type: Object,
       default: () => ({})
+    },
+    canvasName: {
+      type: String
     }
   },
   components: {
@@ -31,7 +34,7 @@ export default {
     return {
       activeNames: ['attr', 'action'],
       // 表单的默认属性设置
-      data: {
+      dataDefault: {
         layout: 'default',
         labelHidden: false,
         labelWidth: 80,
@@ -106,54 +109,35 @@ export default {
           tag: 'el-switch'
         }
       ],
-      actions: []
+      actions: [],
+      actionsData: {}
     }
   },
   watch: {
-    canvas: {
+    'canvas.form': {
       immediate: true,
       // deep: true,
-      handler (canvas, oldData) {
-        if (canvas) {
-          const { form } = canvas
-          this.attrsData = form?.attrs || this.data
-          // this.data = form?.attrs || {}
+      handler (form, oldData) {
+        if (form) {
+          // console.info('form change--', form)
+          this.attrsData = !form?.attrs || isEmpty(form.attrs) ? { ...this.dataDefault } : form?.attrs
+          this.actionsData = !form.actions || isEmpty(form.actions) ? {} : form.actions
         }
-        // debounce(() => {
-        //   this.$emit('change', 'form', data)
-        // }, 1000)
       }
+    }
+  },
+  methods: {
+    getAttrs (attrs) {
+      this.setFormState({ attrs: attrs })
     },
-    attrsData: {
-      immediate: true,
-      deep: true,
-      handler: debounce(function (value, oldValue) {
-        console.info('attrs watch:', value)
-        this.$emit('change', 'form', value)
-      // console.info('attrs watch:', value, oldValue)
-      // if (!isEqual(value, oldValue)) {
-      //   console.info('changeAttrs')
-      //   debounce(() => {
-      //     this.$emit('change', 'form', value)
-      //   }, 1000)
-      // }
-      }, 1000)
+    setFormState ({ attrs, actions }) {
+      this.$store.commit('canvas/updateConfig', {
+        name: this.canvasName,
+        attrs,
+        actions
+      })
     }
   }
-  // computed: {
-  //   attrsData: {
-  //     get () {
-  //       console.info('get attrsData--- ')
-  //       return this.data
-  //     },
-  //     set () {
-
-  //     }
-  //   }
-  // // },
-  // // updated () {
-  // //   console.info('表单设置区 更新')
-  // }
 }
 </script>
 

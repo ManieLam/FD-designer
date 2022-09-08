@@ -29,6 +29,11 @@ export default {
         components: () => import('./FormSetting')
       }]
     }
+  },
+  methods: {
+    clear () {
+      this.$forceUpdate()
+    }
   }
 }
 </script>

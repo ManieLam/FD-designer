@@ -1,7 +1,7 @@
 /** 记录画布, 同步记录在localstorage
  * 画布包括：字段fields(name,label,form,compTag), 表单form(attrs,actions)
  * */
-
+import { formAttrs } from '@/utils/defaultConfig'
 const state = () => ({
   collects: {}, // {name: {fields: []}, form: {attrs, ctions}}
   editingName: '' // 正在编辑的画布名称
@@ -28,7 +28,7 @@ const mutations = {
       states.collects[name] = {
         fields: [element],
         form: {
-          attrs: {},
+          attrs: formAttrs || {},
           actions: {}
         }
       }
@@ -58,8 +58,8 @@ const mutations = {
     if (canvas && (attrs || actions)) {
       const form = canvas.form
       states.collects[name].form = {
-        attrs: { ...form.attrs, ...attrs },
-        actions: { ...form.actions, ...actions }
+        attrs: { ...form.attrs, ...(attrs || {}) },
+        actions: { ...form.actions, ...(actions || {}) }
       }
     }
   },

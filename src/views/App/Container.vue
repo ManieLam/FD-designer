@@ -7,27 +7,29 @@
     //- router-view
     .tool-panel.d-flex-row-between
       el-button-group.tool-wrap__left
-        el-button() 切换画布
+        //- el-button() 切换画布
         el-button(@click="toggleSettingJson=!toggleSettingJson") 查看配置文件
       el-button-group.tool-wrap__right
         el-button() 导出
         el-button(@click="onClear") 清空
         el-button() 预览
-        el-button(type="primary", @click="onSave") 保存
+        el-button(type="primary", :disabled="allCanvas[canvasName]|saveable", @click="onSave") 保存
     DragPage(
-      ref="dragPage"
+      ref="dragPanel"
+      :key="actIndex"
       :formItemConfig="formItemConfig"
       :actIndex="actIndex"
       :canvasName="canvasName"
-      :canvas="actCanvas"
+      :canvas="allCanvas[canvasName]"
       @onSelect="selectFormitem")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
-      :canvas="actCanvas"
+      ref="settingPanel"
+      :key="actIndex"
+      :canvas="allCanvas[canvasName]"
       :actIndex="actIndex"
       :canvasName="canvasName"
-      :formItemConfig="formItemConfig"
-      @change="change")
+      :formItemConfig="formItemConfig")
   //- 查看配置文件的弹窗
   el-dialog(
     title="查看配置文件"
@@ -55,19 +57,27 @@ export default {
   data () {
     return {
       actIndex: 0, // 活动的画布index
-      actCanvas: {},
       formItemConfig: {},
-      formConfig: {},
       toggleSettingJson: false, // 查看json数据
       toggleSettingOpen: true // 切换配置区
     }
   },
+  filters: {
+    saveable (actCanvas) {
+      return !(!!actCanvas && actCanvas?.fields?.length)
+    }
+  },
   computed: {
     canvasName () {
-      return `canvas_${this.actIndex}`
+      return this.$store.state.canvas.editingName || `canvas_${this.actIndex}`
     },
     allCanvas () {
       return this.$store.state.canvas.collects
+    // },
+    // ---有缓存，出现置后性
+    // actCanvas () {
+    //   // return this.allCanvas[this.canvasName]
+    //   return this.$store.state.canvas.collects[this.canvasName]
     }
   },
   methods: {
@@ -77,39 +87,31 @@ export default {
     selectFormitem (ele) {
       this.toggleSettingOpen = true
       this.formItemConfig = ele
-    },
-    change (type, attrs) {
-      if (type === 'form') {
-        // this.formConfig = attrs
-        this.updateFormConfig({ attrs })
-      } else if (type === 'formitem') {
-        this.formItemConfig = attrs
-      }
-    },
-    updateFormConfig ({ attrs, actions }) {
-      this.$store.commit('canvas/updateConfig', {
-        name: this.canvasName,
-        attrs,
-        actions
+      this.$nextTick(() => {
+        this.$forceUpdate()
       })
     },
     onClear () {
-      this.$refs.dragPage.clear()
+      this.$refs.dragPanel.clear()
+      this.$refs.settingPanel.clear()
+      this.formItemConfig = {}
+      this.$store.commit('canvas/clear', this.canvasName)
+      this.onSave()
+      // console.info('清空后:', this.actCanvas)
+      this.$forceUpdate()
     },
     onSave () {
       // this.$refs.dragPage.save()
       localStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
       localStorage.setItem('Canvas-editing', this.canvasName)
     },
-    initCanvas () {
-      this.$store.commit('canvas/init')
-      const editingName = this.$store.state.canvas.editingName || ''
+    async initCanvas () {
+      await this.$store.commit('canvas/init')
+      const editingName = this.$store.state.canvas.editingName
       this.actIndex = editingName ? Number(editingName.split('_')[1]) : 0
-      // this.fieldList = this.allCanvas[editingName]?.fields || []
-      this.actCanvas = this.allCanvas[editingName]
     }
   },
-  mounted () {
+  created () {
     this.initCanvas()
   }
 }

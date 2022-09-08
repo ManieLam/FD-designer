@@ -26,6 +26,7 @@ draggable.list-group.drag-page-container(
 /** 拖拽的面板页面，多个画布，通过复制这个组件生成 */
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
+import { cloneDeep } from 'lodash'
 // import { mapGetters } from 'vuex'
 
 export default {
@@ -82,27 +83,12 @@ export default {
       newField: {}
     }
   },
-  // computed: {
-  //   canvasName () {
-  //     return `canvas_${this.actIndex}`
-  //   }
-  //   // fieldList如果读取的是store里面的会不同步
-  //   //   fieldList () {
-  //   //     // return this.$store.getters.canvasViews
-  //   //     console.info('this.$store.getters；', this.$store.getters.getCanvasView)
-  //   //     return this.$store.getters.getCanvasView(`canvas_${this.canvasIndex}`)
-  //   //   }
-  //   //   // ...mapGetters({
-  //   //   //   fieldList: getCanvasView(`canvas_${this.canvasIndex}`)
-  //   //   // })
-  // },
   watch: {
-    canvas: {
+    actIndex: {
       immediate: true,
-      deep: true,
-      handler (canvas) {
-        if (canvas) {
-          this.fieldList = canvas?.fields || []
+      handler (index, oldIndex) {
+        if (index !== oldIndex) {
+          this.fieldList = cloneDeep(this.canvas.fields) || []
         }
       }
     }
@@ -111,7 +97,6 @@ export default {
     clear () {
       this.fieldList = []
       this.newField = {}
-      this.$store.commit('canvas/clear', this.canvasName)
     },
     formatField ({ tag }) {
       if (!tag) return {}
@@ -135,7 +120,7 @@ export default {
         newIndex
       } : {}
       if (tag) {
-        // this.fieldList.splice(newIndex, 0, element)
+        this.fieldList.splice(newIndex, 0, element)
 
         this.$store.commit('canvas/add', {
           name: this.canvasName,
@@ -146,10 +131,11 @@ export default {
         // console.info('vuex:', this.$store.state.canvas)
 
         this.$emit('onSelect', element)
+        this.$forceUpdate()
       }
     },
     removeWidget (ele, index) {
-      // this.$delete(this.fieldList, index)
+      this.$delete(this.fieldList, index)
       this.$store.commit('canvas/deleteWidget', {
         name: this.canvasName,
         eIndex: index
@@ -157,16 +143,12 @@ export default {
     },
     updateCanvas (list) {
       // console.log('update--', list)
-      // this.fieldList = list
+      this.fieldList = list
       this.$store.commit('canvas/update', {
         name: this.canvasName,
         elements: list
       })
     }
-  // },
-  // mounted () {
-  //   console.info('drag page init---')
-  //   this.initCanvas()
   }
 }
 </script>

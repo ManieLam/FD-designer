@@ -10,6 +10,7 @@
         .widget-form-item-wrap(v-for="(ele, index) in fieldList", :key="ele.name")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
+            :class="{'is-active': formItemConfig.name === ele.name}"
             :name="ele.name"
             :compTag="ele.compTag"
             :index="index"
@@ -47,6 +48,10 @@ export default {
       default: () => ({})
     },
     formConfig: {
+      type: Object,
+      default: () => ({})
+    },
+    formItemConfig: {
       type: Object,
       default: () => ({})
     }
@@ -104,5 +109,7 @@ export default {
   &:hover
     border: 1px dashed #0A4078
     background: rgb(87, 168, 206, 0.2)
-
+.is-active
+  border: 1px dashed #0A4078
+  background: rgb(87, 168, 206, 0.2)
 </style>

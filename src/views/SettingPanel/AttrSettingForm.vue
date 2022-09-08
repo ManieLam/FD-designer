@@ -1,5 +1,5 @@
 <template lang='pug'>
-el-form.setting-list(:model="data", label-position="top")
+el-form.setting-list(v-model="data", label-position="top")
   el-form-item.list-item(
     v-for="attrItem in attrs"
     :key="attrItem.key"
@@ -51,22 +51,25 @@ export default {
   computed: {
     data: {
       get () {
-        return this.inputed
+        console.log('attrSetting get --- ')
+        return this.value
       },
       set (value) {
-        this.$emit('input', this.inputed)
+        console.log('attrSetting set --- ')
+        // this.inputed = value
+        this.$emit('input', value)
       }
+    // },
+    // data: {
+    //   get () {
+    //     return this.inputed
+    //   },
+    //   set (values) {
+    //     console.log('set', values)
+    //     this.inputed = values
+    //     this.$emit('input', values)
+    //   }
     }
-  //   data: {
-  //     get () {
-  //       return { ...this.inputed }
-  //     },
-  //     set (values) {
-  //       console.log('set', values)
-  //       this.inputed = values
-  //       this.$emit('input', values)
-  //     }
-  //   }
   },
   mounted () {
     this.inputed = this.value
