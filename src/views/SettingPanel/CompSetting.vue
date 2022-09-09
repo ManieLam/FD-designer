@@ -8,8 +8,7 @@
         v-bind="$attrs"
         v-on="$listeners"
         v-model="attrsData"
-        :attrs="attrs"
-        @change="updateStorage")
+        :attrs="attrs")
     el-collapse-item.collapse-item(title="行为配置", name="action")
 
 </template>
@@ -18,6 +17,7 @@
 /** */
 import componentAttrs from './componentAttrs'
 import AttrSettingForm from '@/components/AttrSettingForm'
+import { cloneDeep } from 'lodash'
 export default {
   name: 'CompSetting',
   props: ['formItemConfig', 'canvasName'],
@@ -27,17 +27,29 @@ export default {
   data () {
     return {
       activeNames: ['attr', 'action'],
-      attrsData: {}
+      tempAttrsData: {}
+      // attrsData: {}
     }
   },
   watch: {
-    formItemConfig: {
-      immediate: true,
-      handler (config) {
-        if (config) {
-          const { label, name, form } = config
-          this.attrsData = { ...form, label, name }
+    'formItemConfig.name': {
+      // immediate: true,
+      // deep: true,
+      handler (fname, oldfname) {
+        if (fname !== oldfname) {
+          const { label, name, form } = this.formItemConfig
+          // console.log('form:', form)
+          // console.log('label:', label)
+          // console.log('name:', name)
+          const mergeData = { ...cloneDeep(form), label, name }
+          console.info(mergeData)
+          this.attrsData = cloneDeep(mergeData)
         }
+        // if (config) {
+        //   console.info('config:', config)
+        //   const { label, name, form } = config
+        //   this.attrsData = { ...form, label, name }
+        // }
       }
     }
     // 'canvas.fields': {
@@ -58,14 +70,32 @@ export default {
     },
     attrs () {
       return componentAttrs[this.tag]?.attrs || []
+    },
+    attrsData: {
+      get () {
+        // const { label, name, form } = this.formItemConfig
+        // const mergeData = { ...cloneDeep(form), label, name }
+        // console.info('attrsData --- get', mergeData)
+        // return mergeData
+        return this.tempAttrsData
+      },
+      set (data) {
+        console.info('set---', data)
+        // console.info('form:', form)
+        this.tempAttrsData = data
+        // // this.tempAttrsData = { ...form, label, name }
+        // console.info('attrsData --- set', this.tempAttrsData)
+        // // this.updateStorage({ fname: data.name, attrs: data })
+        this.$emit('update', 'comp', data)
+      }
     }
   },
   methods: {
-    updateStorage ({ name, attrs, actions }) {
+    updateStorage ({ fname, attrs, actions }) {
       this.$store.commit('canvas/updateField', {
         name: this.canvasName,
-        fName: name,
-        findex: this.$attrs.canvas?.fields?.findIndex(field => field.name === name),
+        fname,
+        findex: this.$attrs.canvas?.fields?.findIndex(field => field.name === fname),
         attrs,
         actions
       })

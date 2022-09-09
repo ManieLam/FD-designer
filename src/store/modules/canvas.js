@@ -67,9 +67,10 @@ const mutations = {
   updateField (states, { name, fName, findex = null, attrs = null, actions = null }) {
     const canvas = states.collects[name]
     if (canvas && findex !== null && (attrs || actions)) {
-      console.info('更新vuex中的字段', name, findex)
       const field = canvas.fields[findex]
       const { form } = attrs
+      console.info('更新vuex中的字段', name, findex, field, form)
+
       if (!isEqual(form.label, field.label)) canvas.fields[findex].label = field.label
       if (!isEqual(form.name, field.name)) canvas.fields[findex].name = field.name
       canvas.fields[findex].form = omit(form, ['label', 'name'])

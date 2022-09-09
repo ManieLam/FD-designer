@@ -29,7 +29,8 @@
       :canvas="allCanvas[canvasName]"
       :actIndex="actIndex"
       :canvasName="canvasName"
-      :formItemConfig="formItemConfig")
+      :formItemConfig="formItemConfig"
+      @update="updateConfig")
   //- 查看配置文件的弹窗
   el-dialog(
     title="查看配置文件"
@@ -81,6 +82,22 @@ export default {
     }
   },
   methods: {
+    updateConfig (type, attrs) {
+      if (type === 'comp') {
+        console.info('更新字段配置 - containers')
+        // this.formItemConfig = attrs
+        // this.updateFieldStorage({ fname: attrs.name, attrs })
+      }
+    },
+    updateFieldStorage ({ fname, attrs, actions }) {
+      this.$store.commit('canvas/updateField', {
+        name: this.canvasName,
+        fname,
+        findex: this.allCanvas[this.canvasName]?.fields?.findIndex(field => field.name === fname),
+        attrs,
+        actions
+      })
+    },
     onDragged: debounce(({ from, to }) => {
       // console.info('on Dragged', from, to)
     }, 800),

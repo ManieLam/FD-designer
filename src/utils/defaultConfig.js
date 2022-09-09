@@ -10,6 +10,14 @@ export const formAttrs = {
   keepAliveData: true
 }
 
+// 默认下拉组件(select)配置属性值
+export const select = {
+  clearable: true,
+  filterable: true,
+  placeholder: '请选择'
+}
+
+// 默认选项配置
 export const defaultOptions = [{
   label: '选项1',
   value: 1
@@ -20,5 +28,6 @@ export const defaultOptions = [{
 
 export default {
   formAttrs,
-  defaultOptions
+  defaultOptions,
+  select
 }

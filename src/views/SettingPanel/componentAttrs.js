@@ -11,6 +11,7 @@
  * @param label 属性描述
  * @param key 属性关键字段，对应配置表中的属性值
  * @param tag 属性表现的提供用户选择的表单控件（支持element-ui、anso-ui表单控件）,custom-list: 自定义列表
+ * @param tip 信息提示
  * @param options 属性的配置选项
  * @param chains 属性的配置的联动函数
 */
@@ -37,12 +38,13 @@ export const select = {
     {
       label: '选项',
       key: 'options',
-      // tag: 'custom-list'
-      tag: 'el-select'
+      tag: 'form-option',
+      tip: '选项配置的方式只允许一种'
+      // tag: 'el-select'
     },
     {
       label: '是否分组',
-      key: 'group',
+      key: 'isGroup',
       tag: 'el-switch',
       options: [{ label: '分组', value: true }, { label: '不分', value: false }],
       chains: () => {}
@@ -59,23 +61,37 @@ export const select = {
       tag: 'el-switch',
       options: switchDefaultOptions
     },
+    // {
+    //   label: '搜索',
+    //   key: 'filterable',
+    //   group: [
+    //     {
+    //       label: '是否允许搜索',
+    //       tag: 'el-switch',
+    //       key: 'filterable',
+    //       options: switchDefaultOptions,
+    //     }
+    //   ]
+    // },
     {
       label: '是否允许搜索',
+      tag: 'form-search',
+      // tag: 'el-switch',
       key: 'filterable',
-      tag: 'el-switch',
       options: switchDefaultOptions
-    },
-    {
-      label: '是否远程搜索',
-      key: 'filter-method',
-      tag: 'el-switch',
-      options: switchDefaultOptions
+    // },
+    // {
+    //   label: '是否远程搜索',
+    //   key: 'filter-method',
+    //   tag: 'el-switch',
+    //   options: switchDefaultOptions
     }
   ],
   actions: [
     {
       label: '异步搜索函数',
-      key: 'remoteFunc'
+      key: 'remoteFunc',
+      func: () => {}
     }
   ]
 }

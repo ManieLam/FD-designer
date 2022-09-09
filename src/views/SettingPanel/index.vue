@@ -18,7 +18,7 @@ export default {
   name: 'SettingPanel',
   data () {
     return {
-      activeName: 'form',
+      activeName: 'component',
       tabList: [{
         label: '组件配置区',
         name: 'component',
@@ -51,4 +51,8 @@ export default {
     ::v-deep .el-tabs__content
       height: 100%
       overflow-y: auto
+
+.tab-component
+  padding-right: 4px
+  padding-left: 4px
 </style>

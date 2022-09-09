@@ -114,13 +114,15 @@ export default {
     },
     formatField ({ tag }) {
       if (!tag) return {}
+      const htmlTag = this.formItemTags[tag]
       return {
         name: `${tag}_${new Date().getTime()}`,
         compTag: tag,
         label: '自定义字段',
         form: {
-          tag: this.formItemTags[tag],
-          options: this.checkEnumerated(this.formItemTags[tag])
+          tag: htmlTag,
+          options: this.checkEnumerated(htmlTag),
+          ...(this.$defValue?.[htmlTag] || {})
         }
       }
     },
@@ -173,12 +175,11 @@ export default {
 //   height: 100%
 //   display: flex
 //   flex-direction: column
-
   // background: #F5F5F5
 .drag-page-container
   padding: 16px
   border: 1px solid $--border-color-base
-  box-shadow: 0 2px 5px 1px $--border-color-base
+  box-shadow: inset 0 2px 5px 1px $--border-color-base
   background: #fff
   flex: 1
   margin-top: 6px
