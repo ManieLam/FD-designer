@@ -6,6 +6,10 @@ el-form.setting-list(v-model="data", label-position="top")
     :label="attrItem.label"
     :prop="attrItem.key"
     :is-group="!!attrItem.group")
+    template(slot="label")
+      span.span-label {{attrItem.label}}
+      span.span-tip.color-secondary.m-l-8(v-if="attrItem.tip")
+        i.el-icon-info {{attrItem.tip}}
     components(
       v-if="attrItem.tag && !attrItem.group"
       :is="attrItem.tag"
@@ -17,13 +21,20 @@ el-form.setting-list(v-model="data", label-position="top")
         v-for="groupItem in attrItem.group"
         :key="groupItem.key"
         :prop="groupItem.key"
+        :tip="groupItem.tip"
         :label="groupItem.label")
+        template(slot="label")
+          span.span-label {{groupItem.label}}
+          span.span-tip.color-secondary.m-l-8(v-if="groupItem.tip")
+            i.el-icon-info {{groupItem.tip}}
         components(
           v-if="groupItem.tag"
           :is="groupItem.tag"
           v-model="data[groupItem.key]"
           v-bind="groupItem")
+        //- .span-tip(v-if="groupItem.tip") {{groupItem.tip}}
     .component-empty.secondary-text(v-else) -- 开发中 --
+
 </template>
 
 <script>
@@ -51,24 +62,14 @@ export default {
   computed: {
     data: {
       get () {
-        console.log('attrSetting get --- ')
+        // console.log('attrSetting get --- ')
         return this.value
       },
       set (value) {
-        console.log('attrSetting set --- ')
+        // console.log('attrSetting set --- ')
         // this.inputed = value
         this.$emit('input', value)
       }
-    // },
-    // data: {
-    //   get () {
-    //     return this.inputed
-    //   },
-    //   set (values) {
-    //     console.log('set', values)
-    //     this.inputed = values
-    //     this.$emit('input', values)
-    //   }
     }
   },
   mounted () {
@@ -81,6 +82,15 @@ export default {
 .list-item
   &[is-group] ::v-deep .el-form-item__label
     padding: 0
+    width: 100%
+  ::v-deep .el-form-item__label
+    padding: 0
+    width: 100%
+  .span-tip
+    font-size: 10px
+    font-style: italic
+    float: right
+    // vertical-align: middle
 .component-group
   margin-bottom: 8px
   // padding: 8px 0

@@ -4,7 +4,8 @@ import router from './router'
 import store from './store'
 // import './plugins/element.js'
 import Element from 'element-ui'
-import CustomList from '@/components/CustomList'
+import register from '@/components/AttrSettingForm/register'
+// import FormOption from '@/components/AttrSettingForm/FormOption'
 
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/css/index.sass'
@@ -21,7 +22,11 @@ Vue.use(Element, {
   size: 'small'
 })
 Vue.use(AnsoUI)
-Vue.component('custom-list', CustomList)
+
+Object.entries(register).map(([name, comp]) => {
+  Vue.component(name, comp)
+})
+
 Vue.prototype.$Widget = Widgets
 Vue.prototype.$defValue = defaultValueSet
 
