@@ -315,4 +315,29 @@
   .el-button--primary:focus
     border: 1px dashed
 
+// 圆形的小按钮
+.btn-radius-50
+  display: inline-block
+  padding: 2px
+  border-radius: 50%
+  border: 1px solid $--border-color-base
+  cursor: pointer
+  &:hover
+    border: 1px solid $--border-active
+  + .btn-radius-50
+    margin-left: 5px
+
+.box-content__inside
+  position: relative
+  height: fit-content
+  padding-left: 8px
+  &::before
+    content: ''
+    display: inline-block
+    width: 3px
+    height: 100%
+    background: $--bgcolor-secondary
+    position: absolute
+    left: 0
+    top: 0
 /** ===== 公用一些自定义样式 END ===== **/
