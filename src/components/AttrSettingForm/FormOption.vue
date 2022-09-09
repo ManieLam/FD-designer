@@ -4,7 +4,7 @@
   //-   li(v-for="item in list",:key="item.value", :value="item.value") {{item.label}}
   .radio-list.m-b-8
     el-radio-group(v-model="optionType")
-      el-radio-button(v-for="radio in optionTypes", :label="radio.value", :disabled="radio.disabled") {{radio.label}}
+      el-radio-button(v-for="radio in optionTypes", :key="radio.value", :label="radio.value", :disabled="radio.disabled") {{radio.label}}
   table.list-handMade.box-content__inside(v-if="optionType === 'handMade'")
     thead
       tr
