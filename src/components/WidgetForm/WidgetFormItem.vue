@@ -14,19 +14,19 @@ export default {
   //   console.info(this.$props)
   // },
   render (h) {
-    const { form, label, name } = this.config || {}
+    const { label, name } = this.config || {}
     return (
       <el-form-item
         ref={`formitem_${name}`}
         id={`${this.keyName}-formitem-${name}`}
         props={this.$attrs.formItemProp}
         on={this.$listeners}
-        class={form.tag === 'text' ? 'el-form-item-text' : ''}
+        class={this.config.tag === 'text' ? 'el-form-item-text' : ''}
         label={label}
         prop={name}
-        label-hidden={form.labelHidden}
-        label-width={form.labelWidth ? form.labelWidth : ''}
-        is-toptiperror={form.errorToptip}
+        label-hidden={this.config.labelHidden}
+        label-width={this.config.labelWidth ? this.config.labelWidth : ''}
+        is-toptiperror={this.config.errorToptip}
       >
         <template slot="label">
           <span>{label}</span>
@@ -51,10 +51,10 @@ export default {
             class: 'form-item_component',
             props: {
               field: this.config,
-              ...form
+              ...this.config
             },
             attrs: {
-              ...form,
+              ...this.config,
               id: this.name
             }
           })

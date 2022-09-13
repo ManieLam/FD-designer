@@ -84,19 +84,24 @@ export default {
   methods: {
     updateConfig (type, attrs) {
       if (type === 'comp') {
-        console.info('更新字段配置 - containers')
-        // this.formItemConfig = attrs
-        // this.updateFieldStorage({ fname: attrs.name, attrs })
+        this.updateFieldStorage({ fkey: attrs.key, attrs })
       }
     },
-    updateFieldStorage ({ fname, attrs, actions }) {
-      this.$store.commit('canvas/updateField', {
-        name: this.canvasName,
-        fname,
-        findex: this.allCanvas[this.canvasName]?.fields?.findIndex(field => field.name === fname),
-        attrs,
-        actions
-      })
+    updateFieldStorage ({ fkey, attrs, actions }) {
+      const findex = this.allCanvas[this.canvasName]?.fields?.findIndex(field => field.key === fkey)
+      if (findex !== -1) {
+        this.$store.commit('canvas/updateField', {
+          name: this.canvasName,
+          // fname,
+          findex,
+          attrs,
+          actions
+        })
+        this.formItemConfig = attrs
+        this.$nextTick(() => {
+          this.$forceUpdate()
+        })
+      }
     },
     onDragged: debounce(({ from, to }) => {
       // console.info('on Dragged', from, to)

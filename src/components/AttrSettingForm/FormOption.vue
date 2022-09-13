@@ -61,6 +61,7 @@ export default {
         return this.value || [{ label: '选项1', value: 1 }]
       },
       set (data) {
+        console.info('change list', data)
         this.$emit('input', data)
       }
     }

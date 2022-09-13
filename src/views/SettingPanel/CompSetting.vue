@@ -8,7 +8,8 @@
         v-bind="$attrs"
         v-on="$listeners"
         v-model="attrsData"
-        :attrs="attrs")
+        :attrs="attrs"
+        @change="change")
     el-collapse-item.collapse-item(title="行为配置", name="action")
 
 </template>
@@ -32,73 +33,34 @@ export default {
     }
   },
   watch: {
-    'formItemConfig.name': {
-      // immediate: true,
-      // deep: true,
+    'formItemConfig.key': {
       handler (fname, oldfname) {
         if (fname !== oldfname) {
-          const { label, name, form } = this.formItemConfig
-          // console.log('form:', form)
-          // console.log('label:', label)
-          // console.log('name:', name)
-          const mergeData = { ...cloneDeep(form), label, name }
-          console.info(mergeData)
-          this.attrsData = cloneDeep(mergeData)
+          this.attrsData = cloneDeep(this.formItemConfig)
         }
-        // if (config) {
-        //   console.info('config:', config)
-        //   const { label, name, form } = config
-        //   this.attrsData = { ...form, label, name }
-        // }
       }
     }
-    // 'canvas.fields': {
-    //   immediate: true,
-    //   // deep: true,
-    //   handler (fields, oldData) {
-    //     if (fields) {
-    //       // console.info('form change--', form)
-    //       this.attrsData = !form?.attrs || isEmpty(form.attrs) ? { ...this.$defVal?.formAttrs } : form?.attrs
-    //       this.actionsData = !form.actions || isEmpty(form.actions) ? {} : form.actions
-    //     }
-    //   }
-    // }
   },
   computed: {
     tag () {
-      return this.formItemConfig?.form?.tag
+      return this.formItemConfig?.tag
     },
     attrs () {
       return componentAttrs[this.tag]?.attrs || []
     },
     attrsData: {
       get () {
-        // const { label, name, form } = this.formItemConfig
-        // const mergeData = { ...cloneDeep(form), label, name }
-        // console.info('attrsData --- get', mergeData)
-        // return mergeData
         return this.tempAttrsData
       },
       set (data) {
-        console.info('set---', data)
-        // console.info('form:', form)
         this.tempAttrsData = data
-        // // this.tempAttrsData = { ...form, label, name }
-        // console.info('attrsData --- set', this.tempAttrsData)
-        // // this.updateStorage({ fname: data.name, attrs: data })
-        this.$emit('update', 'comp', data)
+        this.change()
       }
     }
   },
   methods: {
-    updateStorage ({ fname, attrs, actions }) {
-      this.$store.commit('canvas/updateField', {
-        name: this.canvasName,
-        fname,
-        findex: this.$attrs.canvas?.fields?.findIndex(field => field.name === fname),
-        attrs,
-        actions
-      })
+    change () {
+      this.$emit('update', 'comp', this.attrsData)
     }
   }
 }

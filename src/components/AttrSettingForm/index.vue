@@ -14,7 +14,8 @@ el-form.setting-list(v-model="data", label-position="top")
       v-if="attrItem.tag && !attrItem.group"
       :is="attrItem.tag"
       v-model="data[attrItem.key]"
-      v-bind="attrItem")
+      v-bind="attrItem"
+      @input="change($event, attrItem.key)")
     //- 属性组配置
     .component-group(v-else-if="attrItem.group", :key="attrItem.group.key")
       el-form-item.group-item(
@@ -31,7 +32,8 @@ el-form.setting-list(v-model="data", label-position="top")
           v-if="groupItem.tag"
           :is="groupItem.tag"
           v-model="data[groupItem.key]"
-          v-bind="groupItem")
+          v-bind="groupItem"
+          @input="change($event, groupItem.key)")
         //- .span-tip(v-if="groupItem.tip") {{groupItem.tip}}
     .component-empty.secondary-text(v-else) -- 开发中 --
 
@@ -62,14 +64,19 @@ export default {
   computed: {
     data: {
       get () {
-        // console.log('attrSetting get --- ')
+        console.log('attrSetting get --- ')
         return this.value
       },
       set (value) {
-        // console.log('attrSetting set --- ')
+        console.log('attrSetting set --- ')
         // this.inputed = value
         this.$emit('input', value)
       }
+    }
+  },
+  methods: {
+    change (value, key) {
+      this.$emit('change', arguments)
     }
   },
   mounted () {

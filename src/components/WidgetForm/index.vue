@@ -12,11 +12,11 @@
       v-model="fieldList"
       animation="150")
       transition-group(name="fade" tag="div" class="widget-form-list")
-        .widget-form-item-wrap(v-for="(ele, index) in fieldList", :key="ele.name")
+        .widget-form-item-wrap(v-for="(ele, index) in fieldList", :key="ele.key")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
-            :class="{'is-active': formItemConfig.name === ele.name}"
-            :name="ele.name"
+            :class="{'is-active': formItemConfig.name === ele.key}"
+            :name="ele.key"
             :compTag="ele.compTag"
             :index="index"
             :config="ele|setFormitemConfig(formConfig.attrs)"
@@ -94,14 +94,7 @@ export default {
   filters: {
     setFormitemConfig (set, fset) {
       // 表单子元素的属性配置在vuex中已经读取
-      const customSet = {
-        form: {
-          ...omit(fset, ['labelWidth', 'keepAliveData', 'layout', 'title'])
-        }
-      }
-      // labelHidden， labelWidth， errorToptip
-      // return mergeWith(set, customSet, (objValue, srcValue) => {
-      // })
+      const customSet = omit(fset, ['labelWidth', 'keepAliveData', 'layout', 'title'])
       return merge(set, customSet)
     }
   },

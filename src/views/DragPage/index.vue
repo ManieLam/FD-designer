@@ -27,7 +27,6 @@ draggable.list-group.drag-page-container(
 /** 拖拽的面板页面，多个画布，通过复制这个组件生成 */
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
-import { cloneDeep } from 'lodash'
 // import { mapGetters } from 'vuex'
 export default {
   name: 'DragPage',
@@ -89,12 +88,10 @@ export default {
     }
   },
   watch: {
-    actIndex: {
-      immediate: true,
-      handler (index, oldIndex) {
-        if (index !== oldIndex) {
-          this.fieldList = cloneDeep(this.canvas.fields) || []
-        }
+    'canvas.fields': {
+      // deep: true,
+      handler (fields) {
+        this.fieldList = fields || []
       }
     }
   },
@@ -117,13 +114,14 @@ export default {
       const htmlTag = this.formItemTags[tag]
       return {
         name: `${tag}_${new Date().getTime()}`,
+        key: `${tag}_${new Date().getTime()}`,
         compTag: tag,
         label: '自定义字段',
-        form: {
-          tag: htmlTag,
-          options: this.checkEnumerated(htmlTag),
-          ...(this.$defValue?.[htmlTag] || {})
-        }
+        tag: htmlTag,
+        options: this.checkEnumerated(htmlTag),
+        ...(this.$defValue?.[htmlTag] || {})
+        // form: {
+        // }
       }
     },
     handleWidgetAdd (evt) {
