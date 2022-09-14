@@ -1,21 +1,39 @@
 <template lang='pug'>
 .form-search-container
-  el-switch(v-model="filterAble", :active-text="filterAble?'开启搜索':''")
+  el-switch(v-model="filterAble")
   .search-async-wrap.p-l-8.p-r-8.box-content__inside(v-if="filterAble")
-    span.label.secondary-text.m-r-8 是否远程搜索
-    el-switch.m-r-8(v-model="isAsync", @change="updateAsyncAttrs")
-    el-button(v-if="isAsync", @click="toggleAsyncSetting") 配置远程搜索
+    //- span.label.secondary-text.m-r-8 设置远程搜索
+    //- el-switch.m-r-8(v-model="isAsync", @change="updateAsyncAttrs")
+    el-button(@click="toggleAsyncSetting") {{ asyncFunc.name ? '重新选择数据源' : '配置远程搜索' }}
+    el-button(v-show="asyncFunc.name", type="text", @click="cancelAsync") 取消远程搜索
+    .list-column__default.m-t-4(v-show="asyncFunc.name")
+      .left-wrap
+        i.el-icon-check.color-primary.m-r-8
+        .color-warning {{asyncFunc.method}}
+        .secondary-text.m-l-8 {{asyncFunc.name}}
+        .tip.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
+      .right-wrap
+    AsyncRequired(title="配置远程搜索", v-model="asyncSettingShow", :chosenData="asyncFunc", @chosen="getAsyncFunc")
 </template>
 
 <script>
 /** 搜索配置 */
+import AsyncRequired from './AsyncRequired'
 export default {
   name: 'FormSearch',
-  props: ['value'],
+  props: {
+    value: Boolean,
+    fullSetting: {
+      type: Object,
+      default: () => ({})
+    }
+  },
+  components: {
+    AsyncRequired
+  },
   data () {
     return {
-      isAsync: false
-      // filterAble: false
+      asyncSettingShow: false
     }
   },
   computed: {
@@ -26,14 +44,27 @@ export default {
       set (flag) {
         this.$emit('input', flag)
       }
+    },
+    asyncFunc: {
+      get () {
+        return this.fullSetting.filterAbleAsyncFunc || {}
+      },
+      set (data) {
+        this.$emit('updateAnAttr', { name: 'filterAbleAsyncFunc', value: data.name ? data : null })
+        this.$emit('updateAnAttr', { name: 'filterAbleType', value: data.name ? 'filterAbleAsyncFunc' : null })
+      }
     }
   },
   methods: {
-    updateAsyncAttrs (value) {
-      console.info('updateAsyncAttrs---', value)
-    },
     toggleAsyncSetting () {
-      console.info('打开远程搜索配置')
+      // console.info('打开远程搜索配置')
+      this.asyncSettingShow = !this.asyncSettingShow
+    },
+    getAsyncFunc (data) {
+      this.asyncFunc = data
+    },
+    cancelAsync () {
+      this.asyncFunc = {}
     }
   }
 }
