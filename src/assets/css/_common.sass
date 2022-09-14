@@ -38,6 +38,16 @@
   padding-top: 0 !important
 .mar-l-0
   margin-left: 0 !important
+.p-4
+  padding: 4px
+.p-t-4
+  padding-top: 4px
+.p-r-4
+  padding-right: 4px
+.p-b-4
+  padding-bottom: 4px
+.p-l-4
+  padding-left: 4px
 .p-8
   padding: $--padding-primary
 .p-t-8
@@ -59,6 +69,16 @@
 .p-l-16
   padding-left: $--padding-size-medium
 
+.m-4
+  margin: 4px
+.m-t-4
+  margin-top: 4px
+.m-r-4
+  margin-right: 4px
+.m-b-4
+  margin-bottom: 4px
+.m-l-4
+  margin-left: 4px
 .m-8
   margin: $--margin-primary
 .m-t-8
@@ -88,6 +108,10 @@
   color: $--color-text-regular !important
 .color-disabled
   color: $--color-text-placeholder !important
+.color-danger
+  color: $--color-danger
+.color-warning
+  color: $--color-warning
 
 .border-top
   border-top: 1px solid $--border-color-base
@@ -96,10 +120,6 @@
 .border-hover
   border-color: $--border-active
 
-// .table-padding
-//   padding: $--table-space-size-default
-// .table-padding-leftright
-//   padding: 0 $--table-space-size-default
 
 .bgcolor-fff
   background: #fff
@@ -340,4 +360,32 @@
     position: absolute
     left: 0
     top: 0
+
+// 一些hover动效
+.hover-change-scale:hover
+  transform: scale(1.2)
+.hover-change-color:hover
+  color: $--bgcolor-secondary
+.hover-change-color__danger:hover
+  color: $--color-danger
+.hover-change-bgColor:hover
+  background: $--bgcolor-secondary
+  @extend .border-hover
+
+// 列表展示 - 左右布局
+.list-column__default
+  border: 1px solid $--border-color-base
+  padding: 8px
+  cursor: pointer
+  @extend .d-flex-row-between
+  @extend .align-items-center
+  @extend .hover-change-bgColor
+  & + .left-api-list
+    margin-top: 8px
+  .left-wrap
+    @extend .d-flex-v-center
+  .right-wrap
+    i.icon
+      @extend .hover-change-color
+
 /** ===== 公用一些自定义样式 END ===== **/
