@@ -6,8 +6,7 @@
       el-button(v-bind="toolAttr", icon="el-icon-receiving", title="注册业务组件")
       el-button(
         v-bind="toolAttr"
-        :title="isCollapse? '展开' : '收缩'"
-        :icon="isCollapse? 'el-icon-s-unfold': 'el-icon-s-fold'")
+        :title="isCollapse? '展开' : '收缩'", :icon="isCollapse? 'el-icon-s-unfold' : 'el-icon-s-fold'")
   .panel-content
     .content-block(v-for="widget in widgetGroups", :key="widget.name")
       .title {{widget.label}}
