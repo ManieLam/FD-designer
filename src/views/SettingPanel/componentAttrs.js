@@ -31,7 +31,7 @@ export const select = {
       tag: 'el-input'
     },
     {
-      label: '占位符',
+      label: '占位内容',
       key: 'placeholder',
       tag: 'el-input'
     },
@@ -85,6 +85,11 @@ export const select = {
     //   key: 'filter-method',
     //   tag: 'el-switch',
     //   options: switchDefaultOptions
+    },
+    {
+      label: '校验',
+      key: 'rules',
+      tag: 'form-validate'
     }
   ],
   actions: [
