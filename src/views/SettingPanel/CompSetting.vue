@@ -9,7 +9,8 @@
         v-on="$listeners"
         v-model="attrsData"
         :attrs="attrs"
-        @change="change")
+        @change="change"
+        @updateAnAttr="updateAnAttr")
     el-collapse-item.collapse-item(title="行为配置", name="action")
 
 </template>
@@ -60,6 +61,11 @@ export default {
   },
   methods: {
     change () {
+      this.$emit('update', 'comp', this.attrsData)
+    },
+    updateAnAttr ({ name, value }) {
+      // console.info('updateAnAttr:', name, value)
+      this.$set(this.attrsData, name, value)
       this.$emit('update', 'comp', this.attrsData)
     }
   }

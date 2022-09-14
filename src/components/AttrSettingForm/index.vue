@@ -13,8 +13,10 @@ el-form.setting-list(v-model="data", label-position="top")
     components(
       v-if="attrItem.tag && !attrItem.group"
       :is="attrItem.tag"
-      v-model="data[attrItem.key]"
+      v-model.lazy="data[attrItem.key]"
       v-bind="attrItem"
+      v-on="$listeners"
+      :fullSetting="data"
       @input="change($event, attrItem.key)")
     //- 属性组配置
     .component-group(v-else-if="attrItem.group", :key="attrItem.group.key")
@@ -31,8 +33,10 @@ el-form.setting-list(v-model="data", label-position="top")
         components(
           v-if="groupItem.tag"
           :is="groupItem.tag"
-          v-model="data[groupItem.key]"
+          v-model.lazy="data[groupItem.key]"
           v-bind="groupItem"
+          v-on="$listeners"
+          :fullSetting="data"
           @input="change($event, groupItem.key)")
         //- .span-tip(v-if="groupItem.tip") {{groupItem.tip}}
     .component-empty.secondary-text(v-else) -- 开发中 --
@@ -64,11 +68,9 @@ export default {
   computed: {
     data: {
       get () {
-        console.log('attrSetting get --- ')
         return this.value
       },
       set (value) {
-        console.log('attrSetting set --- ')
         // this.inputed = value
         this.$emit('input', value)
       }
@@ -76,7 +78,11 @@ export default {
   },
   methods: {
     change (value, key) {
-      this.$emit('change', arguments)
+      this.$emit('change', ...arguments)
+    // },
+    // setAsyncFunc (func, key) {
+    //   // console.info('attr')
+    //   this.$emit('setAsyncFunc', ...arguments)
     }
   },
   mounted () {
