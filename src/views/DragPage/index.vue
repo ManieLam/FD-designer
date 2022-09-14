@@ -91,6 +91,7 @@ export default {
     'canvas.fields': {
       // deep: true,
       handler (fields) {
+        // this.fieldList = Array.from(new Set(fields)) || []
         this.fieldList = fields || []
       }
     }
@@ -135,8 +136,8 @@ export default {
         newIndex
       } : {}
       if (tag) {
-        this.fieldList.splice(newIndex, 0, element)
-
+        // this.fieldList.splice(newIndex, 0, element)
+        console.info('add fields')
         this.$store.commit('canvas/add', {
           name: this.canvasName,
           eIndex: newIndex,
@@ -150,7 +151,7 @@ export default {
       }
     },
     removeWidget (ele, index) {
-      this.$delete(this.fieldList, index)
+      // this.$delete(this.fieldList, index)
       this.$store.commit('canvas/deleteWidget', {
         name: this.canvasName,
         eIndex: index
@@ -158,7 +159,7 @@ export default {
     },
     updateCanvas (list) {
       // console.log('update--', list)
-      this.fieldList = list
+      // this.fieldList = list
       this.$store.commit('canvas/update', {
         name: this.canvasName,
         elements: list
