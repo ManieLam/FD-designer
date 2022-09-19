@@ -7,8 +7,8 @@
     row-key="__key"
     v-on="$listeners"
     @selection-change="handleSelectionChange")
-    el-table-column(v-if="isSelection", type="selection", width="55", :selectable="selectAble")
-    el-table-column(label="Key", prop="key")
+    el-table-column(v-if="isSelection", type="selection", width="38", :selectable="selectAble")
+    el-table-column(label="Key", prop="key", width="180")
       template(slot-scope="scope")
         el-input(
           v-if="editAble"
@@ -20,11 +20,25 @@
         .secondary-text(v-else) {{ scope.row.key }}
     el-table-column(label="Value", prop="value")
       template(slot-scope="scope")
-        el-input(v-if="editAble"
-        :disabled="scope|disabledRow(editRowAble)"
-        placeholder="Value"
-        v-model.lazy="scope.row.value"
-        @input="changeInput($event, 'value', scope.$index)")
+        .column-item.d-flex-v-center(v-if="editAble")
+          el-select(v-model="scope.row.varType", slot="prepend", style="min-width: 90px")
+            el-option(v-for="opt in valueTypeOptions", :key="opt.value", v-bind="opt")
+          el-input(
+            v-show="!scope.row.varType || scope.row.varType==='const' || scope.row.varType === 'field'"
+            v-model.lazy="scope.row.value"
+            style="margin-top:1px"
+            :disabled="scope|disabledRow(editRowAble)"
+            :clearable="true"
+            placeholder="Value"
+            @input="changeInput($event, 'value', scope.$index)")
+          el-select(
+            v-show="scope.row.varType==='var'"
+            v-model="scope.row.value"
+            :disabled="scope|disabledRow(editRowAble)"
+            no-data-text="暂无可选"
+            :clearable="true"
+            @input="changeInput($event, 'value', scope.$index)")
+            el-option(v-for="varOpt in gbVariables", :key="varOpt.value", v-bind="varOpt")
         //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.value }}
     el-table-column(label="operation", width="80")
@@ -38,7 +52,7 @@
 import { isEmpty, debounce } from 'lodash'
 /** 自定义列表组件 */
 const ListItem = function (config) {
-  return { key: '', value: '', __key: new Date().getTime(), ...config }
+  return { key: '', value: '', varType: 'const', __key: new Date().getTime(), ...config }
 }
 export default {
   name: 'CustomList',
@@ -51,7 +65,7 @@ export default {
     },
     editAble: {
       type: Boolean,
-      default: false
+      default: true
     },
     editRowAble: Function,
     isSelection: {
@@ -62,6 +76,12 @@ export default {
   },
   data () {
     return {
+      valueTypeVal: 'const',
+      valueTypeOptions: [
+        { label: '定值', value: 'const' },
+        { label: '字段', value: 'field' },
+        { label: '数据字典', value: 'var' }
+      ]
       // list: []
       // list: Array.from({ length: 10 }, (el, i) => { return `文本_${i + 1}` })
     }
@@ -72,11 +92,21 @@ export default {
     }
   },
   computed: {
+    gbVariables () {
+      return this.$gbImport.gbVariables || []
+    },
     list () {
       return isEmpty(this.value) ? [new ListItem()] : this.value
     }
   },
-  // watch: {
+  watch: {
+    list (datas) {
+      this.$nextTick(() => {
+        datas.forEach(row => {
+          this.$refs.table.toggleRowSelection(row, true)
+        })
+      })
+    }
   //   'list.length': {
   //     handler (datas) {
   //       // console.info('list is change--', datas)
@@ -84,7 +114,7 @@ export default {
   //       this.$refs.table.toggleRowSelection('')
   //     }
   //   }
-  // },
+  },
   methods: {
     changeInput: debounce(function (value, keyName, rowIndex) {
       // v-model="scope.row[keyName]"无法触发list值变化监听
@@ -101,17 +131,7 @@ export default {
     addItem (row) {
       const { $index } = row
       this.list.splice($index + 1, 0, new ListItem())
-      this.$nextTick(() => {
-        this.$refs.table.toggleRowSelection(this.list[$index + 1])
-      })
     }
-  },
-  updated () {
-    this.$nextTick(() => {
-      this.list.forEach(row => {
-        this.$refs.table.toggleRowSelection(row)
-      })
-    })
   }
 }
 </script>

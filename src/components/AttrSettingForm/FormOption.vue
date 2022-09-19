@@ -24,15 +24,16 @@
         td(v-if="index === list.length - 1")
           i.el-icon-plus.color-primary.btn-radius-50(@click="add")
   .list-async.box-content__inside(v-if="optionType === 'optionsAsyncFunc'")
-    el-button(@click="asyncSetting = !asyncSetting") {{ asyncFunc.name ? '重新选择数据源' : '配置数据源' }}
+    el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.name ? '重新选择数据源' : '配置数据源' }}
     .list-column__default.m-t-4(v-show="asyncFunc.name")
       .left-wrap
-        i.el-icon-check.color-primary.m-r-8
-        .color-warning {{asyncFunc.method}}
-        .secondary-text.m-l-8 {{asyncFunc.name}}
-        .tip.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
+        .d-flex-v-center
+          i.el-icon-check.color-primary.m-r-8
+          .color-warning {{asyncFunc.method}}
+          .secondary-text.m-l-8 {{asyncFunc.url}}
+        .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
       .right-wrap
-    AsyncRequired(title="配置数据源", v-model="asyncSetting", :chosenData="asyncFunc", @chosen="getAsyncSeting")
+    AsyncRequired(title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc", @chosen="getAsyncSeting")
 </template>
 
 <script>
@@ -66,7 +67,7 @@ export default {
         { label: '动态数据', value: 'optionsAsyncFunc' },
         { label: '批量导入', value: 'optionsImport', disabled: true }
       ],
-      asyncSetting: false
+      setAsyncVisible: false
       // asyncFunc: {}
       // list: []
       // list: Array.from({ length: 10 }, (el, i) => { return `文本_${i + 1}` })

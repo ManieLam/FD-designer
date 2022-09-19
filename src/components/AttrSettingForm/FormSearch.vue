@@ -8,12 +8,13 @@
     el-button(v-show="asyncFunc.name", type="text", @click="cancelAsync") 取消远程搜索
     .list-column__default.m-t-4(v-show="asyncFunc.name")
       .left-wrap
-        i.el-icon-check.color-primary.m-r-8
-        .color-warning {{asyncFunc.method}}
-        .secondary-text.m-l-8 {{asyncFunc.name}}
-        .tip.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
+        .d-flex-v-center
+          i.el-icon-check.color-primary.m-r-8
+          .color-warning {{asyncFunc.method}}
+          .secondary-text.m-l-8 {{asyncFunc.url}}
+        .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
       .right-wrap
-    AsyncRequired(title="配置远程搜索", v-model="asyncSettingShow", :chosenData="asyncFunc", @chosen="getAsyncFunc")
+    AsyncRequired(title="配置远程搜索", v-model="setAsyncVisible", :chosenData="asyncFunc", @chosen="getAsyncFunc")
 </template>
 
 <script>
@@ -33,7 +34,7 @@ export default {
   },
   data () {
     return {
-      asyncSettingShow: false
+      setAsyncVisible: false
     }
   },
   computed: {
@@ -58,7 +59,7 @@ export default {
   methods: {
     toggleAsyncSetting () {
       // console.info('打开远程搜索配置')
-      this.asyncSettingShow = !this.asyncSettingShow
+      this.setAsyncVisible = !this.setAsyncVisible
     },
     getAsyncFunc (data) {
       this.asyncFunc = data

@@ -118,7 +118,7 @@
 .border-bottom
   border-bottom: 1px solid $--border-color-base
 .border-hover
-  border-color: $--border-active
+  border-color: $--border-active !important
 
 
 .bgcolor-fff
@@ -145,6 +145,12 @@
   font-size: $--font-size-small
 .font-size-large
   font-size: $--font-size-large
+.font-primary
+  @include font-primary
+.font-secondary
+  @include font-secondary
+.font-large
+  @include font-large
 
 // 列表页头部标题
 .header-label__primary
@@ -377,15 +383,24 @@
   border: 1px solid $--border-color-base
   padding: 8px
   cursor: pointer
+  line-height: 1.2
+  @extend .font-size-small
   @extend .d-flex-row-between
   @extend .align-items-center
   @extend .hover-change-bgColor
   & + .left-api-list
     margin-top: 8px
-  .left-wrap
-    @extend .d-flex-v-center
+  // .left-wrap
+  //   @extend .d-flex-v-center
   .right-wrap
     i.icon
       @extend .hover-change-color
+
+// 代码类
+.code-editor-desc__pre, .code-editor-desc__suffix
+  color: $--color-primary
+  margin: 0
+  font-size: 16px
+
 
 /** ===== 公用一些自定义样式 END ===== **/
