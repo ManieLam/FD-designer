@@ -19,6 +19,7 @@
     "vuex": "^3.4.0"
   },
   "devDependencies": {
+    "@types/ace": "^0.0.48",
     "@vue/cli-plugin-babel": "~4.5.15",
     "@vue/cli-plugin-eslint": "~4.5.15",
     "@vue/cli-plugin-router": "~4.5.15",

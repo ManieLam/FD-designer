@@ -3,6 +3,11 @@ module.exports = {
   lintOnSave: true,
   productionSourceMap: false,
   publicPath: './',
+  configureWebpack: {
+    externals: [
+      'ace'
+    ]
+  },
   chainWebpack: config => {
     config.module.rule('sass').oneOfs.store.forEach((item) => {
       item
