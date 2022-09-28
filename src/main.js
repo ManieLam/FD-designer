@@ -15,7 +15,10 @@ import Widgets from '@/utils/widgets'
 import defaultValueSet from '@/utils/defaultConfig'
 import gbImport from '@/utils/import'
 import AnsoUI from 'anso-ui'
+
 import CodeEditorConstruct from '@/components/CodeEditor/CodeEditorConstruct'
+import SmartDialog from '@/components/SmartDialog.vue'
+import SmartDrawer from '@/components/SmartDrawer.vue'
 
 Vue.config.productionTip = false
 
@@ -24,14 +27,18 @@ Vue.use(Element, {
 })
 Vue.use(AnsoUI)
 
+// 动态注册组件到全局使用
 Object.entries(register).map(([name, comp]) => {
   Vue.component(name, comp)
 })
 
+Vue.use(CodeEditorConstruct) // 注册代码编辑器插件
+Vue.component('SmartDialog', SmartDialog)
+Vue.component('SmartDrawer', SmartDrawer)
+
 Vue.prototype.$Widget = Widgets
 Vue.prototype.$defValue = defaultValueSet
 Vue.prototype.$gbImport = gbImport
-Vue.use(CodeEditorConstruct)
 
 new Vue({
   router,
