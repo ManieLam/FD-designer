@@ -53,6 +53,14 @@ const mutations = {
   update (states, { name, element = {}, eIndex, elements }) {
     states.collects[name].fields = elements
   },
+  /** 更新表单事件 */
+  updateActions (states, { name, actions = null, type = 'REWRITE', actionName = '', actionVal }) {
+    if (type === 'REWRITE') {
+      states.collects[name].form.actions = actions
+    } else if (type === 'PUSH') {
+      states.collects[name].form.actions[actionName] = actionVal
+    }
+  },
   // 更新表单属性
   updateConfig (states, { name, attrs = null, actions = null }) {
     const canvas = states.collects[name]
@@ -82,7 +90,13 @@ const mutations = {
   export (states, name, isAll = false) {}
 }
 
-const actions = {}
+const actions = {
+  // updateFormActions ({ state, commit }, { name, actions = null }) {
+  //   const canvas = state.collects[name]
+  //   if (canvas && actions) {
+  //   }
+  // }
+}
 
 export default {
   namespaced: true,
