@@ -1,5 +1,5 @@
 <template lang='pug'>
-el-dialog.async-required-dialog(:title="title", :visible.sync="dialogVisabled", width="70%", center)
+el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialogVisabled", width="70%", center, :close-on-click-modal="false")
   .async-required-container
     .top-wrap.d-flex-row-between.m-b-8
       .left-wrap__top {{apiData.name ? '已选中:' : '请选择一个数据源'}}
@@ -11,7 +11,7 @@ el-dialog.async-required-dialog(:title="title", :visible.sync="dialogVisabled", 
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
         el-button(type="primary", @click="testLink") 测试链接
         el-button(type="primary", title="保存至全局，允许下次继续使用", @click="save") 保存
-        el-button(type="primary", @click="chooseChange") 确定选中
+        el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
     .bottom-wrap.d-flex-row-between
       .left-wrap.m-r-8
         .left-api-list.d-flex-row-between.align-items-center.hover-change-bgColor(v-for="(apiItem, index) in apiList", :key="apiItem.name", @click.stop="editApi(apiItem, index)")
@@ -23,6 +23,7 @@ el-dialog.async-required-dialog(:title="title", :visible.sync="dialogVisabled", 
             .color-text-secondary.font-size-small.m-l-8 {{ apiItem.demo || ''}}
           .right
             .el-icon-delete.hover-change-scale.hover-change-color__danger(@click.stop.prevent="removeApi(apiItem, index)")
+        el-empty.left-empty(v-show="!apiList.length", description="暂无数据源，请添加")
       .right-wrap
         .right-custom-data
           el-form(ref="apiForm", :model="apiData", label-position="right", :rules="rules")
@@ -125,9 +126,11 @@ export default {
     return {
       // addHeader: false,
       // addBody: false,
+      key: new Date().getTime(),
       apiData: new ApiData(),
       apiMethods: ['GET', 'POST', 'PATCH', 'SET', 'DELETE'],
-      apiList: this.$gbImport.gbApiRequires || [],
+      apiStorageList: this.$store.getters.getResources,
+      // apiList: this.$gbImport.gbApiRequires || [],
       // dataHandleFunc: {},
       // dataHandles: [
       //   ['beforeRequired', '请求发送前', '(config, data)'],
@@ -173,9 +176,16 @@ export default {
     chosenData (data) {
       this.apiData = { ...data, dataHandleFunc: data.dataHandleFunc || cloneDeep(this.dataHandles) }
       // this.dataHandleFunc = data.dataHandleFunc || new ApiData().dataHandleFunc
+    },
+    apiList (list) {
+      // this.$store.commit
+      this.$store.dispatch('resources/updateList', list)
     }
   },
   computed: {
+    apiList () {
+      return this.$store.getters.getResources
+    },
     hasHeader () {
       return this.apiData.header != null
     },
@@ -184,11 +194,11 @@ export default {
     },
     dataHandleFunc: {
       get () {
-        console.log('dataHandleFunc get:')
+        // console.log('dataHandleFunc get:')
         return this.apiData.dataHandleFunc || cloneDeep(this.dataHandles)
       },
       set (val) {
-        console.info('dataHandleFunc set:', val)
+        // console.info('dataHandleFunc set:', val)
         this.apiData.dataHandleFunc = val
       }
     },
@@ -237,18 +247,18 @@ export default {
     },
     save () {
       if (this.apiData?.__index == null) {
-        // this.apiList.push(this.apiData)
-        this.$gbImport.gbApiRequires.push(this.apiData)
+        this.apiList.push(this.apiData)
+        // this.$gbImport.gbApiRequires.push(this.apiData)
       } else {
         const { __index } = this.apiData
         if (__index > -1) {
-          // this.$set(this.apiList, __index, this.apiData)
-          this.$set(this.$gbImport.gbApiRequires, __index, this.apiData)
+          this.$set(this.apiList, __index, this.apiData)
+          // this.$set(this.$gbImport.gbApiRequires, __index, this.apiData)
         }
       }
-      this.$nextTick(() => {
-        this.apiData = new ApiData()
-      })
+      // this.$nextTick(() => {
+      //   this.apiData = new ApiData()
+      // })
     },
     chooseChange () {
       this.$refs.apiForm.validate(valid => {

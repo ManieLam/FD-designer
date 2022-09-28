@@ -9,7 +9,15 @@
         :attrs="attrs"
         @input="getAttrs")
     el-collapse-item.collapse-item(title="行为配置", name="action")
-
+      //- el-button(@click="toggleSource") 配置表单数据源
+      //- .column-name
+      .action-setting-wrap
+        .row-item
+          el-checkbox(v-model="isRelationAction") 配置表单通用字典
+          form-list.box-content__inside(
+            v-model="relationList"
+            :draggable="false"
+            :columnProps="relationProps")
 </template>
 
 <script>
@@ -101,6 +109,13 @@ export default {
           tag: 'el-switch'
         }
       ],
+      /* 配置字典 */
+      isRelationAction: false, // 是否开启配置字典
+      relationList: [],
+      relationProps: [
+        { label: '字典关键值', prop: 'name' },
+        { label: '字典名', prop: 'label' }
+      ], // 字典选项
       actions: [],
       actionsData: {}
     }
@@ -116,6 +131,9 @@ export default {
           this.actionsData = !form.actions || isEmpty(form.actions) ? {} : form.actions
         }
       }
+    },
+    relationList (list) {
+      this.changeRelation(list)
     }
   },
   methods: {
@@ -127,6 +145,15 @@ export default {
         name: this.canvasName,
         attrs,
         actions
+      })
+    },
+    changeRelation (list = []) {
+      // this.$set(this.actionsData, 'relationList', list)
+      this.actionsData.relationList = list
+      // this.setFormState({ actions: this.actionsData })
+      this.$store.commit('canvas/updateActions', {
+        name: this.canvasName,
+        actions: this.actionsData
       })
     }
   }

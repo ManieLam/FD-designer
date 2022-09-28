@@ -131,10 +131,14 @@ export default {
       await this.$store.commit('canvas/init')
       const editingName = this.$store.state.canvas.editingName
       this.actIndex = editingName ? Number(editingName.split('_')[1]) : 0
+    },
+    async initResource () {
+      await this.$store.commit('resources/init')
     }
   },
   created () {
     this.initCanvas()
+    this.initResource()
   }
 }
 </script>
