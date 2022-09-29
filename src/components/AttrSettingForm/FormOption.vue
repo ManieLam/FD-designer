@@ -24,6 +24,7 @@
         td(v-if="index === list.length - 1")
           i.el-icon-plus.color-primary.btn-radius-50(@click="add")
   .list-async.box-content__inside(v-if="optionType === 'optionsAsyncFunc'")
+    //- 动态配置数据源
     el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.name ? '重新选择数据源' : '配置数据源' }}
     .list-column__default.m-t-4(v-show="asyncFunc.name")
       .left-wrap
@@ -33,14 +34,20 @@
           .secondary-text.m-l-8 {{asyncFunc.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
       .right-wrap
-    AsyncRequired(title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc", @chosen="getAsyncSeting")
+      AsyncRequired(title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
+    //- 选择现有字典
+  .list-async.box-content__inside(v-if="optionType === 'optionRelationKey'")
+      el-input(v-model.trim.lazy="optionRelationKey", placeholder="请填写字典关键名")
+      //- el-select(v-model="value", placeholder="请选择字典")
+      //-   el-option(v-for="item in options", :key="item.value", :label="item.label", :value="item.value")
 </template>
 
 <script>
 import Draggable from 'vuedraggable'
 import AsyncRequired from './AsyncRequired.vue'
-/** 自定义列表组件
+/** 自定义选项配置
  * 遇到`xxxAsyncFunc`的命名，就使用异步请求方法，执行是在运行表单时候运行，即在业务方使用
+ * 遇到`optionRelationKey`,则使用relation请求,在表单中如有勾选[首次加载字典], 则默认执行
  */
 export default {
   name: 'FormOption',
@@ -64,10 +71,12 @@ export default {
       optionTypes: [
         // 以取值命名value，方便数据同时存在options/optionsAsyncFunc后
         { label: '手动添加', value: 'options' },
-        { label: '动态数据', value: 'optionsAsyncFunc' },
+        { label: '动态字典', value: 'optionRelationKey' },
+        { label: '动态数据源', value: 'optionsAsyncFunc' },
         { label: '批量导入', value: 'optionsImport', disabled: true }
       ],
-      setAsyncVisible: false
+      setAsyncVisible: false,
+      remoteType: 'asyncFunc'
       // asyncFunc: {}
       // list: []
       // list: Array.from({ length: 10 }, (el, i) => { return `文本_${i + 1}` })
@@ -93,6 +102,14 @@ export default {
       },
       set (data) {
         this.$emit('updateAnAttr', { name: 'optionsAsyncFunc', value: data })
+      }
+    },
+    optionRelationKey: {
+      get () {
+        return this.fullSetting.optionsRelationKey || ''
+      },
+      set (data) {
+        this.$emit('updateAnAttr', { name: 'optionsRelationKey', value: data })
       }
     }
   },

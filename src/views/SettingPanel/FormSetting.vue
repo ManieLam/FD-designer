@@ -1,6 +1,7 @@
 <template lang='pug'>
 .setting-form-wrap
-  el-collapse.setting-wrap(v-model="activeNames")
+  .secondary-text(v-if="!canvas || !canvas.form") 请先拖拽组件, 再做操作
+  el-collapse.setting-wrap(v-model="activeNames", v-else)
     el-collapse-item.collapse-item(title="属性配置", name="attr")
       AttrSettingForm(
         v-bind="$attrs"
@@ -11,17 +12,14 @@
     el-collapse-item.collapse-item(title="行为配置", name="action")
       //- el-button(@click="toggleSource") 配置表单数据源
       //- .column-name
-      .action-setting-wrap
+      .action-setting-wrap.m-t-8
+        .color-text-primary.font-size-base 表单首次加载
         .row-item
-          el-checkbox(v-model="isRelationAction") 配置表单通用字典
-          form-list.box-content__inside(
-            v-model="relationList"
-            :draggable="false"
-            :columnProps="relationProps")
+          el-checkbox(v-model="actionsData.getRelationImmediate") 加载字段字典
 </template>
 
 <script>
-/** */
+/** 表单配置区 */
 import AttrSettingForm from '@/components/AttrSettingForm'
 import { isEmpty } from 'lodash'
 export default {
@@ -46,7 +44,11 @@ export default {
         {
           label: '是否只读',
           key: 'readOnly',
-          tag: 'el-switch'
+          tag: 'el-checkbox',
+          options: [{
+            value: true,
+            label: '开启'
+          }]
         },
         {
           // Anso-ui没有支持表单标题展示
@@ -106,12 +108,16 @@ export default {
         {
           label: '保留数据输入',
           key: 'keepAliveData',
-          tag: 'el-switch'
+          tag: 'el-checkbox',
+          options: [{
+            value: true,
+            label: '开启'
+          }]
         }
       ],
       /* 配置字典 */
-      isRelationAction: false, // 是否开启配置字典
-      relationList: [],
+      // isRelationAction: true, // 是否开启配置字典
+      // relationList: [],
       relationProps: [
         { label: '字典关键值', prop: 'name' },
         { label: '字典名', prop: 'label' }
@@ -121,20 +127,31 @@ export default {
     }
   },
   watch: {
+    canvas (obj) {
+      console.info('canvas change---', obj)
+    },
     'canvas.form': {
       immediate: true,
       // deep: true,
       handler (form, oldData) {
+        console.info('form change--', form)
         if (form) {
-          // console.info('form change--', form)
           this.attrsData = !form?.attrs || isEmpty(form.attrs) ? { ...this.$defVal?.formAttrs } : form?.attrs
           this.actionsData = !form.actions || isEmpty(form.actions) ? {} : form.actions
+          this.relationList = form?.actions?.relationList || []
+        } else {
+          this.actionsData = {}
+          this.attrsData = { ...this.$defVal?.formAttrs }
+          this.relationList = []
         }
       }
-    },
-    relationList (list) {
-      this.changeRelation(list)
     }
+    // isRelationAction (flag) {
+    //   if (!flag) this.relationList = []
+    // },
+    // relationList (list) {
+    //   this.changeRelation(list)
+    // }
   },
   methods: {
     getAttrs (attrs) {
@@ -146,15 +163,16 @@ export default {
         attrs,
         actions
       })
-    },
-    changeRelation (list = []) {
-      // this.$set(this.actionsData, 'relationList', list)
-      this.actionsData.relationList = list
-      // this.setFormState({ actions: this.actionsData })
-      this.$store.commit('canvas/updateActions', {
-        name: this.canvasName,
-        actions: this.actionsData
-      })
+    // },
+    // changeRelation (list = []) {
+    //   console.info('更改relation:', list)
+    //   // this.$set(this.actionsData, 'relationList', list)
+    //   // this.actionsData.relationList = list
+    //   // this.setFormState({ actions: this.actionsData })
+    //   this.$store.commit('canvas/updateActions', {
+    //     name: this.canvasName,
+    //     actions: this.actionsData
+    //   })
     }
   }
 }

@@ -1,8 +1,25 @@
 /** 记录画布, 同步记录在localstorage
  * 画布包括：字段fields(name,label,form,compTag), 表单form(attrs,actions)
  * */
-import { formAttrs } from '@/utils/defaultConfig'
+import { formAttrs as defaultFormAttrs } from '@/utils/defaultConfig'
 // import { isEqual, omit } from 'lodash'
+// 定义画布数据
+const CanvasData = function ({ fields = [], formAttrs = {}, formActions = {} }) {
+  return {
+    fields: fields,
+    form: {
+      attrs: Object.assign(defaultFormAttrs, formAttrs),
+      actions: {
+        mounted: {},
+        created: {},
+        destory: {},
+        getRelationImmediate: true, // 是否立即加载relation
+        ...formActions
+      }
+    }
+  }
+}
+
 const state = () => ({
   collects: {}, // {name: {fields: []}, form: {attrs, ctions}}
   editingName: '' // 正在编辑的画布名称
@@ -26,13 +43,14 @@ const mutations = {
     if (elements) {
       elements.splice(eIndex, 0, element)
     } else {
-      states.collects[name] = {
-        fields: [element],
-        form: {
-          attrs: formAttrs || {},
-          actions: {}
-        }
-      }
+      // states.collects[name] = {
+      //   fields: [element],
+      //   form: {
+      //     attrs: formAttrs || {},
+      //     actions: {}
+      //   }
+      // }
+      states.collects[name] = new CanvasData({ fields: [element] })
       // states.collects[name].fields = [element]
     }
   },
@@ -55,10 +73,15 @@ const mutations = {
   },
   /** 更新表单事件 */
   updateActions (states, { name, actions = null, type = 'REWRITE', actionName = '', actionVal }) {
-    if (type === 'REWRITE') {
-      states.collects[name].form.actions = actions
-    } else if (type === 'PUSH') {
-      states.collects[name].form.actions[actionName] = actionVal
+    const canvas = states.collects[name]
+    if (canvas && canvas.form) {
+      if (type === 'REWRITE') {
+        canvas.form.actions = actions
+      } else if (type === 'PUSH') {
+        canvas.form.actions[actionName] = actionVal
+      }
+    } else {
+      console.warn('画布中暂无表单')
     }
   },
   // 更新表单属性

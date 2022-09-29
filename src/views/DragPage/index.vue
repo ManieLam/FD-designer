@@ -90,6 +90,7 @@ export default {
   watch: {
     'canvas.fields': {
       // deep: true,
+      immediate: true,
       handler (fields) {
         // this.fieldList = Array.from(new Set(fields)) || []
         this.fieldList = fields || []
