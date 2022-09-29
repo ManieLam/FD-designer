@@ -45,20 +45,20 @@ export const select = {
     {
       label: '是否分组',
       key: 'isGroup',
-      tag: 'el-switch',
+      tag: 'el-checkbox',
       options: [{ label: '分组', value: true }, { label: '不分', value: false }],
       chains: () => {}
     },
     {
       label: '是否多选',
       key: 'multiple',
-      tag: 'el-switch',
+      tag: 'el-checkbox',
       options: [{ label: '多选', value: true }, { label: '单选', value: false }]
     },
     {
       label: '是否允许清空选项',
       key: 'clearable',
-      tag: 'el-switch',
+      tag: 'el-checkbox',
       options: switchDefaultOptions
     },
     // {
