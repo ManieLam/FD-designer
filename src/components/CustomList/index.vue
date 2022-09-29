@@ -10,37 +10,40 @@
     el-table-column(v-if="isSelection", type="selection", width="38", :selectable="selectAble")
     el-table-column(label="Key", prop="key", width="180")
       template(slot-scope="scope")
-        el-input(
-          v-if="editAble"
-          :disabled="scope|disabledRow(editRowAble)"
-          placeholder="Key"
-          v-model.lazy="scope.row.key"
-          @input="changeInput($event, 'key', scope.$index)")
-          //- @input="changeInput($event, 'value', scope.$index)"
+        .edit-input(v-if="editAble")
+          slot(v-bind.column-name="scope")
+            el-input(
+              :disabled="scope|disabledRow(editRowAble)"
+              placeholder="Key"
+              v-model.lazy="scope.row.key"
+              @input="changeInput($event, 'key', scope.$index)")
+              //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.key }}
     el-table-column(label="Value", prop="value")
       template(slot-scope="scope")
         .column-item.d-flex-v-center(v-if="editAble")
-          el-select(v-model="scope.row.varType", slot="prepend", style="min-width: 90px")
-            el-option(v-for="opt in valueTypeOptions", :key="opt.value", v-bind="opt")
-          el-input(
-            v-show="!scope.row.varType || scope.row.varType==='const' || scope.row.varType === 'field'"
-            v-model.lazy="scope.row.value"
-            style="margin-top:1px"
-            :disabled="scope|disabledRow(editRowAble)"
-            :clearable="true"
-            placeholder="Value"
-            @input="changeInput($event, 'value', scope.$index)")
-          el-select(
-            v-show="scope.row.varType==='var'"
-            v-model="scope.row.value"
-            :disabled="scope|disabledRow(editRowAble)"
-            no-data-text="暂无可选"
-            :clearable="true"
-            @input="changeInput($event, 'value', scope.$index)")
-            el-option(v-for="varOpt in gbVariables", :key="varOpt.value", v-bind="varOpt")
-        //- @input="changeInput($event, 'value', scope.$index)"
+          slot(v-bind.column-value="scope")
+            el-select(v-model="scope.row.varType", slot="prepend", style="min-width: 90px")
+              el-option(v-for="opt in valueTypeOptions", :key="opt.value", v-bind="opt")
+            el-input(
+              v-show="!scope.row.varType || scope.row.varType==='const' || scope.row.varType === 'field'"
+              v-model.lazy="scope.row.value"
+              style="margin-top:1px"
+              :disabled="scope|disabledRow(editRowAble)"
+              :clearable="true"
+              placeholder="Value"
+              @input="changeInput($event, 'value', scope.$index)")
+            el-select(
+              v-show="scope.row.varType==='var'"
+              v-model="scope.row.value"
+              :disabled="scope|disabledRow(editRowAble)"
+              no-data-text="暂无可选"
+              :clearable="true"
+              @input="changeInput($event, 'value', scope.$index)")
+              el-option(v-for="varOpt in gbVariables", :key="varOpt.value", v-bind="varOpt")
+          //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.value }}
+    slot(name="custom-columns")
     el-table-column(label="operation", width="80")
       template(slot-scope="scope")
         .icon.el-icon-plus.m-r-8.cursor-pointer.hover-change-scale(@click="addItem(scope)")
@@ -80,7 +83,8 @@ export default {
       valueTypeOptions: [
         { label: '定值', value: 'const' },
         { label: '字段', value: 'field' },
-        { label: '数据字典', value: 'var' }
+        { label: '数据字典', value: 'var' },
+        { label: '列表字段', value: 'list' }
       ]
       // list: []
       // list: Array.from({ length: 10 }, (el, i) => { return `文本_${i + 1}` })

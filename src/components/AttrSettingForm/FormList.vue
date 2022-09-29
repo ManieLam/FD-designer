@@ -81,6 +81,16 @@ export default {
       return Object.keys(keyBy(this.columnProps, 'prop'))
     }
   },
+  watch: {
+    list: {
+      immediate: true,
+      handler (len) {
+        if (!len || !len.length) {
+          this.add()
+        }
+      }
+    }
+  },
   methods: {
     initPropValue () {
       return this.listPropValue.reduce((obj, name) => {
@@ -96,9 +106,9 @@ export default {
         this.$delete(this.actList, index)
       }
     }
-  },
-  mounted () {
-    if (!this.list || !this.list.length) this.add()
+  // },
+  // mounted () {
+  //   if (!this.list || !this.list.length) this.add()
   }
 }
 </script>
