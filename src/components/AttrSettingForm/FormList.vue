@@ -40,12 +40,12 @@ export default {
   components: {
     Draggable
   },
-  model: {
-    prop: 'list',
-    event: 'change'
-  },
+  // model: {
+  //   prop: 'list',
+  //   event: 'input'
+  // },
   props: {
-    list: Array,
+    value: Array,
     draggable: {
       type: Boolean,
       default: true
@@ -71,10 +71,10 @@ export default {
   computed: {
     actList: {
       get () {
-        return this.list
+        return this.value
       },
       set (data) {
-        this.$emit('change', data)
+        this.$emit('input', data)
       }
     },
     listPropValue () {
@@ -82,7 +82,7 @@ export default {
     }
   },
   watch: {
-    list: {
+    value: {
       immediate: true,
       handler (len) {
         if (!len || !len.length) {

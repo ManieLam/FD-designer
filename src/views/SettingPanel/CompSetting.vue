@@ -7,16 +7,16 @@
       AttrSettingForm(
         v-bind="$attrs"
         v-on="$listeners"
-        v-model="attrsData"
+        :value="attrsData"
         :attrs="attrs"
-        @change="change"
+        @update="update"
         @updateAnAttr="updateAnAttr")
     el-collapse-item.collapse-item(title="行为配置", name="action")
 
 </template>
 
 <script>
-/** */
+/** 组件配置区 */
 import componentAttrs from './componentAttrs'
 import AttrSettingForm from '@/components/AttrSettingForm'
 import { cloneDeep } from 'lodash'
@@ -55,12 +55,12 @@ export default {
       },
       set (data) {
         this.tempAttrsData = data
-        this.change()
+        this.update()
       }
     }
   },
   methods: {
-    change () {
+    update () {
       this.$emit('update', 'comp', this.attrsData)
     },
     updateAnAttr ({ name, value }) {
