@@ -5,12 +5,12 @@ export const gbApiRequires = [
     name: 'getUser',
     method: 'GET',
     url: '/api/getUser',
-    demo: '获取用水户信息',
+    demo: '示例: 获取用水户信息',
     body: [
-      { key: 'waterUserCode', value: '123' } // 带$,表示变量，如：$userCode
+      { key: 'waterUserCode', value: '123', varType: 'const', __key: 1111 } // 带$,表示变量，如：$userCode
     ]
   },
-  { name: 'relation', method: 'GET', url: '/api/relation', demo: '字典数据' }
+  { name: 'relation', method: 'GET', url: '/api/relation', demo: '公共字典接口' }
 ]
 
 // 公共请求头、请求配置(axios的配置)

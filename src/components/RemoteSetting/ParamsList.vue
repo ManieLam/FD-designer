@@ -7,7 +7,7 @@
     row-key="__key"
     v-on="$listeners"
     @selection-change="handleSelectionChange")
-    el-table-column(v-if="isSelection", type="selection", width="38", :selectable="selectAble")
+    //- el-table-column(v-if="isSelection", type="selection", width="38", :selectable="selectAble")
     el-table-column(label="Key", prop="key", width="180")
       template(slot-scope="scope")
         .edit-input(v-if="editAble")
@@ -25,22 +25,30 @@
           slot(v-bind.column-value="scope")
             el-select(v-model="scope.row.varType", slot="prepend", style="min-width: 90px")
               el-option(v-for="opt in valueTypeOptions", :key="opt.value", v-bind="opt")
-            el-input(
-              v-show="!scope.row.varType || scope.row.varType==='const' || scope.row.varType === 'field'"
+            components(
+              v-if="varTags[scope.row.varType].tag"
               v-model.lazy="scope.row.value"
-              style="margin-top:1px"
-              :disabled="scope|disabledRow(editRowAble)"
+              :is="varTags[scope.row.varType].tag"
               :clearable="true"
-              placeholder="Value"
+              style="margin-top: 1px;"
+              placeholder="value"
               @input="changeInput($event, 'value', scope.$index)")
-            el-select(
-              v-show="scope.row.varType==='var'"
-              v-model="scope.row.value"
-              :disabled="scope|disabledRow(editRowAble)"
-              no-data-text="暂无可选"
-              :clearable="true"
-              @input="changeInput($event, 'value', scope.$index)")
-              el-option(v-for="varOpt in gbVariables", :key="varOpt.value", v-bind="varOpt")
+            //- el-input(
+            //-   v-show="!scope.row.varType || scope.row.varType==='const' || scope.row.varType === 'field'"
+            //-   v-model.lazy="scope.row.value"
+            //-   style="margin-top:1px"
+            //-   :disabled="scope|disabledRow(editRowAble)"
+            //-   :clearable="true"
+            //-   placeholder="Value"
+            //-   @input="changeInput($event, 'value', scope.$index)")
+            //- el-select(
+            //-   v-show="scope.row.varType==='var'"
+            //-   v-model="scope.row.value"
+            //-   :disabled="scope|disabledRow(editRowAble)"
+            //-   no-data-text="暂无可选"
+            //-   :clearable="true"
+            //-   @input="changeInput($event, 'value', scope.$index)")
+            //-   el-option(v-for="varOpt in gbVariables", :key="varOpt.value", v-bind="varOpt")
           //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.value }}
     slot(name="custom-columns")
@@ -52,18 +60,16 @@
 </template>
 
 <script>
-import { isEmpty, debounce } from 'lodash'
+import { isEmpty, debounce, keyBy } from 'lodash'
+import { ApiBodyParams } from '@/model/resource'
 /** 自定义列表组件 */
-const ListItem = function (config) {
-  return { key: '', value: '', varType: 'const', __key: new Date().getTime(), ...config }
-}
 export default {
-  name: 'CustomList',
+  name: 'ParamsList',
   props: {
     value: {
       type: Array,
       default: () => {
-        return [new ListItem()]
+        return [new ApiBodyParams()]
       }
     },
     editAble: {
@@ -71,20 +77,19 @@ export default {
       default: true
     },
     editRowAble: Function,
-    isSelection: {
-      type: Boolean,
-      default: false
-    },
+    // isSelection: {
+    //   type: Boolean,
+    //   default: false
+    // },
     selectAble: Function
   },
   data () {
     return {
-      valueTypeVal: 'const',
       valueTypeOptions: [
-        { label: '定值', value: 'const' },
-        { label: '字段', value: 'field' },
-        { label: '数据字典', value: 'var' },
-        { label: '列表字段', value: 'list' }
+        { label: '定值', value: 'const', tag: 'el-input' },
+        { label: '表单数据', value: 'formData', tag: 'el-input' },
+        { label: '路由数据', value: 'router', tag: 'el-input' },
+        { label: '本地缓存', value: 'localstorage', tag: 'el-input' }
       ]
       // list: []
       // list: Array.from({ length: 10 }, (el, i) => { return `文本_${i + 1}` })
@@ -100,24 +105,24 @@ export default {
       return this.$gbImport.gbVariables || []
     },
     list () {
-      return isEmpty(this.value) ? [new ListItem()] : this.value
+      return isEmpty(this.value) ? [new ApiBodyParams()] : this.value
+    },
+    varTags () {
+      return keyBy(this.valueTypeOptions, 'value')
     }
   },
   watch: {
-    list (datas) {
-      this.$nextTick(() => {
-        datas.forEach(row => {
-          this.$refs.table.toggleRowSelection(row, true)
-        })
-      })
-    }
-  //   'list.length': {
-  //     handler (datas) {
-  //       // console.info('list is change--', datas)
-  //       // debounce(() => this.$emit('input', datas), 800)
-  //       this.$refs.table.toggleRowSelection('')
-  //     }
-  //   }
+    // list: {
+    //   deep: true,
+    //   immediate: true,
+    //   handler (datas) {
+    //     this.$nextTick(() => {
+    //       datas.forEach(row => {
+    //         this.$refs.table.toggleRowSelection(row, row.usable)
+    //       })
+    //     })
+    //   }
+    // }
   },
   methods: {
     changeInput: debounce(function (value, keyName, rowIndex) {
@@ -125,7 +130,7 @@ export default {
       this.$emit('input', this.list)
     }, 800),
     handleSelectionChange (selection) {
-      // console.info('handleSelectionChange:', arguments)
+      console.info('handleSelectionChange:', arguments)
       // this.$emit('change')
     },
     removeItem (row) {
@@ -134,7 +139,7 @@ export default {
     },
     addItem (row) {
       const { $index } = row
-      this.list.splice($index + 1, 0, new ListItem())
+      this.list.splice($index + 1, 0, new ApiBodyParams())
     }
   }
 }

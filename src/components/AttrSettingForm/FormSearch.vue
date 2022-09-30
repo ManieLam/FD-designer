@@ -14,12 +14,12 @@
           .secondary-text.m-l-8 {{asyncFunc.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
       .right-wrap
-    AsyncRequired(title="配置远程搜索", v-model="setAsyncVisible", :chosenData="asyncFunc", @chosen="getAsyncFunc")
+      RemoteSettingRequire(title="配置远程搜索", v-model="setAsyncVisible", :chosenData="asyncFunc", @chosen="getAsyncFunc")
 </template>
 
 <script>
 /** 搜索配置 */
-import AsyncRequired from './AsyncRequired'
+import RemoteSettingRequire from '../RemoteSetting/Require'
 export default {
   name: 'FormSearch',
   props: {
@@ -30,7 +30,7 @@ export default {
     }
   },
   components: {
-    AsyncRequired
+    RemoteSettingRequire
   },
   data () {
     return {

@@ -27,8 +27,8 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
       .right-wrap
         .right-custom-data
           el-form(ref="apiForm", :model="apiData", label-position="right", :rules="rules")
-            el-form-item(label="名称", prop="name")
-              el-input(v-model="apiData.name", placeholder="接口标识名称，请使用英文或数字")
+            //- el-form-item(label="名称", prop="name")
+            //-   el-input(v-model="apiData.name", placeholder="接口标识名称，请使用英文或数字")
 
             el-form-item(label="请求地址", prop="url")
               el-input(v-model="apiData.url", placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置")
@@ -41,13 +41,13 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求头部
                 .label-right.cursor-pointer.font-size-medium.hover-change-scale(:class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'", @click="toggleCustomList('header')")
-              CustomList(v-show="hasHeader", v-model="apiData.header", :editAble="true", :isSelection="true")
+              ParamsList(v-show="hasHeader", v-model="apiData.header", :editAble="true", :isSelection="true")
 
             el-form-item(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求参数
                 .label-right.cursor-pointer.font-size-medium.hover-change-scale(:class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'", @click="toggleCustomList('body')")
-              CustomList(v-show="hasBody", v-model="apiData.body", :editAble="true", :isSelection="true")
+              ParamsList(v-show="hasBody", v-model="apiData.body", :editAble="true", :isSelection="true")
 
             el-form-item(label="是否表单初始化发送请求", prop="immediate")
               el-switch(v-model="apiData.immediate")
@@ -74,27 +74,12 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
 </template>
 
 <script>
-import CustomList from '../CustomList'
-import { cloneDeep } from 'lodash'
+import ParamsList from './ParamsList'
+import { cloneDeep, keyBy } from 'lodash'
 import CodeEditor from '@/components/CodeEditor/index'
-// import axios from 'axios'
-/** 数据源名称，请求地址， 请求头、请求链接、请求参数、请求 */
-const ApiData = function (config) {
-  return {
-    method: 'GET',
-    header: null,
-    body: null,
-    dataHandle: [],
-    dataHandleFunc: {
-      beforeRequired: {},
-      afterRequired: {},
-      error: {}
-    },
-    ...config
-  }
-}
+import { ApiData } from '@/model/resource.js'
 export default {
-  name: 'AsyncRequired',
+  name: 'RemoteSettingRequire',
   props: {
     title: String,
     value: {
@@ -107,7 +92,7 @@ export default {
     }
   },
   components: {
-    CustomList,
+    ParamsList,
     CodeEditor
   },
   filters: {
@@ -124,19 +109,10 @@ export default {
   },
   data () {
     return {
-      // addHeader: false,
-      // addBody: false,
       key: new Date().getTime(),
       apiData: new ApiData(),
       apiMethods: ['GET', 'POST', 'PATCH', 'SET', 'DELETE'],
       apiStorageList: this.$store.getters.getResources,
-      // apiList: this.$gbImport.gbApiRequires || [],
-      // dataHandleFunc: {},
-      // dataHandles: [
-      //   ['beforeRequired', '请求发送前', '(config, data)'],
-      //   ['afterRequired', '请求返回响应数据时', '(res)'],
-      //   ['error', '异常数据处理', '(e)']
-      // ],
       dataHandles: {
         beforeRequired: {
           name: 'beforeRequired',
@@ -163,8 +139,18 @@ export default {
       dataHandleEditors: {},
       rules: {
         name: [
-          { required: true, message: '必填', trigger: 'change' },
-          { pattern: /^[a-z0-9]+$/i, message: '请输入英文或数字', trigger: 'change' }
+          // { required: true, message: '必填', trigger: 'change' },
+          { pattern: /^[a-z0-9]+$/i, message: '请输入英文或数字', trigger: 'change' },
+          {
+            validator: (rule, value, callback) => {
+              if (this.apiNames[value]) {
+                callback(new Error('已存在相同接口'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
         ],
         url: { required: true, message: '必填', trigger: 'change' },
         method: { required: true, message: '必填', trigger: 'change' }
@@ -173,12 +159,19 @@ export default {
     }
   },
   watch: {
-    chosenData (data) {
-      this.apiData = { ...data, dataHandleFunc: data.dataHandleFunc || cloneDeep(this.dataHandles) }
-      // this.dataHandleFunc = data.dataHandleFunc || new ApiData().dataHandleFunc
+    chosenData: {
+      deep: true,
+      immediate: true,
+      handler (name) {
+        const data = this.chosenData
+        // this.apiData = { ...data, dataHandleFunc: data.dataHandleFunc || cloneDeep(this.dataHandles) }
+        this.apiData = new ApiData({
+          ...data,
+          dataHandleFunc: data.dataHandleFunc || cloneDeep(this.dataHandles)
+        })
+      }
     },
     apiList (list) {
-      // this.$store.commit
       this.$store.dispatch('resources/updateList', list)
     }
   },
@@ -186,16 +179,19 @@ export default {
     apiList () {
       return this.$store.getters.getResources
     },
+    apiNames () {
+      return Object.keys(keyBy(this.apiList, 'name'))
+    },
     hasHeader () {
-      return this.apiData.header != null
+      return this.apiData?.header != null
     },
     hasBody () {
-      return this.apiData.body != null
+      return this.apiData?.body != null
     },
     dataHandleFunc: {
       get () {
         // console.log('dataHandleFunc get:')
-        return this.apiData.dataHandleFunc || cloneDeep(this.dataHandles)
+        return this.apiData?.dataHandleFunc || cloneDeep(this.dataHandles)
       },
       set (val) {
         // console.info('dataHandleFunc set:', val)
@@ -216,6 +212,7 @@ export default {
       this.apiData = {
         ...cloneDeep(api),
         dataHandleFunc: api.dataHandleFunc || cloneDeep(this.dataHandles),
+        name: `${api.url}_${api.method}`,
         __index: index
       }
     },
@@ -246,19 +243,17 @@ export default {
       // this.dataHandleFunc = this.apiData.dataHandleFunc
     },
     save () {
+      const apiData = Object.assign(this.apiData, { name: this.apiData.name || `${this.apiData.url}_${this.apiData.method}` })
       if (this.apiData?.__index == null) {
-        this.apiList.push(this.apiData)
+        this.apiList.push(apiData)
         // this.$gbImport.gbApiRequires.push(this.apiData)
       } else {
         const { __index } = this.apiData
         if (__index > -1) {
-          this.$set(this.apiList, __index, this.apiData)
+          this.$set(this.apiList, __index, apiData)
           // this.$set(this.$gbImport.gbApiRequires, __index, this.apiData)
         }
       }
-      // this.$nextTick(() => {
-      //   this.apiData = new ApiData()
-      // })
     },
     chooseChange () {
       this.$refs.apiForm.validate(valid => {
@@ -272,7 +267,7 @@ export default {
     },
     testLink () {},
     toggleCustomList (type) {
-      console.log('toggleCustomList:', type)
+      // console.log('toggleCustomList:', type)
       const data = this.apiData[type]
       if (data) {
         this.$set(this.apiData, type, null)
@@ -284,19 +279,17 @@ export default {
     formatFuncByStr (str, handle) {
       const { funcDefined, name } = handle
       const funcStr = funcDefined.replace(/\{[^}]+\}/g, `{ ${str} }`)
-      // console.log('funcStr:', funcStr)
-      // this.dataHandleFunc[name] = funcStr
       this.$set(this.apiData.dataHandleFunc[name], 'funcStr', funcStr)
     },
     openFuncEdit (actNames) {
       this.funcEditVisibles = actNames
-      // this.apiData
       actNames.forEach(name => {
         this.$set(this.apiData.dataHandleFunc[name], 'desc', this.dataHandles[name].desc)
       })
     }
   },
   mounted () {
+    console.info('remote mounted')
     // this.initFuncEdit()
   }
 }

@@ -34,7 +34,7 @@
           .secondary-text.m-l-8 {{asyncFunc.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
       .right-wrap
-    AsyncRequired(title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
+    RemoteSettingRequire(title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
     //- 选择现有字典
   .list-async.box-content__inside(v-if="optionType === 'optionRelationKey'")
       el-input(v-model.trim.lazy="optionRelationKey", placeholder="请填写字典关键名")
@@ -44,7 +44,7 @@
 
 <script>
 import Draggable from 'vuedraggable'
-import AsyncRequired from './AsyncRequired.vue'
+import RemoteSettingRequire from '../RemoteSetting/Require'
 /** 自定义选项配置
  * 遇到`xxxAsyncFunc`的命名，就使用异步请求方法，执行是在运行表单时候运行，即在业务方使用
  * 遇到`optionRelationKey`,则使用relation请求,在表单中如有勾选[首次加载字典], 则默认执行
@@ -63,7 +63,7 @@ export default {
   },
   components: {
     Draggable,
-    AsyncRequired
+    RemoteSettingRequire
   },
   data () {
     return {
