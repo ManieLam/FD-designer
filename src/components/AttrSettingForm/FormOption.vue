@@ -34,7 +34,7 @@
           .secondary-text.m-l-8 {{asyncFunc.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
       .right-wrap
-    RemoteSettingRequire(title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
+    RemoteSettingRequire(key="option", title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
     //- 选择现有字典
   .list-async.box-content__inside(v-if="optionType === 'optionRelationKey'")
       el-input(v-model.trim.lazy="optionRelationKey", placeholder="请填写字典关键名")

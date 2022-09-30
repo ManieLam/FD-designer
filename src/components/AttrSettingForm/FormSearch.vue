@@ -14,7 +14,7 @@
           .secondary-text.m-l-8 {{asyncFunc.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
       .right-wrap
-      RemoteSettingRequire(title="配置远程搜索", v-model="setAsyncVisible", :chosenData="asyncFunc", @chosen="getAsyncFunc")
+      RemoteSettingRequire(key="search", title="配置远程搜索", v-model="setAsyncVisible", :chosenData="asyncFunc", @chosen="getAsyncFunc")
 </template>
 
 <script>

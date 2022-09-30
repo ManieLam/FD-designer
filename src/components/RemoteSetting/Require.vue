@@ -40,13 +40,17 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
             el-form-item(prop="header")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求头部
-                .label-right.cursor-pointer.font-size-medium.hover-change-scale(:class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'", @click="toggleCustomList('header')")
+                .label-right.cursor-pointer.font-size-medium.hover-change-scale(
+                  :class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
+                  @click="toggleCustomList('header')")
               ParamsList(v-show="hasHeader", v-model="apiData.header", :editAble="true", :isSelection="true")
 
             el-form-item(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求参数
-                .label-right.cursor-pointer.font-size-medium.hover-change-scale(:class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'", @click="toggleCustomList('body')")
+                .label-right.cursor-pointer.font-size-medium.hover-change-scale(
+                  :class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
+                  @click="toggleCustomList('body')")
               ParamsList(v-show="hasBody", v-model="apiData.body", :editAble="true", :isSelection="true")
 
             el-form-item(label="是否表单初始化发送请求", prop="immediate")
@@ -62,8 +66,8 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
                   :title="handle.title"
                   :name="handle.name")
                   CodeEditor(
-                    v-if="dataHandleFunc && dataHandleFunc[handle.name]"
-                    v-model="dataHandleFunc[handle.name].desc"
+                    v-if="apiData && apiData[handle.name]"
+                    v-model="apiData[handle.name].desc"
                     :key="apiData.name"
                     @change="formatFuncByStr($event, handle)")
                     pre.code-editor-desc__pre(slot="code-pre") {{handle.params|filterParamsDesc}}
@@ -77,7 +81,7 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
 import ParamsList from './ParamsList'
 import { cloneDeep, keyBy } from 'lodash'
 import CodeEditor from '@/components/CodeEditor/index'
-import { ApiData } from '@/model/resource.js'
+import { ApiData, ApiDataHandles } from '@/model/resource.js'
 export default {
   name: 'RemoteSettingRequire',
   props: {
@@ -113,29 +117,7 @@ export default {
       apiData: new ApiData(),
       apiMethods: ['GET', 'POST', 'PATCH', 'SET', 'DELETE'],
       apiStorageList: this.$store.getters.getResources,
-      dataHandles: {
-        beforeRequired: {
-          name: 'beforeRequired',
-          title: '请求发送前',
-          params: { params: '表单数据，即提交的数据' },
-          desc: '\n return params',
-          funcDefined: '(params) => { return params }' // 实际在表单执行时，实际运行的方法，记录eval(真实方法)
-        },
-        afterRequired: {
-          name: 'afterRequired',
-          title: '请求返回响应数据时',
-          params: { res: '响应参数，允许写Promise函数，触发error的catch' },
-          desc: '\n return res.data',
-          funcDefined: '(res) => { return res.data }'
-        },
-        error: {
-          name: 'error',
-          title: '异常数据处理',
-          params: { err: '异常数据' },
-          desc: '\n return err',
-          funcDefined: '(err) => { return err }'
-        }
-      },
+      dataHandles: ApiDataHandles,
       dataHandleEditors: {},
       rules: {
         name: [
@@ -162,13 +144,8 @@ export default {
     chosenData: {
       deep: true,
       immediate: true,
-      handler (name) {
-        const data = this.chosenData
-        // this.apiData = { ...data, dataHandleFunc: data.dataHandleFunc || cloneDeep(this.dataHandles) }
-        this.apiData = new ApiData({
-          ...data,
-          dataHandleFunc: data.dataHandleFunc || cloneDeep(this.dataHandles)
-        })
+      handler (data) {
+        this.apiData = new ApiData(data)
       }
     },
     apiList (list) {
@@ -188,16 +165,6 @@ export default {
     hasBody () {
       return this.apiData?.body != null
     },
-    dataHandleFunc: {
-      get () {
-        // console.log('dataHandleFunc get:')
-        return this.apiData?.dataHandleFunc || cloneDeep(this.dataHandles)
-      },
-      set (val) {
-        // console.info('dataHandleFunc set:', val)
-        this.apiData.dataHandleFunc = val
-      }
-    },
     dialogVisabled: {
       get () {
         return this.value
@@ -211,7 +178,6 @@ export default {
     editApi (api, index) {
       this.apiData = {
         ...cloneDeep(api),
-        dataHandleFunc: api.dataHandleFunc || cloneDeep(this.dataHandles),
         name: `${api.url}_${api.method}`,
         __index: index
       }
@@ -265,7 +231,12 @@ export default {
         }
       })
     },
-    testLink () {},
+    testLink () {
+      console.info('测试发起请求:', this.apiData)
+      this.$require(this.apiData).then(res => {
+        console.info(res)
+      })
+    },
     toggleCustomList (type) {
       // console.log('toggleCustomList:', type)
       const data = this.apiData[type]
@@ -279,13 +250,11 @@ export default {
     formatFuncByStr (str, handle) {
       const { funcDefined, name } = handle
       const funcStr = funcDefined.replace(/\{[^}]+\}/g, `{ ${str} }`)
-      this.$set(this.apiData.dataHandleFunc[name], 'funcStr', funcStr)
+      this.$set(this.apiData[name], 'funcStr', funcStr)
+      this.$set(this.apiData[name], '__isChange', funcStr !== funcDefined)
     },
     openFuncEdit (actNames) {
       this.funcEditVisibles = actNames
-      actNames.forEach(name => {
-        this.$set(this.apiData.dataHandleFunc[name], 'desc', this.dataHandles[name].desc)
-      })
     }
   },
   mounted () {

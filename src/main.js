@@ -14,6 +14,7 @@ import 'anso-ui/lib/anso-ui.css'
 import Widgets from '@/utils/widgets'
 import defaultValueSet from '@/utils/defaultConfig'
 import gbImport from '@/utils/import'
+import require from '@/utils/request'
 import AnsoUI from 'anso-ui'
 
 import CodeEditorConstruct from '@/components/CodeEditor/CodeEditorConstruct'
@@ -39,6 +40,7 @@ Vue.component('SmartDrawer', SmartDrawer)
 Vue.prototype.$Widget = Widgets
 Vue.prototype.$defValue = defaultValueSet
 Vue.prototype.$gbImport = gbImport
+Vue.prototype.$require = require
 
 new Vue({
   router,
