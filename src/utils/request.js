@@ -17,15 +17,12 @@ export const httpHeader = (props, timeStamp) => {
 }
 function useEval (funcStr = '', cb) {
   ((callback) => {
-    console.info('before:', funcStr)
-    const func = eval(funcStr)
-    console.info(func)
-    callback(func)
+    callback(eval(funcStr))
   })(cb)
 }
 
 /* 参数格式转换 */
-export function formatParams ({ body, beforeRequired }) {
+export function formatParams ({ body, beforeRequired } = {}) {
   const params = body.reduce((res, row) => {
     let paramsVal = ''
     switch (row.varType) {
@@ -41,10 +38,9 @@ export function formatParams ({ body, beforeRequired }) {
     res[row.key] = paramsVal
     return res
   }, {})
-  if (beforeRequired && beforeRequired.__isChange) {
-    useEval(beforeRequired.funcStr, (func) => {
-      const result = func(params)
-      console.info('result:', result)
+  if (beforeRequired?.__isChange) {
+    useEval(beforeRequired.funcInput, (func) => {
+      func(params)
     })
   }
   return params
@@ -78,19 +74,20 @@ axios.interceptors.request.use(
     return config
   },
   error => {
-    console.log('error', error)
+    // console.log('error', error)
     return Promise.reject(new Error(error).message)
   }
 )
 
 axios.interceptors.response.use(
   response => {
-    console.log('.....', response)
+    // console.log('.....', response)
     return response.data
   },
   error => {
-    console.log('error', error)
-    return Promise.reject(new Error(error).message)
+    // console.log('error', error)
+    // return Promise.reject(new Error(error))
+    return Promise.reject(error)
   }
 )
 
@@ -98,33 +95,41 @@ export function fetch (props) {
   return axios(httpOptions(props))
     .then(
       (response) => {
-        if (response.data.code === 0) {
-          // clearRequestQueue(props, response.data)
-          return response.data
-        } else if (response.data.code === 6) {
-          // 警告类，允许业务往下执行
-          // 以防进入catch
-          return Object({
-            ...response.data,
-            statusText: response.statusText,
-            __status: 'warning'
-          })
-        } else {
-          throw Object({
-            response: {
-              status: response.data.code,
-              statusText: response.data.message
-            }
+        // if (response.data.code === 0) {
+        //   // clearRequestQueue(props, response.data)
+        //   return response.data
+        // } else if (response.data.code === 6) {
+        //   // 警告类，允许业务往下执行
+        //   // 以防进入catch
+        //   return Object({
+        //     ...response.data,
+        //     statusText: response.statusText,
+        //     __status: 'warning'
+        //   })
+        // } else {
+        //   throw Object({
+        //     response: {
+        //       status: response.data.code,
+        //       statusText: response.data.message
+        //     }
+        //   })
+        // }
+        if (props.afterRequired?.__isChange) {
+          useEval(props.afterRequired.funcInput, (func) => {
+            func(response)
           })
         }
       },
       (reject) => {
-        console.error('is no action:', reject)
+        if (props.error?.__isChange) {
+          useEval(props.error.funcInput, (func) => {
+            func(reject)
+          })
+        }
         return false
       }
     )
     .catch((error) => {
-      console.error('is axios error', error)
       if (error.response) {
         Message.error(error.response.statusText)
       }

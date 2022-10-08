@@ -1,5 +1,12 @@
 <template lang='pug'>
-el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialogVisabled", width="70%", center, :close-on-click-modal="false")
+el-dialog.async-required-dialog(
+  :key="key"
+  :title="title"
+  :visible.sync="dialogVisabled"
+  width="70%"
+  center
+  :append-to-body="true"
+  :close-on-click-modal="false")
   .async-required-container
     .top-wrap.d-flex-row-between.m-b-8
       .left-wrap__top {{apiData.name ? '已选中:' : '请选择一个数据源'}}
@@ -26,7 +33,7 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
         el-empty.left-empty(v-show="!apiList.length", description="暂无数据源，请添加")
       .right-wrap
         .right-custom-data
-          el-form(ref="apiForm", :model="apiData", label-position="right", :rules="rules")
+          el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
             //- el-form-item(label="名称", prop="name")
             //-   el-input(v-model="apiData.name", placeholder="接口标识名称，请使用英文或数字")
 
@@ -40,7 +47,7 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
             el-form-item(prop="header")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求头部
-                .label-right.cursor-pointer.font-size-medium.hover-change-scale(
+                .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
                   :class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
                   @click="toggleCustomList('header')")
               ParamsList(v-show="hasHeader", v-model="apiData.header", :editAble="true", :isSelection="true")
@@ -48,7 +55,7 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
             el-form-item(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求参数
-                .label-right.cursor-pointer.font-size-medium.hover-change-scale(
+                .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
                   :class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
                   @click="toggleCustomList('body')")
               ParamsList(v-show="hasBody", v-model="apiData.body", :editAble="true", :isSelection="true")
@@ -67,10 +74,10 @@ el-dialog.async-required-dialog(:key="key", :title="title", :visible.sync="dialo
                   :name="handle.name")
                   CodeEditor(
                     v-if="apiData && apiData[handle.name]"
-                    v-model="apiData[handle.name].desc"
+                    v-model="apiData[handle.name].placeholder"
                     :key="apiData.name"
                     @change="formatFuncByStr($event, handle)")
-                    pre.code-editor-desc__pre(slot="code-pre") {{handle.params|filterParamsDesc}}
+                    pre.code-editor-desc__pre(slot="code-pre") {{handle.params|filterPrePlaceholder}}
                     pre.code-editor-desc__suffix(slot="code-suffix") }
 
             el-form-item(label="备注", prop="demo")
@@ -100,7 +107,7 @@ export default {
     CodeEditor
   },
   filters: {
-    filterParamsDesc (desc) {
+    filterPrePlaceholder (desc) {
       const descList = Object.entries(desc)
       return descList.reduce((str, [name, value], index) => {
         str += `// @ { ${name} } ${value} \n`
@@ -248,10 +255,10 @@ export default {
       }
     },
     formatFuncByStr (str, handle) {
-      const { funcDefined, name } = handle
-      const funcStr = funcDefined.replace(/\{[^}]+\}/g, `{ ${str} }`)
-      this.$set(this.apiData[name], 'funcStr', funcStr)
-      this.$set(this.apiData[name], '__isChange', funcStr !== funcDefined)
+      const { funcDefault, name } = handle
+      const funcInput = funcDefault.replace(/\{[^}]+\}/g, `{ ${str} }`)
+      this.$set(this.apiData[name], 'funcInput', funcInput)
+      this.$set(this.apiData[name], '__isChange', funcInput !== funcDefault)
     },
     openFuncEdit (actNames) {
       this.funcEditVisibles = actNames

@@ -4,22 +4,25 @@ export const ApiDataHandles = {
     name: 'beforeRequired',
     title: '请求发送前',
     params: { params: '表单数据，即提交的数据' },
-    desc: '\n return params',
-    funcDefined: '(params) => { return params }' // 实际在表单执行时，实际运行的方法，记录eval(真实方法)
+    placeholder: '\n return params',
+    funcDefault: '(params) => { return params }',
+    funcInput: '' // 实际在表单执行时，实际运行的方法，记录eval(真实方法)
   },
   afterRequired: {
     name: 'afterRequired',
     title: '请求返回响应数据时',
     params: { res: '响应参数，允许写Promise函数，触发error的catch' },
-    desc: '\n return res.data',
-    funcDefined: '(res) => { return res.data }'
+    placeholder: '\n return res.data',
+    funcDefault: '(res) => { return res.data }',
+    funcInput: ''
   },
   error: {
     name: 'error',
     title: '异常数据处理',
     params: { err: '异常数据' },
-    desc: '\n return err',
-    funcDefined: '(err) => { return err }'
+    placeholder: '\n return err',
+    funcDefault: '(err) => { return err }',
+    funcInput: ''
   }
 }
 
