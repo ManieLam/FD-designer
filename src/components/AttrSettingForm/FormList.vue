@@ -10,7 +10,7 @@ table.list-options
     tr.drag-list(v-for="(item, index) in actList", :key="index")
       td(v-for="prop in columnProps", :key="prop.prop")
         slot(v-bind[prop.prop]="item")
-          el-input(v-model="item[prop.prop]")
+          el-input(v-model="item[prop.prop]", :placeholder="prop.placeholder")
       td
         i.el-icon-minus.color-primary.btn-radius-50(:disabled="actList.length===1",  @click="remove(item, index)")
       td(v-if="index === actList.length - 1")
@@ -22,7 +22,7 @@ table.list-options
         i.el-icon-rank.handle
       td(v-for="prop in columnProps")
         slot(v-bind[prop.prop]="item")
-          el-input(v-model="item[prop.prop]")
+          el-input(v-model="item[prop.prop]", :placeholder="prop.placeholder")
       td
         i.el-icon-minus.color-primary.btn-radius-50(:disabled="actList.length===1",  @click="remove(item, index)")
       td(v-if="index === actList.length - 1")
@@ -45,7 +45,10 @@ export default {
   //   event: 'input'
   // },
   props: {
-    value: Array,
+    value: {
+      type: Array,
+      default: () => ([])
+    },
     draggable: {
       type: Boolean,
       default: true
@@ -58,10 +61,6 @@ export default {
           { label: '选项文本', prop: 'label' }
         ]
       }
-    },
-    length: {
-      type: Number,
-      default: 2
     }
   },
   data () {
