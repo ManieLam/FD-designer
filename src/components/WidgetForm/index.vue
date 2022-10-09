@@ -4,7 +4,10 @@
   .empty-wrap.color-secondary.text-center(v-if="!fieldList.length") 支持拖拽元素进入
   el-form(
     v-else
+    ref="form"
     v-bind="formConfig"
+    :rules="rules"
+    :model="formData"
     :label-width="`${formAttrs.labelWidth}px`"
     :label-position="formAttrs.labelPosition"
     :disabled="formAttrs.readOnly")
@@ -38,7 +41,8 @@
  * 默认只支持常规表单
  * TODO 支持表单多种布局
  */
-import { merge, omit } from 'lodash'
+import { merge, omit, isEmpty } from 'lodash'
+import { formatFormRules } from '@/utils/format.js'
 import Draggable from 'vuedraggable'
 import WidgetFormItem from './WidgetFormItem'
 export default {
@@ -70,9 +74,19 @@ export default {
       // formAttrs: {},
       // fieldList: this.fields,
       // fields: [],
+      formData: {},
       buttonList: [
         { label: '取消', name: 'cancel', func: () => {} },
-        { label: '提交', name: 'submit', type: 'primary', func: () => {} }
+        {
+          label: '提交',
+          name: 'submit',
+          type: 'primary',
+          func: () => {
+            this.$refs.form.validate((valid) => {
+              console.info('验证结果', valid)
+            })
+          }
+        }
       ]
     }
   },
@@ -89,6 +103,20 @@ export default {
     },
     formAttrs () {
       return this.formConfig?.attrs || {}
+    },
+    rules () {
+      /* 如果做要同步视图的校验，计算比较多, 这里采用手动点击预览 或 保存后刷新查看结果 */
+      return this.fieldList.reduce((obj, field) => {
+        const rules = field.rules
+        if (!!rules && (!isEmpty(rules.isRequired) || !isEmpty(rules.isRegexp) || !!rules.isValidator)) {
+          return {
+            ...obj,
+            [field.name]: formatFormRules(rules)
+          }
+        } else {
+          return obj
+        }
+      }, {})
     }
   },
   filters: {
@@ -101,6 +129,8 @@ export default {
   methods: {
     setFormitemAttrs () {},
     setFormAttrs () {}
+  },
+  mounted () {
   }
 }
 </script>

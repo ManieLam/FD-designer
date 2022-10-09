@@ -15,9 +15,14 @@ export const httpHeader = (props, timeStamp) => {
     'x-csrf-token': 'test'
   }
 }
-function useEval (funcStr = '', cb) {
-  ((callback) => {
-    callback(eval(funcStr))
+
+export function useEval (funcStr = '', cb) {
+  ((_cb) => {
+    // console.info(_cb)
+    const func = eval(funcStr)
+    // console.info(typeof func)
+    // console.info(func)
+    _cb(func)
   })(cb)
 }
 
@@ -39,9 +44,7 @@ export function formatParams ({ body, beforeRequired } = {}) {
     return res
   }, {})
   if (beforeRequired?.__isChange) {
-    useEval(beforeRequired.funcInput, (func) => {
-      func(params)
-    })
+    useEval(beforeRequired.funcInput, (func) => func(params))
   }
   return params
 }
@@ -115,16 +118,12 @@ export function fetch (props) {
         //   })
         // }
         if (props.afterRequired?.__isChange) {
-          useEval(props.afterRequired.funcInput, (func) => {
-            func(response)
-          })
+          useEval(props.afterRequired.funcInput, (func) => func(response))
         }
       },
       (reject) => {
         if (props.error?.__isChange) {
-          useEval(props.error.funcInput, (func) => {
-            func(reject)
-          })
+          useEval(props.error.funcInput, (func) => func(reject))
         }
         return false
       }
