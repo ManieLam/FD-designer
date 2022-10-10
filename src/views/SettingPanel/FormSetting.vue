@@ -8,19 +8,40 @@
         v-on="$listeners"
         :value="attrsData"
         :attrs="attrs"
-        @input="getAttrs")
+        @update="update")
     el-collapse-item.collapse-item(title="行为配置", name="action")
       //- el-button(@click="toggleSource") 配置表单数据源
       //- .column-name
       .action-setting-wrap.m-t-8
-        .color-text-primary.font-size-base 表单首次加载
+        .color-text-primary.font-size-base 表单初始化时
         .row-item
-          el-checkbox(v-model="actionsData.getRelationImmediate") 加载字段字典
+          el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
+        .row-item
+          el-checkbox(v-model="actionsData.getResourceImmediate") 是否发起请求
+          .list-async.box-content__inside(
+            v-if="actionsData.getResourceImmediate")
+            //- 动态配置数据源
+            el-button(@click="setRemoteVisable = !setRemoteVisable") {{ immediateRemoteRequire.name ? '重新选择数据源' : '配置数据源' }}
+            .list-column__default.m-t-4(v-show="immediateRemoteRequire.name")
+              .left-wrap
+                .d-flex-v-center
+                  i.el-icon-check.color-primary.m-r-8
+                  .color-warning {{immediateRemoteRequire.method}}
+                  .secondary-text.m-l-8 {{immediateRemoteRequire.url}}
+                .color-text-secondary.font-size-small.m-l-8 {{ immediateRemoteRequire.demo || ''}}
+              .right-wrap
+            RemoteSettingRequire(
+              key="formRequire"
+              title="配置表单首次加载数据源"
+              v-model="setRemoteVisable"
+              :chosenData="immediateRemoteRequire"
+              @chosen="getAsyncSeting")
 </template>
 
 <script>
 /** 表单配置区 */
 import AttrSettingForm from '@/components/AttrSettingForm'
+import RemoteSettingRequire from '@/components/RemoteSetting/Require'
 import { isEmpty } from 'lodash'
 export default {
   name: 'FormSetting',
@@ -34,7 +55,8 @@ export default {
     }
   },
   components: {
-    AttrSettingForm
+    AttrSettingForm,
+    RemoteSettingRequire
   },
   data () {
     return {
@@ -123,18 +145,19 @@ export default {
         { label: '字典名', prop: 'label' }
       ], // 字典选项
       actions: [],
-      actionsData: {}
+      actionsData: {},
+      setRemoteVisable: false
     }
   },
   watch: {
     canvas (obj) {
-      console.info('canvas change---', obj)
+      // console.info('canvas change---', obj)
     },
     'canvas.form': {
       immediate: true,
       // deep: true,
       handler (form, oldData) {
-        console.info('form change--', form)
+        // console.info('form change--', form)
         if (form) {
           this.attrsData = !form?.attrs || isEmpty(form.attrs) ? { ...this.$defVal?.formAttrs } : form?.attrs
           this.actionsData = !form.actions || isEmpty(form.actions) ? {} : form.actions
@@ -153,11 +176,23 @@ export default {
     //   this.changeRelation(list)
     // }
   },
+  computed: {
+    immediateRemoteRequire: {
+      get () {
+        return this.actionsData.immediateRemoteRequire || {}
+      },
+      set (datas) {
+        // this.actionsData.immediateRemoteRequire = datas
+        this.$set(this.actionsData, 'immediateRemoteRequire', datas)
+        this.setFormState({ actions: this.actionsData })
+      }
+    }
+  },
   methods: {
-    getAttrs (attrs) {
-      this.setFormState({ attrs: attrs })
+    update (attrs) {
+      this.setFormState({ attrs: this.attrsData })
     },
-    setFormState ({ attrs, actions }) {
+    setFormState ({ attrs = null, actions = null }) {
       this.$store.commit('canvas/updateConfig', {
         name: this.canvasName,
         attrs,
@@ -173,6 +208,12 @@ export default {
     //     name: this.canvasName,
     //     actions: this.actionsData
     //   })
+    },
+    getAsyncSeting (data) {
+      this.immediateRemoteRequire = data
+    },
+    getAttrUpdate (data) {
+      console.info('getAttrUpdate:', data)
     }
   }
 }

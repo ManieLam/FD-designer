@@ -17,8 +17,8 @@ el-dialog.async-required-dialog(
       el-button-group.right-wrap__top
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
         el-button(type="primary", @click="testLink") 测试链接
-        el-button(type="primary", title="保存至全局，允许下次继续使用", @click="save") 保存
-        el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
+        el-button(type="primary", title="保存至全局，允许下次继续使用", @click="save") 保存至全局
+        el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 选中当前
     .bottom-wrap.d-flex-row-between
       .left-wrap.m-r-8
         .left-api-list.d-flex-row-between.align-items-center.hover-change-bgColor(v-for="(apiItem, index) in apiList", :key="apiItem.name", @click.stop="editApi(apiItem, index)")
@@ -60,8 +60,8 @@ el-dialog.async-required-dialog(
                   @click="toggleCustomList('body')")
               ParamsList(v-show="hasBody", v-model="apiData.body", :editAble="true", :isSelection="true")
 
-            el-form-item(label="是否表单初始化发送请求", prop="immediate")
-              el-switch(v-model="apiData.immediate")
+            //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
+            //-   el-switch(v-model="apiData.immediate")
 
             el-form-item(label="数据处理", prop="dataHandle")
               el-collapse.box-content__inside.code-editor__collapse.m-r-8(
@@ -265,7 +265,7 @@ export default {
     }
   },
   mounted () {
-    console.info('remote mounted')
+    // console.info('remote mounted')
     // this.initFuncEdit()
   }
 }
