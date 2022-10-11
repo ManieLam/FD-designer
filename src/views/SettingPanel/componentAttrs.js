@@ -36,16 +36,10 @@ export const select = {
       tag: 'el-input'
     },
     {
-      label: '选项',
-      key: 'options',
-      tag: 'form-option',
-      tip: '选项配置的方式只允许一种'
-      // tag: 'el-select'
-    },
-    {
       label: '是否分组',
       key: 'isGroup',
       tag: 'el-checkbox',
+      labelHidden: true,
       options: [{ label: '分组', value: true }, { label: '不分', value: false }],
       chains: () => {}
     },
@@ -53,50 +47,46 @@ export const select = {
       label: '是否多选',
       key: 'multiple',
       tag: 'el-checkbox',
+      labelHidden: true,
       options: [{ label: '多选', value: true }, { label: '单选', value: false }]
     },
     {
       label: '是否允许清空选项',
       key: 'clearable',
       tag: 'el-checkbox',
+      labelHidden: true,
       options: switchDefaultOptions
     },
-    // {
-    //   label: '搜索',
-    //   key: 'filterable',
-    //   group: [
-    //     {
-    //       label: '是否允许搜索',
-    //       tag: 'el-switch',
-    //       key: 'filterable',
-    //       options: switchDefaultOptions,
-    //     }
-    //   ]
-    // },
     {
-      label: '是否允许搜索',
+      label: '选项',
+      key: 'options',
+      tag: 'form-option',
+      tip: '选项配置的方式只允许一种'
+      // tag: 'el-select'
+    },
+    {
+      label: '搜索',
       tag: 'form-search',
       // tag: 'el-switch',
       key: 'filterable',
       options: switchDefaultOptions
-    // },
-    // {
-    //   label: '是否远程搜索',
-    //   key: 'filter-method',
-    //   tag: 'el-switch',
-    //   options: switchDefaultOptions
     },
     {
       label: '校验',
       key: 'rules',
       tag: 'form-validate'
+    },
+    {
+      label: '默认值',
+      key: 'defaultValue',
+      tag: 'form-defaultValue'
     }
   ],
   actions: [
     {
-      label: '异步搜索函数',
-      key: 'remoteFunc',
-      func: () => {}
+      label: '联动配置',
+      key: 'chains',
+      tag: 'form-chains'
     }
   ]
 }

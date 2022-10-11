@@ -14,6 +14,10 @@ export const formAttrs = {
 export const select = {
   clearable: true,
   filterable: true,
+  defaultValue: {
+    customFunc: '(data, fields, field) => {\n return data[field.name]}',
+    valueType: 'isDefault'
+  }, // 默认值配置
   placeholder: '请选择'
 }
 
