@@ -3,7 +3,8 @@
   .validate-list
     .validate-item
       el-checkbox(v-model="validType.isRequired") 不允许为空
-      el-input(v-if="validType.isRequired", v-model="requireRule.message", placeholder="自定义错误信息")
+      el-input(v-if="validType.isRequired", v-model="requireRule.message", placeholder="请输入")
+        template(slot="prepend") 自定义错误信息
     .validate-item
       el-checkbox(v-model="validType.isRegexp") 正则判断
       form-list(v-if="validType.isRegexp", :columnProps="regexpProps", :draggable="false", v-model="regexpRule")
