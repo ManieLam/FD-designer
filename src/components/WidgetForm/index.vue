@@ -18,7 +18,10 @@
         .widget-form-item-wrap(v-for="(ele, index) in fieldList", :key="ele.key")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
+            v-on="$listeners"
+            v-model="formData[ele.name]"
             :class="{'is-active': formItemConfig.name === ele.key}"
+            :keyName="ele.key"
             :name="ele.key"
             :compTag="ele.compTag"
             :index="index"
@@ -131,6 +134,9 @@ export default {
     setFormAttrs () {}
   },
   mounted () {
+    // this.formData = this.fieldList.reduce((res, field) => {
+    //   return { ...res, [field.name]: field.defaultValue || null }
+    // }, {})
   }
 }
 </script>

@@ -3,12 +3,25 @@
 export default {
   name: 'WidgetFormItem',
   props: [
+    'value',
     'name',
     'config',
-    'compTag'
+    'compTag',
+    'keyName'
   ],
   data () {
     return {}
+  },
+  computed: {
+    currentValue: {
+      get () {
+        return this.value
+      },
+      set (val) {
+        // this.$emit('onValueChange', this.field, val, null)
+        this.$emit('input', val, this.field)
+      }
+    }
   },
   // mounted () {
   //   console.info(this.$props)
@@ -23,7 +36,7 @@ export default {
         on={this.$listeners}
         class={this.config.tag === 'text' ? 'el-form-item-text' : ''}
         label={label}
-        prop={name}
+        prop={this.name}
         label-hidden={this.config.labelHidden}
         label-width={this.config.labelWidth ? this.config.labelWidth : ''}
         is-toptiperror={this.config.errorToptip}
@@ -51,12 +64,14 @@ export default {
             class: 'form-item_component',
             props: {
               field: this.config,
+              value: this.currentValue,
               ...this.config
             },
             attrs: {
               ...this.config,
               id: this.name
-            }
+            },
+            on: { ...this.$listeners }
           })
         }
       </el-form-item>
