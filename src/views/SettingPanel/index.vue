@@ -1,6 +1,6 @@
 <template lang='pug'>
 .setting-panel
-  el-tabs.setting-tab(v-model="activeName")
+  el-tabs.setting-tab(v-model="activeName", type="card")
     el-tab-pane.tab-component(
       v-for="tab in tabList"
       :key="tab.name"
@@ -48,6 +48,8 @@ export default {
     flex: 1
     display: flex
     flex-direction: column
+    ::v-deep > .el-tabs__header
+      margin-bottom: 0px
     ::v-deep .el-tabs__content
       height: 100%
       overflow-y: auto

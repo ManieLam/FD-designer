@@ -1,11 +1,11 @@
 <template lang='pug'>
-.form-option-container
+.form-option-container.box-content__inside
   //- ul.list-wrap
   //-   li(v-for="item in list",:key="item.value", :value="item.value") {{item.label}}
   .radio-list.m-b-8
-    el-radio-group(v-model="optionType", @change="toggleOptionType")
-      el-radio-button(v-for="radio in optionTypes", :key="radio.value", :label="radio.value", :disabled="radio.disabled") {{radio.label}}
-  table.list-options.box-content__inside(v-if="optionType === 'options'")
+    el-radio-group(v-model="optionType", fill="#57a8ce", @change="toggleOptionType")
+      el-radio(v-for="radio in optionTypes", :key="radio.value", :label="radio.value", :disabled="radio.disabled") {{radio.label}}
+  table.list-options(v-if="optionType === 'options'")
     thead
       tr
         th
@@ -23,7 +23,7 @@
           i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  @click="remove(item, index)")
         td(v-if="index === list.length - 1")
           i.el-icon-plus.color-primary.btn-radius-50(@click="add")
-  .list-async.box-content__inside(v-if="optionType === 'optionsAsyncFunc'")
+  .list-async(v-if="optionType === 'optionsAsyncFunc'")
     //- 动态配置数据源
     el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.name ? '重新选择数据源' : '配置数据源' }}
     .list-column__default.m-t-4(v-show="asyncFunc.name")
@@ -36,7 +36,7 @@
       .right-wrap
     RemoteSettingRequire(key="option", title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
     //- 选择现有字典
-  .list-async.box-content__inside(v-if="optionType === 'optionRelationKey'")
+  .list-async(v-if="optionType === 'optionRelationKey'")
       el-input(v-model.trim.lazy="optionRelationKey", placeholder="请填写字典关键名")
       //- el-select(v-model="value", placeholder="请选择字典")
       //-   el-option(v-for="item in options", :key="item.value", :label="item.label", :value="item.value")
@@ -48,6 +48,7 @@ import RemoteSettingRequire from '../RemoteSetting/Require'
 /** 自定义选项配置
  * 遇到`xxxAsyncFunc`的命名，就使用异步请求方法，执行是在运行表单时候运行，即在业务方使用
  * 遇到`optionRelationKey`,则使用relation请求,在表单中如有勾选[首次加载字典], 则默认执行
+ * TODO 配置disabled的方法
  */
 export default {
   name: 'FormOption',

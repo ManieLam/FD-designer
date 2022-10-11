@@ -3,11 +3,10 @@ el-form.setting-list(v-model="data", label-position="top")
   el-form-item.list-item(
     v-for="attrItem in attrs"
     :key="attrItem.key"
-    :label="attrItem.label"
     :prop="attrItem.key"
     :is-group="!!attrItem.group")
     template(slot="label")
-      span.span-label {{attrItem.label}}
+      span.span-label(v-if="!attrItem.labelHidden") {{attrItem.label}}
       span.span-tip.color-secondary.m-l-8(v-if="attrItem.tip")
         i.el-icon-info {{attrItem.tip}}
     components(
@@ -27,7 +26,7 @@ el-form.setting-list(v-model="data", label-position="top")
         :tip="groupItem.tip"
         :label="groupItem.label")
         template(slot="label")
-          span.span-label {{groupItem.label}}
+          span.span-label(v-if="!attrItem.labelHidden") {{groupItem.label}}
           span.span-tip.color-secondary.m-l-8(v-if="groupItem.tip")
             i.el-icon-info {{groupItem.tip}}
         components(
@@ -71,6 +70,7 @@ export default {
         return this.value
       },
       set (value) {
+        console.info('set - ', value)
         // this.inputed = value
         this.$emit('input', value)
       }

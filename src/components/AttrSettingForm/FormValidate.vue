@@ -2,10 +2,10 @@
 .form-validate-container.box-content__inside
   .validate-list
     .validate-item
-      el-checkbox(v-model="validType.isRequired") 必填
+      el-checkbox(v-model="validType.isRequired") 不允许为空
       el-input(v-if="validType.isRequired", v-model="requireRule.message", placeholder="自定义错误信息")
     .validate-item
-      el-checkbox(v-model="validType.isRegexp") 正则
+      el-checkbox(v-model="validType.isRegexp") 正则判断
       form-list(v-if="validType.isRegexp", :columnProps="regexpProps", :draggable="false", v-model="regexpRule")
     .validate-item
       el-checkbox(v-model="validType.isValidator") 自定义规则

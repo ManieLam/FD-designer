@@ -2,8 +2,25 @@
 .setting-form-wrap
   .secondary-text(v-if="!formItemConfig.name || !attrs.length") 组件配置区
     .secondary-text {{formItemConfig.name}}
-  el-collapse.setting-wrap(v-model="activeNames", v-else)
-    el-collapse-item.collapse-item(title="属性配置", name="attr")
+  .setting-wrap(v-else)
+    el-tabs.setting-tab(v-model="activeName", :stretch="true")
+      el-tab-pane.tab-component(
+        v-for="tab in tabList"
+        :key="tab.name"
+        :name="tab.name"
+        :label="tab.label")
+        AttrSettingForm(
+          v-show="activeName==='attr'"
+          v-bind="$attrs"
+          v-on="$listeners"
+          :value="attrsData"
+          :attrs="attrs"
+          @update="update"
+          @updateAnAttr="updateAnAttr")
+      //- el-radio-button(label="attr") 属性
+      //- el-radio-button(label="action") 行为
+  //- el-collapse.setting-wrap(v-model="activeNames", v-else)
+  //-   el-collapse-item.collapse-item(title="属性配置", name="attr")
       AttrSettingForm(
         v-bind="$attrs"
         v-on="$listeners"
@@ -28,7 +45,13 @@ export default {
   },
   data () {
     return {
-      activeNames: ['attr', 'action'],
+      tabList: [
+        { label: '属性', name: 'attr' },
+        { label: '行为', name: 'action' }
+        // { label: '样式', name: 'style' }
+      ],
+      // activeNames: ['attr', 'action'],
+      activeName: 'attr',
       tempAttrsData: {}
       // attrsData: {}
     }
