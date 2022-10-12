@@ -25,8 +25,8 @@
           i.el-icon-plus.color-primary.btn-radius-50(@click="add")
   .list-async(v-if="optionType === 'optionsAsyncFunc'")
     //- 动态配置数据源
-    el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.name ? '重新选择数据源' : '配置数据源' }}
-    .list-column__default.m-t-4(v-show="asyncFunc.name")
+    el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.url ? '重新选择数据源' : '配置数据源' }}
+    .list-column__default.m-t-4(v-show="asyncFunc.url")
       .left-wrap
         .d-flex-v-center
           i.el-icon-check.color-primary.m-r-8
