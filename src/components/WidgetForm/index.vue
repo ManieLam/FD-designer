@@ -25,7 +25,7 @@
             :name="ele.key"
             :compTag="ele.compTag"
             :index="index"
-            :config="ele|setFormitemConfig(formConfig.attrs)"
+            :config="ele"
             @click.native="$emit('onSelect', ele)")
           .tool-wrap
             .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
@@ -44,7 +44,7 @@
  * 默认只支持常规表单
  * TODO 支持表单多种布局
  */
-import { merge, omit, isEmpty } from 'lodash'
+import { isEmpty } from 'lodash'
 import { formatFormRules } from '@/utils/format.js'
 import Draggable from 'vuedraggable'
 import WidgetFormItem from './WidgetFormItem'
@@ -122,13 +122,16 @@ export default {
       }, {})
     }
   },
-  filters: {
-    setFormitemConfig (set, fset) {
-      // 表单子元素的属性配置在vuex中已经读取
-      const customSet = omit(fset, ['labelWidth', 'keepAliveData', 'layout', 'title'])
-      return merge(set, customSet)
-    }
-  },
+  // filters: {
+  //   setFormitemConfig (set, fset) {
+  //     // 表单子元素的属性配置在vuex中已经读取
+  //     // const customSet = omit(fset, ['labelWidth', 'keepAliveData', 'layout', 'title'])
+  //     // return merge(set, {
+  //     //   readOnly: fset.readOnly
+  //     // })
+  //     return set
+  //   }
+  // },
   methods: {
     setFormitemAttrs () {},
     setFormAttrs () {}

@@ -36,6 +36,14 @@ export const select = {
       tag: 'el-input'
     },
     {
+      label: '是否只读',
+      key: 'disabled',
+      tag: 'el-checkbox',
+      labelHidden: true,
+      options: [{ label: '只读', value: true }, { label: '可编辑', value: false }],
+      chains: () => {}
+    },
+    {
       label: '是否分组',
       key: 'isGroup',
       tag: 'el-checkbox',
@@ -83,6 +91,9 @@ export const select = {
     }
   ],
   actions: [
+    // {
+    //   label: '自带操作'
+    // },
     {
       label: '联动配置',
       key: 'chains',
