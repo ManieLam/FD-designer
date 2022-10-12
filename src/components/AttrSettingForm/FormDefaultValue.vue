@@ -1,7 +1,7 @@
 <template lang='pug'>
 .box-content__inside
   el-radio-group(v-model="settingValue.valueType")
-    el-radio(v-for="radio in valueTypeGroups", :label="radio.name") {{ radio.label }}
+    el-radio(v-for="radio in valueTypeGroups", :key="radio.name", :label="radio.name") {{ radio.label }}
   //- 预设数据配置
   .content-item(v-if="settingValue.valueType==='isPreset'")
     el-select(v-model="settingValue.presetType", placeholder="请选择关联的数据类型")

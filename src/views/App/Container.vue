@@ -8,7 +8,7 @@
     .tool-panel.d-flex-row-between
       el-button-group.tool-wrap__left
         //- el-button() 切换画布
-        el-button(@click="toggleSettingJson=!toggleSettingJson") 查看配置文件
+        el-button(@click="toggleSettingJson") 查看配置文件
       el-button-group.tool-wrap__right
         el-button() 导出
         el-button(@click="onClear") 清空
@@ -35,8 +35,9 @@
   el-dialog(
     title="查看配置文件"
     width="60%"
-    :visible.sync="toggleSettingJson")
-    .setting-json-wrap {{ allCanvas }}
+    :visible.sync="settingJsonVisable")
+    //- .setting-json-wrap {{ allCanvas }}
+    CodeEditor.json-codeEditor(:value="allCanvas|filterCanvasStr", mode="ace/mode/json", :readOnly="true")
 </template>
 
 <script>
@@ -47,25 +48,30 @@ import DragPage from '../DragPage'
 import SettingPanel from '../SettingPanel'
 // import Draggable from 'vuedraggable'
 import { debounce } from 'lodash'
+import CodeEditor from '@/components/CodeEditor'
 export default {
   name: 'AppContainer',
   components: {
     // Draggable,
     DragPage,
     WidgetPanel,
-    SettingPanel
+    SettingPanel,
+    CodeEditor
   },
   data () {
     return {
       actIndex: 0, // 活动的画布index
       formItemConfig: {},
-      toggleSettingJson: false, // 查看json数据
+      settingJsonVisable: false, // 查看json数据
       toggleSettingOpen: true // 切换配置区
     }
   },
   filters: {
     saveable (actCanvas) {
       return !(!!actCanvas && actCanvas?.fields?.length)
+    },
+    filterCanvasStr (obj) {
+      return JSON.stringify(obj, null, '\t')
     }
   },
   computed: {
@@ -79,9 +85,18 @@ export default {
     // actCanvas () {
     //   // return this.allCanvas[this.canvasName]
     //   return this.$store.state.canvas.collects[this.canvasName]
+    },
+    allCanvasStr () {
+      return JSON.stringify(this.allCanvas, null, '\t')
     }
   },
   methods: {
+    toggleSettingJson () {
+      this.$forceUpdate()
+      this.$nextTick(() => {
+        this.settingJsonVisable = !this.settingJsonVisable
+      })
+    },
     updateConfig (type, attrs) {
       if (type === 'comp') {
         this.updateFieldStorage({ fkey: attrs.key, attrs })
@@ -172,4 +187,11 @@ export default {
     // .tool-panel
     //   background: #ff
 
+.json-codeEditor
+  max-height: 100vh
+  min-height: 80vh
+  ::v-deep .code-editor
+    height: 100%
+    max-height: 100vh
+    min-height: 80vh
 </style>
