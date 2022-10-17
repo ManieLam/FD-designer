@@ -2,15 +2,17 @@
 //- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList", key="form")
 .widget-form-container
   .empty-wrap.color-secondary.text-center(v-if="!fieldList.length") 支持拖拽元素进入
-  el-form(
+  el-form.widget-form-wrap(
     v-else
     ref="form"
     v-bind="formConfig"
+    :class="{'is-active-form': selectItem === 'form'}"
     :rules="rules"
     :model="formData"
     :label-width="`${formAttrs.labelWidth}px`"
     :label-position="formAttrs.labelPosition"
-    :disabled="formAttrs.readOnly")
+    :disabled="formAttrs.readOnly"
+    @click.native="onClick({ type: 'form', data: formAttrs })")
     Draggable.list-group.drag-page-container(
       v-model="fieldList"
       animation="150")
@@ -26,7 +28,7 @@
             :compTag="ele.compTag"
             :index="index"
             :config="ele"
-            @click.native="$emit('onSelect', ele)")
+            @click.native.stop="onClick({ type: 'component', data: ele })")
           .tool-wrap
             .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
 
@@ -77,6 +79,7 @@ export default {
       // formAttrs: {},
       // fieldList: this.fields,
       // fields: [],
+      selectItem: '',
       formData: {},
       buttonList: [
         { label: '取消', name: 'cancel', func: () => {} },
@@ -110,7 +113,7 @@ export default {
     rules () {
       /* 如果做要同步视图的校验，计算比较多, 这里采用手动点击预览 或 保存后刷新查看结果 */
       return this.fieldList.reduce((obj, field) => {
-        const rules = field.rules
+        const rules = field.validate
         if (!!rules && (!isEmpty(rules.isRequired) || !isEmpty(rules.isRegexp) || !!rules.isValidator)) {
           return {
             ...obj,
@@ -133,6 +136,10 @@ export default {
   //   }
   // },
   methods: {
+    onClick ({ type, data }) {
+      this.selectItem = type === 'component' ? data.key : type
+      this.$emit('onSelect', { type, data })
+    },
     setFormitemAttrs () {},
     setFormAttrs () {}
   },
@@ -145,6 +152,11 @@ export default {
 </script>
 
 <style lang='sass' scoped>
+.widget-form-wrap
+  padding: 8px
+  border: 1px dashed #f5f5f5
+  &:hover
+    border: 1px dashed #0A4078
 .widget-form-item-wrap
   padding-bottom: 0
   position: relative
@@ -170,4 +182,6 @@ export default {
 .is-active
   border: 1px dashed #0A4078
   background: rgb(87, 168, 206, 0.2)
+.is-active-form
+  border: 1px dashed #0A4078
 </style>

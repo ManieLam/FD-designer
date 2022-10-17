@@ -6,6 +6,8 @@ import { formAttrs as defaultFormAttrs } from '@/utils/defaultConfig'
 // 定义画布数据
 const CanvasData = function ({ fields = [], formAttrs = {}, formActions = {} }) {
   return {
+    name: '',
+    label: '',
     fields: fields,
     form: {
       attrs: Object.assign(defaultFormAttrs, formAttrs),
@@ -17,8 +19,11 @@ const CanvasData = function ({ fields = [], formAttrs = {}, formActions = {} }) 
         getResourceImmediate: false, // 是否立即发起数据请求
         getRelationImmediate: true, // 是否立即加载relation
         ...formActions
-      }
-    }
+      },
+      buttons: []
+    },
+    groups: {},
+    template: 'Form'
   }
 }
 

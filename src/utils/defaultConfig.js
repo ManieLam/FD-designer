@@ -7,7 +7,8 @@ export const formAttrs = {
   labelWidth: 100,
   labelPosition: 'right',
   readOnly: false,
-  keepAliveData: true
+  keepAliveData: true,
+  isGroup: false // 是否组合
 }
 
 // 默认下拉组件(select)配置属性值

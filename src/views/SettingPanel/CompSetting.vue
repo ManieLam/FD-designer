@@ -34,7 +34,7 @@
 
 <script>
 /** 组件配置区 */
-import componentAttrs from './componentAttrs'
+import componentAttrs from '@/utils/componentAttrs'
 import AttrSettingForm from '@/components/AttrSettingForm'
 import { cloneDeep } from 'lodash'
 export default {

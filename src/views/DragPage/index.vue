@@ -147,7 +147,7 @@ export default {
         })
         // console.info('vuex:', this.$store.state.canvas)
 
-        this.$emit('onSelect', element)
+        this.$emit('onSelect', { type: 'component', data: element })
         this.$forceUpdate()
       }
     },

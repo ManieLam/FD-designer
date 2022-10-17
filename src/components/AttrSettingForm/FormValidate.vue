@@ -75,7 +75,7 @@ export default {
       deep: true,
       handler (data, oldData) {
         if (!isEqual(data, oldData)) {
-          this.$emit('updateAnAttr', { name: 'rules', value: data })
+          this.$emit('updateAnAttr', { name: 'validate', value: data })
         }
       }
     }

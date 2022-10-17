@@ -81,7 +81,7 @@ export const select = {
     },
     {
       label: '校验',
-      key: 'rules',
+      key: 'validate',
       tag: 'form-validate'
     },
     {

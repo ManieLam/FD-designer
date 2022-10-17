@@ -10,9 +10,9 @@
         //- el-button() 切换画布
         el-button(@click="toggleSettingJson") 查看配置文件
       el-button-group.tool-wrap__right
-        el-button() 导出
+        el-button(@click="toExportProps.visable=true") 导出
         el-button(@click="onClear") 清空
-        el-button() 预览
+        el-button(@click="onPreview") 预览
         el-button(type="primary", :disabled="allCanvas[canvasName]|saveable", @click="onSave") 保存
     DragPage(
       ref="dragPanel"
@@ -21,7 +21,7 @@
       :actIndex="actIndex"
       :canvasName="canvasName"
       :canvas="allCanvas[canvasName]"
-      @onSelect="selectFormitem")
+      @onSelect="onSelectElement")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
       ref="settingPanel"
@@ -38,6 +38,21 @@
     :visible.sync="settingJsonVisable")
     //- .setting-json-wrap {{ allCanvas }}
     CodeEditor.json-codeEditor(:value="allCanvas|filterCanvasStr", mode="ace/mode/json", :readOnly="true")
+  //- 查看预览的
+  el-dialog(
+    title="查看预览效果"
+    width="80%"
+    :visible.sync="previewProps.visable")
+    component(v-if="previewProps.visable && componentVM", :is="componentVM")
+    //- FromTemp(v-if="previewProps.visable", :config="previewProps.data")
+  //- 导出.vue或.html
+  el-dialog(
+    title="选择导出的类型"
+    width="50%"
+    :visible.sync="toExportProps.visable")
+    .toexport-radio-block
+      .block-item(id="export-vue", @click="onExport('vue')") vue文件
+      .block-item(id="export-html", @click="onExport('html')") html+js+css文件
 </template>
 
 <script>
@@ -49,6 +64,10 @@ import SettingPanel from '../SettingPanel'
 // import Draggable from 'vuedraggable'
 import { debounce } from 'lodash'
 import CodeEditor from '@/components/CodeEditor'
+import FDTranslator from '@/components/Translator/index.js'
+import Vue from 'vue'
+// import FromTemp from '@/components/Translator/Template/Form'
+// console.info(FDTranslator)
 export default {
   name: 'AppContainer',
   components: {
@@ -57,13 +76,25 @@ export default {
     WidgetPanel,
     SettingPanel,
     CodeEditor
+    // FromTemp
   },
   data () {
     return {
       actIndex: 0, // 活动的画布index
       formItemConfig: {},
       settingJsonVisable: false, // 查看json数据
-      toggleSettingOpen: true // 切换配置区
+      toggleSettingOpen: true, // 切换配置区
+      /* 预览 */
+      previewProps: {
+        visable: false,
+        data: {}
+      },
+      /* 导出 */
+      toExportProps: {
+        visable: false,
+        data: {}
+      },
+      componentVM: null
     }
   },
   filters: {
@@ -121,12 +152,16 @@ export default {
     onDragged: debounce(({ from, to }) => {
       // console.info('on Dragged', from, to)
     }, 800),
-    selectFormitem (ele) {
-      this.toggleSettingOpen = true
-      this.formItemConfig = ele
-      this.$nextTick(() => {
-        this.$forceUpdate()
-      })
+    onSelectElement ({ type, data }) {
+      console.info('on Select')
+      // this.toggleSettingOpen = true
+      if (type === 'component') {
+        this.formItemConfig = data
+        this.$nextTick(() => {
+          this.$forceUpdate()
+        })
+      }
+      this.$refs.settingPanel.activeName = type
     },
     onClear () {
       this.$refs.dragPanel.clear()
@@ -149,7 +184,22 @@ export default {
     },
     async initResource () {
       await this.$store.commit('resources/init')
-    }
+    },
+    onPreview () {
+      this.previewProps.data = this.allCanvas[this.canvasName]
+      console.info('previewProps:', this.previewProps)
+      // 模板转换
+      const vms = FDTranslator(Vue, {
+        opt: {
+          router: this.$router,
+          store: this.$store
+        },
+        canvas: [this.previewProps.data]
+      })
+      this.componentVM = vms.length ? vms[0] : null
+      this.previewProps.visable = !this.previewProps.visable
+    },
+    onExport (type) {}
   },
   created () {
     this.initCanvas()
@@ -194,4 +244,22 @@ export default {
     height: 100%
     max-height: 100vh
     min-height: 80vh
+
+.toexport-radio-block
+  display: flex
+  align-items: center
+  justify-content: center
+  .block-item
+    border: 1px solid $--border-color-base
+    padding: 8px 20px
+    text-align: center
+    line-height: 2.8
+    & + .block-item
+      margin-left: 8px
+    &:hover
+      color: $--color-primary
+      cursor: pointer
+      background: $--bgcolor-secondary
+      border-color: $--border-active
+
 </style>

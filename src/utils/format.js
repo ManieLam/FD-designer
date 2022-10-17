@@ -3,10 +3,10 @@ import { useEval } from '@/utils/request'
 /** 格式化表单字段验证规则
  *  @param rules 字段规则{isRequired:<Object>, isRegexp:<Array>, isValidator:<String> }
  *  */
-export function formatFormRules (rules) {
+export function formatFormRules (rules = {}) {
   return Object.entries(rules).reduce((list, [name, rule]) => {
     if (rule) {
-      if (name === 'isRegexp') list = list.concat(rule)
+      if (name === 'isRegexp') list = list.concat({ ...rule, pattern: new RegExp(rule.pattern) })
       if (name === 'isRequired') list.push(rule)
       if (name === 'isValidator') {
         list.push({
@@ -21,6 +21,10 @@ export function formatFormRules (rules) {
   }, [])
 }
 
+/** 解译默认值 */
+export function formatDefaultValueFunc () {}
+
 export default {
-  formatFormRules
+  formatFormRules,
+  formatDefaultValueFunc
 }
