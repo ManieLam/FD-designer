@@ -43,15 +43,17 @@
     title="查看预览效果"
     width="80%"
     :visible.sync="previewProps.visable")
-    component(v-if="previewProps.visable && componentVM", :is="componentVM")
     //- FromTemp(v-if="previewProps.visable", :config="previewProps.data")
+    component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data")
+    //- form-component(v-if="previewProps.visable", :config="previewProps.data")
   //- 导出.vue或.html
   el-dialog(
     title="选择导出的类型"
     width="50%"
     :visible.sync="toExportProps.visable")
     .toexport-radio-block
-      .block-item(id="export-vue", @click="onExport('vue')") vue文件
+      .block-item(id="export-json", @click="exportJson") 配置文件
+      //- .block-item(id="export-vue", @click="exportVue") vue文件
       .block-item(id="export-html", @click="onExport('html')") html+js+css文件
 </template>
 
@@ -64,10 +66,10 @@ import SettingPanel from '../SettingPanel'
 // import Draggable from 'vuedraggable'
 import { debounce } from 'lodash'
 import CodeEditor from '@/components/CodeEditor'
-import FDTranslator from '@/components/Translator/index.js'
+import { templateRegister, getVueComp } from '@/components/Translator/index.js'
 import Vue from 'vue'
 // import FromTemp from '@/components/Translator/Template/Form'
-// console.info(FDTranslator)
+// console.info(FromTemp)
 export default {
   name: 'AppContainer',
   components: {
@@ -94,7 +96,7 @@ export default {
         visable: false,
         data: {}
       },
-      componentVM: null
+      componentVM: 'FormTemp'
     }
   },
   filters: {
@@ -185,21 +187,40 @@ export default {
     async initResource () {
       await this.$store.commit('resources/init')
     },
-    onPreview () {
+    async onPreview () {
       this.previewProps.data = this.allCanvas[this.canvasName]
-      console.info('previewProps:', this.previewProps)
-      // 模板转换
-      const vms = FDTranslator(Vue, {
-        opt: {
-          router: this.$router,
-          store: this.$store
-        },
-        canvas: [this.previewProps.data]
-      })
-      this.componentVM = vms.length ? vms[0] : null
+      this.componentVM = templateRegister[this.previewProps.data?.template]
       this.previewProps.visable = !this.previewProps.visable
+      console.info('previewProps:', this.previewProps)
     },
-    onExport (type) {}
+    onExport (type) {
+    //   if (type === 'json') {
+    //     this.exportJson()
+      // }
+    },
+    exportJson () {
+      const blob = new Blob([JSON.stringify(this.allCanvas[this.canvasName])], { type: 'application/json' })
+      const alink = document.createElement('a')
+      alink.download = '表单设计器配置文件'
+      alink.href = URL.createObjectURL(blob)
+      alink.style.display = 'none'
+      document.body.appendChild(alink)
+      alink.click()
+      URL.revokeObjectURL(alink.href)
+    },
+    async exportVue () {
+      // 获取配置的表单组件
+      const comps = await getVueComp(Vue, {
+        opt: { router: this.$route, store: this.$store },
+        canvas: Object.values(this.allCanvas)
+      })
+      Object.entries(comps).forEach(([name, func]) => {
+        if (name) {
+          Vue.component(name, func)
+        }
+      })
+      console.info(comps)
+    }
   },
   created () {
     this.initCanvas()

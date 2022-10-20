@@ -5,6 +5,7 @@ import store from './store'
 // import './plugins/element.js'
 import Element from 'element-ui'
 import register from '@/components/AttrSettingForm/register'
+import { registerModules } from '@/components/Translator/index.js'
 
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/css/index.sass'
@@ -27,6 +28,11 @@ Vue.use(Element, {
   size: 'small'
 })
 Vue.use(AnsoUI)
+// console.info(FDTranslator)
+// Vue.use(FDTranslator)
+
+// 注册转译模板
+registerModules(Vue)
 
 // 动态注册组件到全局使用
 Object.entries(register).map(([name, comp]) => {
