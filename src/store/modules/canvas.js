@@ -2,30 +2,8 @@
  * 画布包括：字段fields(name,label,form,compTag), 表单form(attrs,actions)
  * */
 import { formAttrs as defaultFormAttrs } from '@/utils/defaultConfig'
+import { CanvasData } from '@/model/canvas' // 定义画布数据
 // import { isEqual, omit } from 'lodash'
-// 定义画布数据
-const CanvasData = function ({ fields = [], formAttrs = {}, formActions = {} }) {
-  return {
-    name: '',
-    label: '',
-    fields: fields,
-    form: {
-      attrs: Object.assign(defaultFormAttrs, formAttrs),
-      actions: {
-        // mounted: {},
-        // created: {},
-        // destory: {},
-        immediateRemoteRequire: {},
-        getResourceImmediate: false, // 是否立即发起数据请求
-        getRelationImmediate: true, // 是否立即加载relation
-        ...formActions
-      },
-      buttons: []
-    },
-    groups: {},
-    template: 'Form'
-  }
-}
 
 const state = () => ({
   collects: {}, // {name: {fields: []}, form: {attrs, ctions}}
@@ -50,15 +28,7 @@ const mutations = {
     if (elements) {
       elements.splice(eIndex, 0, element)
     } else {
-      // states.collects[name] = {
-      //   fields: [element],
-      //   form: {
-      //     attrs: formAttrs || {},
-      //     actions: {}
-      //   }
-      // }
-      states.collects[name] = new CanvasData({ fields: [element] })
-      // states.collects[name].fields = [element]
+      states.collects[name] = new CanvasData({ fields: [element] }, defaultFormAttrs)
     }
   },
   /* 删除 */
@@ -92,13 +62,14 @@ const mutations = {
     }
   },
   // 更新表单属性
-  updateConfig (states, { name, attrs = null, actions = null }) {
+  updateConfig (states, { name, attrs = null, actions = null, buttons = null }) {
     const canvas = states.collects[name]
-    if (canvas && (attrs || actions)) {
+    if (canvas && (attrs || actions || buttons)) {
       const form = canvas.form
       states.collects[name].form = {
         attrs: { ...form.attrs, ...(attrs || {}) },
-        actions: { ...form.actions, ...(actions || {}) }
+        actions: { ...form.actions, ...(actions || {}) },
+        buttons: Array.isArray(buttons) ? buttons.sort((a, b) => a?.sort - b?.sort) : { ...form.buttons }
       }
     }
   },

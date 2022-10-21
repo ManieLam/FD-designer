@@ -11,8 +11,32 @@ export const formAttrs = {
   isGroup: false // 是否组合
 }
 
+// 默认表单按钮配置
+export const formButtons = {
+  cancel: { label: '取消', name: 'cancel', sort: 0, func: () => {} },
+  submit: {
+    label: '提交',
+    name: 'submit',
+    type: 'primary',
+    validate: true,
+    sort: 2,
+    func: () => {
+      this.$refs.form.validate((valid) => {
+        console.info('验证结果', valid)
+      })
+    }
+  },
+  reset: {
+    label: '重置',
+    name: 'reset',
+    sort: 1,
+    func: () => {}
+  }
+}
+
 // 默认下拉组件(select)配置属性值
 export const select = {
+  type: '下拉组件',
   clearable: true,
   filterable: true,
   defaultValue: {
@@ -33,6 +57,7 @@ export const defaultOptions = [{
 
 export default {
   formAttrs,
+  formButtons,
   defaultOptions,
   select
 }

@@ -21,6 +21,11 @@ const switchDefaultOptions = [{ label: '允许', value: true }, { label: '不允
 export const select = {
   attrs: [
     {
+      label: '类型',
+      key: 'type',
+      tag: 'AnsoDataformText'
+    },
+    {
       label: '字段键名',
       key: 'name',
       tag: 'el-input'
@@ -41,7 +46,7 @@ export const select = {
       tag: 'el-checkbox',
       labelHidden: true,
       options: [{ label: '只读', value: true }, { label: '可编辑', value: false }],
-      chains: () => {}
+      chains: () => { }
     },
     {
       label: '是否分组',
@@ -49,7 +54,7 @@ export const select = {
       tag: 'el-checkbox',
       labelHidden: true,
       options: [{ label: '分组', value: true }, { label: '不分', value: false }],
-      chains: () => {}
+      chains: () => { }
     },
     {
       label: '是否多选',
@@ -102,6 +107,31 @@ export const select = {
   ]
 }
 
+export const button = (function () {
+  const attrs = [
+    { label: '按钮标签', key: 'label', tag: 'el-input' },
+    { label: '排序', key: 'sort', tag: 'el-input-number' }
+  ]
+  return {
+    submitAttrs: [
+      ...attrs,
+      { label: '提交前校验', key: 'validate', tag: 'el-switch' },
+      { label: '配置数据源', key: 'funcStr', tag: 'form-remote' }
+    ],
+    resetAttrs: [
+      ...attrs,
+      { label: '重置前二次提醒', key: 'tipBeforeReset', tag: 'el-switch' }
+    ],
+    cancelAttrs: [
+      ...attrs,
+      { label: '取消前二次提醒', key: 'tipBeforeCancel', tag: 'el-switch' },
+      { label: '取消后返回页面', key: 'routeAfterCancel', tag: 'el-input', placeholder: '请输入页面路由地址' }
+    ],
+    attrs
+  }
+})()
+
 export default {
-  select
+  select,
+  button
 }

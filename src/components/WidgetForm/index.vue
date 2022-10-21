@@ -32,12 +32,12 @@
           .tool-wrap
             .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
 
-    el-form-item.m-t-16.widget-form-item
+    el-form-item.m-t-16.widget-form-item(@click.native.stop="onClick({ type: 'button', data: buttonList })")
       el-button(
         v-for="button in buttonList"
         v-bind="button"
         :key="button.name"
-        @click="button.func") {{ button.label }}
+        @click="onButtonClick(button)") {{ button.label }}
 
 </template>
 
@@ -80,23 +80,13 @@ export default {
       // fieldList: this.fields,
       // fields: [],
       selectItem: '',
-      formData: {},
-      buttonList: [
-        { label: '取消', name: 'cancel', func: () => {} },
-        {
-          label: '提交',
-          name: 'submit',
-          type: 'primary',
-          func: () => {
-            this.$refs.form.validate((valid) => {
-              console.info('验证结果', valid)
-            })
-          }
-        }
-      ]
+      formData: {}
     }
   },
   computed: {
+    buttonList () {
+      return this.formConfig.buttons || []
+    },
     fieldList: {
       get () {
         return this.fields
@@ -136,6 +126,11 @@ export default {
   //   }
   // },
   methods: {
+    onButtonClick (button) {
+      if (button.func) {
+        button.func()
+      }
+    },
     onClick ({ type, data }) {
       this.selectItem = type === 'component' ? data.key : type
       this.$emit('onSelect', { type, data })
