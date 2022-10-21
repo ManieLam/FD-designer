@@ -70,7 +70,7 @@ export default {
         return this.value
       },
       set (value) {
-        console.info('set - ', value)
+        // console.info('set - ', value)
         // this.inputed = value
         this.$emit('input', value)
       }
