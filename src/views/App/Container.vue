@@ -155,15 +155,22 @@ export default {
       // console.info('on Dragged', from, to)
     }, 800),
     onSelectElement ({ type, data }) {
-      console.info('on Select')
-      // this.toggleSettingOpen = true
-      if (type === 'component') {
+      const firTab = type === 'component'
+      if (firTab) {
         this.formItemConfig = data
         this.$nextTick(() => {
           this.$forceUpdate()
         })
       }
-      this.$refs.settingPanel.activeName = type
+      this.$refs.settingPanel.activeName = firTab ? 'component' : 'form'
+      this.$nextTick(() => {
+        if (!firTab) {
+          const tabEL = this.$refs.settingPanel.$refs?.form?.[0]
+          if (tabEL) {
+            type === 'button' ? tabEL.togggleTab('action') : tabEL.togggleTab('attr')
+          }
+        }
+      })
     },
     onClear () {
       this.$refs.dragPanel.clear()

@@ -7,6 +7,7 @@
       :name="tab.name"
       :label="tab.label")
       component(
+        :ref="tab.name"
         :is="tab.components"
         v-bind="$attrs"
         v-on="$listeners")
