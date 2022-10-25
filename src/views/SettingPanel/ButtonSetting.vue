@@ -121,7 +121,7 @@ export default {
 .button-list-item
   margin-top: 4px
 
-.list-item-comp
-  flex: 1
+// .list-item-comp
+//   flex: 1
 
 </style>

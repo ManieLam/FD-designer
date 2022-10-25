@@ -190,6 +190,7 @@ export default {
       await this.$store.commit('canvas/init')
       const editingName = this.$store.state.canvas.editingName
       this.actIndex = editingName ? Number(editingName.split('_')[1]) : 0
+      this.formItemConfig = this.allCanvas[this.canvasName]?.fields?.[0] || {}
     },
     async initResource () {
       await this.$store.commit('resources/init')
@@ -198,7 +199,7 @@ export default {
       this.previewProps.data = this.allCanvas[this.canvasName]
       this.componentVM = templateRegister[this.previewProps.data?.template]
       this.previewProps.visable = !this.previewProps.visable
-      console.info('previewProps:', this.previewProps)
+      // console.info('previewProps:', this.previewProps)
     },
     onExport (type) {
     //   if (type === 'json') {
@@ -232,7 +233,8 @@ export default {
   created () {
     this.initCanvas()
     this.initResource()
-  }
+  },
+  mounted () {}
 }
 </script>
 

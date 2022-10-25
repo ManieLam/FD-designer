@@ -147,6 +147,13 @@ export default {
 </script>
 
 <style lang='sass' scoped>
+.widget-form-container
+  position: relative
+  .empty-wrap
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate3d(-50%, -50%, 0)
 .widget-form-wrap
   padding: 8px
   border: 1px dashed #f5f5f5

@@ -44,6 +44,7 @@ export default {
   display: flex
   flex-direction: column
   height: 100%
+  position: relative
   .setting-tab
     height: 100%
     flex: 1
@@ -54,6 +55,11 @@ export default {
     ::v-deep .el-tabs__content
       height: 100%
       overflow-y: auto
+  ::v-deep .empty-text
+    position: absolute
+    left: 50%
+    top: 50%
+    transform: translate3d(-50%, -50%, 0)
 
 .tab-component
   padding-right: 4px

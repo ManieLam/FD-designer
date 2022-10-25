@@ -4,6 +4,7 @@ export default [
     label: '是否只读',
     key: 'readOnly',
     tag: 'el-checkbox',
+    labelHidden: true,
     options: [{
       value: true,
       label: '开启'
@@ -68,6 +69,7 @@ export default [
     label: '保留数据输入',
     key: 'keepAliveData',
     tag: 'el-checkbox',
+    labelHidden: true,
     options: [{
       value: true,
       label: '开启'

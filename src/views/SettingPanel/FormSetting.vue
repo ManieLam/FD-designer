@@ -1,6 +1,6 @@
 <template lang='pug'>
 .setting-form-wrap
-  .secondary-text(v-if="!canvas || !canvas.form") 请先拖拽组件, 再做操作
+  .secondary-text.empty-text(v-if="!canvas || !canvas.form") 请先拖拽组件, 再做操作
   .setting-wrap(v-else)
     el-tabs.setting-tab(v-model="activeName", :stretch="true")
       el-tab-pane.tab-component(
@@ -23,10 +23,12 @@
             .color-text-primary.font-size-base.m-b-8 表单初始化时
             .row-item
               el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
+              .row-item__input.box-content__inside
+                //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource", placeholder="输入字典接口")
+                form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource")
             .row-item
               el-checkbox(v-model="actionsData.getResourceImmediate") 是否发起请求
-              .list-async.box-content__inside(
-                v-if="actionsData.getResourceImmediate")
+              .row-item__remote.box-content__inside(v-if="actionsData.getResourceImmediate")
                 //- 动态配置数据源
                 el-button(@click="setRemoteVisable = !setRemoteVisable") {{ immediateRemoteRequire.name ? '重新选择数据源' : '配置数据源' }}
                 .list-column__default.m-t-4(v-show="immediateRemoteRequire.name")
@@ -183,5 +185,8 @@ export default {
   border: 0
 
 .setting-block + .setting-block
-  margin-top: 10px
+  margin-top: 16px
+
+.row-item + .row-item
+  margin-top: 4px
 </style>

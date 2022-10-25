@@ -1,6 +1,6 @@
 <template lang='pug'>
 .setting-form-wrap
-  .secondary-text(v-if="!formItemConfig.name || !attrs.length") 请先拖拽组件, 再做操作
+  .secondary-text.empty-text(v-if="!formItemConfig.name || !attrs.length") 请先拖拽组件, 再做操作
     .secondary-text {{formItemConfig.name}}
   .setting-wrap(v-else)
     el-tabs.setting-tab(v-model="activeName", :stretch="true")
@@ -58,6 +58,7 @@ export default {
   },
   watch: {
     'formItemConfig.key': {
+      immediate: true,
       handler (fname, oldfname) {
         if (fname !== oldfname) {
           this.attrsData = cloneDeep(this.formItemConfig)
