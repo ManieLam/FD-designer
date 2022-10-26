@@ -15,9 +15,12 @@
 } */
 
 import { gbApiRequires } from '@/utils/import' // 假设这个属于公共导入的配置
+import { ApiData } from '@/model/resource'
+
+const formatResource = gbApiRequires.map(r => ApiData(r))
 
 const state = {
-  list: gbApiRequires || []
+  list: formatResource || []
 }
 const mutations = {
   init (states) {
@@ -25,7 +28,7 @@ const mutations = {
     if (storages) {
       states.list = JSON.parse(storages) || []
     } else {
-      states.list = gbApiRequires || []
+      states.list = formatResource || []
     }
   },
   addOne (states, source) {

@@ -41,10 +41,10 @@
   //- 查看预览的
   el-dialog(
     title="查看预览效果"
-    width="80%"
+    width="60%"
     :visible.sync="previewProps.visable")
     //- FromTemp(v-if="previewProps.visable", :config="previewProps.data")
-    component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data")
+    component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data", :isTest="true")
     //- form-component(v-if="previewProps.visable", :config="previewProps.data")
   //- 导出.vue或.html
   el-dialog(

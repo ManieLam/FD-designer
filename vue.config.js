@@ -3,6 +3,18 @@ module.exports = {
   lintOnSave: true,
   productionSourceMap: false,
   publicPath: './',
+  devServer: {
+    port: 11011,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:4523/m1/1812979-0-default',
+        changeOrigin: true
+      }
+    }
+  },
   configureWebpack: {
     externals: [
       'ace'

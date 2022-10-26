@@ -13,19 +13,19 @@ export const gbApiRequires = [
   { name: 'relation', method: 'GET', url: '/api/relation', demo: '公共字典接口' }
 ]
 
-// 公共请求头、请求配置(axios的配置)
+// 公共请求头、请求配置(axios的配置) - TODO
 export const gbRequireOptions = {
   header: {}
 }
 
-// 公共事件
+// 公共事件 - TODO
 export const gbFunc = {
   // reset: function (form) {},
   // refresh: function () {},
   // message
 }
 
-// 公共icon读取
+// 公共icon读取 - TODO
 export const gbIcons = {}
 
 export default {

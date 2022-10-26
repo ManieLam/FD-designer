@@ -18,17 +18,15 @@ export const httpHeader = (props, timeStamp) => {
 
 export function useEval (funcStr = '', cb) {
   ((_cb) => {
-    // console.info(_cb)
     const func = eval(funcStr)
-    // console.info(typeof func)
-    // console.info(func)
     _cb(func)
   })(cb)
 }
 
 /* 参数格式转换 */
-export function formatParams ({ body, beforeRequired } = {}) {
-  const params = body.reduce((res, row) => {
+export function formatParams ({ body = [], beforeRequired } = {}) {
+  // console.info('body:', body)
+  const params = body ? body.reduce((res, row) => {
     let paramsVal = ''
     switch (row.varType) {
       case 'const':
@@ -42,7 +40,7 @@ export function formatParams ({ body, beforeRequired } = {}) {
     }
     res[row.key] = paramsVal
     return res
-  }, {})
+  }, {}) : {}
   if (beforeRequired?.__isChange) {
     useEval(beforeRequired.funcInput, (func) => func(params))
   }
@@ -119,6 +117,8 @@ export function fetch (props) {
         // }
         if (props.afterRequired?.__isChange) {
           useEval(props.afterRequired.funcInput, (func) => func(response))
+        } else {
+          return response
         }
       },
       (reject) => {
