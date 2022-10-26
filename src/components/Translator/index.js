@@ -40,14 +40,19 @@ export function loadScript (url) {
 }
 
 /* 注册模板文件 */
-export function registerModules (Vue) {
+export function registerModules (Vue, propsData = {}) {
   const components = Object.values(templateRegister)
   // 将业务线异步组件存到全局
   components.forEach(comp => {
     if (comp.name) {
-      Vue.component(comp.name, (resolve, reject) => {
-        resolve(comp)
-      })
+      // const mergeComp = Object.assign(comp, { propsData: propsData })
+      // const MergeComp = Vue.extend(Object.assign(comp, { propsData }))
+      // console.info(MergeComp)
+      Vue.component(comp.name, Vue.extend(comp))
+      // Vue.component(comp.name, (resolve, reject) => {
+      //   // resolve(new MergeComp({ propsData }))
+      //   resolve(MergeComp)
+      // })
     }
   })
   console.info('注册')

@@ -218,7 +218,7 @@ export default {
     save () {
       const apiData = Object.assign(this.apiData, { name: this.apiData.name || `${this.apiData.url}_${this.apiData.method}` })
       if (this.apiData?.__index == null) {
-        this.apiList.push(apiData)
+        this.apiList.push(Object.assign(apiData, { __index: this.apiList.length }))
         // this.$gbImport.gbApiRequires.push(this.apiData)
       } else {
         const { __index } = this.apiData
