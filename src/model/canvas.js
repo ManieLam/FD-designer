@@ -12,7 +12,7 @@ export const CanvasData = function ({ fields = [], formAttrs = {}, formActions =
         getRelationImmediate: true, // 是否立即加载relation
         ...formActions
       },
-      buttons: Object.values(formButtons)
+      buttons: Object.values(formButtons).sort((a, b) => a?.sort - b?.sort)
     },
     groups: {},
     template: 'Form'
