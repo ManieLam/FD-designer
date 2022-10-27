@@ -19,7 +19,17 @@ export const httpHeader = (props, timeStamp) => {
 export function useEval (funcStr = '', cb) {
   ((_cb) => {
     const func = eval(funcStr)
-    _cb(func)
+    // console.log('_cb----')
+    // console.info(_cb)
+    // console.log('func------')
+    // console.info(func)
+    // console.info(_cb(func))
+    return _cb(func)
+    // try {
+    //   _cb(func)
+    // } catch (error) {
+    //   console.error('useEval', error)
+    // }
   })(cb)
 }
 
@@ -42,6 +52,7 @@ export function formatParams ({ body = [], beforeRequired } = {}) {
     return res
   }, {}) : {}
   if (beforeRequired?.__isChange) {
+    // console.info('beforeRequired:', beforeRequired)
     useEval(beforeRequired.funcInput, (func) => func(params))
   }
   return params
@@ -95,35 +106,17 @@ axios.interceptors.response.use(
 export function fetch (props) {
   return axios(httpOptions(props))
     .then(
-      (response) => {
-        // if (response.data.code === 0) {
-        //   // clearRequestQueue(props, response.data)
-        //   return response.data
-        // } else if (response.data.code === 6) {
-        //   // 警告类，允许业务往下执行
-        //   // 以防进入catch
-        //   return Object({
-        //     ...response.data,
-        //     statusText: response.statusText,
-        //     __status: 'warning'
-        //   })
-        // } else {
-        //   throw Object({
-        //     response: {
-        //       status: response.data.code,
-        //       statusText: response.data.message
-        //     }
-        //   })
-        // }
-        if (props.afterRequired?.__isChange) {
-          useEval(props.afterRequired.funcInput, (func) => func(response))
-        } else {
-          return response
-        }
+      async (response) => {
+        const { __isChange, funcInput, funcDefault } = props.afterRequired || {}
+        let res = {}
+        await useEval(__isChange ? funcInput : funcDefault, function (func) {
+          res = func(response)
+        })
+        return res
       },
       (reject) => {
         if (props.error?.__isChange) {
-          useEval(props.error.funcInput, (func) => func(reject))
+          return useEval(props.error.funcInput, (func) => func(reject))
         }
         return false
       }
