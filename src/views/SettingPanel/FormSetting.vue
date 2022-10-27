@@ -18,38 +18,34 @@
           @update="update")
         //- 设置表单行为
         .action-setting-wrap.m-t-8(v-show="activeName==='action'")
-          //- 表单初始化时
-          .setting-block
-            .color-text-primary.font-size-base.m-b-8 表单初始化时
-            .row-item
-              el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
-              .row-item__input.box-content__inside
-                //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource", placeholder="输入字典接口")
-                form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource")
-            .row-item
-              el-checkbox(v-model="actionsData.getResourceImmediate") 是否发起请求
-              .row-item__remote.box-content__inside(v-if="actionsData.getResourceImmediate")
-                //- 动态配置数据源
-                el-button(@click="setRemoteVisable = !setRemoteVisable") {{ immediateRemoteRequire.name ? '重新选择数据源' : '配置数据源' }}
-                .list-column__default.m-t-4(v-show="immediateRemoteRequire.name")
-                  .left-wrap
-                    .d-flex-v-center
-                      i.el-icon-check.color-primary.m-r-8
-                      .color-warning {{immediateRemoteRequire.method}}
-                      .secondary-text.m-l-8 {{immediateRemoteRequire.url}}
-                    .color-text-secondary.font-size-small.m-l-8 {{ immediateRemoteRequire.demo || ''}}
-                  .right-wrap
-                RemoteSettingRequire(
-                  key="formRequire"
-                  title="配置表单首次加载数据源"
-                  v-model="setRemoteVisable"
-                  :chosenData="immediateRemoteRequire"
-                  @chosen="getAsyncSeting")
-          //- 配置表单按钮操作
-          .setting-block
-            .color-text-primary.font-size-base.m-b-8 操作按钮
-            .row-item
-              ButtonSetting(:key="canvasName", :list="buttonList", @change="updateButtons")
+          el-collapse
+            //- 表单初始化时
+            el-collapse-item.setting-block(title=" 表单初始化时")
+              //- .label.color-text-primary.font-size-base.m-b-8 表单初始化时
+              .row-item
+                el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
+                .row-item__input.box-content__inside
+                  //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource", placeholder="输入字典接口")
+                  form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource")
+
+              .row-item.p-t-16
+                el-checkbox(v-model="actionsData.getResourceImmediate") 获取初始化数据
+                .row-item__remote(v-if="actionsData.getResourceImmediate")
+                  //- 前置触发条件：路由带参数（跳转进入）
+                  .box-content__inside
+                    el-dropdown.m-b-8(split-button) 前置触发条件(TODO)
+                      el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceWhen(byRoute)") 根据页面路由参数
+                    //- .dropdown-item-content(v-if="immediateRemotePrecondition.type === 'byRoute'")
+                    //-   form-list()
+
+                  //- 动态配置数据源
+                  .box-content__inside
+                    form-remote(v-if="!!actionsData.immediateRemoteRequire", v-model="actionsData.immediateRemoteRequire", title="配置表单首次加载数据源")
+            //- 配置表单按钮操作
+            el-collapse-item.setting-block(title="操作按钮")
+              //- .label.color-text-primary.font-size-base.m-b-8 操作按钮
+              .row-item
+                ButtonSetting(:key="canvasName", :list="buttonList", @change="updateButtons")
 
 </template>
 
@@ -83,14 +79,10 @@ export default {
         { label: '行为', name: 'action' }
         // { label: '样式', name: 'style' }
       ],
-      // activeNames: ['attr', 'action'],
       activeName: 'attr',
-      // activeNames: ['attr', 'action'],
       attrsData: {},
       attrs: formAttrs,
       /* 配置字典 */
-      // isRelationAction: true, // 是否开启配置字典
-      // relationList: [],
       relationProps: [
         { label: '字典关键值', prop: 'name' },
         { label: '字典名', prop: 'label' }
@@ -98,6 +90,10 @@ export default {
       actions: [],
       actionsData: {},
       setRemoteVisable: false,
+      immediateRemotePrecondition: {},
+      // immediateRemotePrecondition: {
+      //   route
+      // },
       buttonList: []
     }
   },
@@ -175,6 +171,9 @@ export default {
     },
     getAttrUpdate (data) {
       console.info('getAttrUpdate:', data)
+    },
+    getResourceWhen (type) {
+      this.$set(this.actionsData, 'immediateRemotePrecondition', this.immediateRemotePrecondition)
     }
   }
 }
@@ -184,9 +183,27 @@ export default {
 .setting-wrap
   border: 0
 
-.setting-block + .setting-block
-  margin-top: 16px
+.setting-block
+  // & + .setting-block
+  //   margin-top: 16px
+  > .label
+    color: $--color-text-primary
+    // font-size: 16px
+    font-size: $--font-size-base
+    margin-bottom: 8px
+  // .color-text-primary.font-size-base.m-b-8
+    &::after
 
 .row-item + .row-item
   margin-top: 4px
+
+.dropdown-item
+  font-size: $--font-size-base
+  color: $--color-text-primary
+  padding-left: 16px
+  padding-right: 16px
+  cursor: pointer
+  &:hover
+    // background: $--bgcolor-secondary
+    color: $--color-primary
 </style>

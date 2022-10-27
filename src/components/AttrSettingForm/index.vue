@@ -5,10 +5,14 @@ el-form.setting-list(v-model="data", label-position="top")
     :key="attrItem.key"
     :prop="attrItem.key"
     :is-group="!!attrItem.group")
-    template(slot="label")
+    .d-flex-row-between.align-items-center(slot="label")
       span.span-label(v-if="!attrItem.labelHidden") {{attrItem.label}}
       span.span-tip.color-secondary.m-l-8(v-if="attrItem.tip")
         i.el-icon-info {{attrItem.tip}}
+      span.group-collapse(
+        v-if="attrItem.group"
+        :class="attrItem.group.__collapse ? 'el-icon-arrow-right' : 'el-icon-arrow-down'"
+        @click="toggleGroup(attrItem.group)")
     components(
       v-if="attrItem.tag && !attrItem.group"
       :is="attrItem.tag"
@@ -18,7 +22,7 @@ el-form.setting-list(v-model="data", label-position="top")
       :fullSetting="data"
       @input="update")
     //- 属性组配置
-    .component-group(v-else-if="attrItem.group", :key="attrItem.group.key")
+    .component-group(v-else-if="attrItem.group && !!attrItem.group.__collapse", :key="attrItem.group.key")
       el-form-item.group-item(
         v-for="groupItem in attrItem.group"
         :key="groupItem.key"
@@ -38,7 +42,7 @@ el-form.setting-list(v-model="data", label-position="top")
           :fullSetting="data"
           @input="update")
         //- .span-tip(v-if="groupItem.tip") {{groupItem.tip}}
-    .component-empty.secondary-text(v-else) -- 开发中 --
+    //- .component-empty.secondary-text(v-else) -- 开发中 --
 
 </template>
 
@@ -80,6 +84,9 @@ export default {
     update (value, key) {
       this.$emit('update', this.data)
       // this.$emit('update', ...arguments)
+    },
+    toggleGroup (group) {
+      this.$set(group, '__collapse', !group.__collapse)
     }
   },
   mounted () {
@@ -107,4 +114,11 @@ export default {
   // box-shadow: 1px 0px 5px 2px $--border-color-base
   border-top: 1px dashed $--border-color-base
   border-bottom: 1px dashed $--border-color-base
+
+.group-collapse
+  cursor: pointer
+  margin-left: 10px
+  &:hover
+    transform: scale(1.2)
+    color: #000
 </style>

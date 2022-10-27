@@ -9,8 +9,8 @@
     thead
       tr
         th
-        th 选项值
-        th 选项文本
+        th 选项值(value)
+        th 选项文本(label)
     Draggable(tag="tbody", :list="list", class="list-group", handle=".handle", animation="150")
       tr.drag-list(v-for="(item, index) in list")
         td
@@ -21,8 +21,7 @@
           el-input(v-model="item.label")
         td
           i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  @click="remove(item, index)")
-        td(v-if="index === list.length - 1")
-          i.el-icon-plus.color-primary.btn-radius-50(@click="add")
+          i.el-icon-plus.color-primary.btn-radius-50(v-if="index === list.length - 1", @click="add")
   .list-async(v-if="optionType === 'optionsAsyncFunc'")
     //- 动态配置数据源
     el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.url ? '重新选择数据源' : '配置数据源' }}
@@ -37,9 +36,9 @@
     RemoteSettingRequire(key="option", title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
     //- 选择现有字典
   .list-async(v-if="optionType === 'optionRelationKey'")
-      el-input(v-model.trim.lazy="optionRelationKey", placeholder="请填写字典关键名")
-      //- el-select(v-model="value", placeholder="请选择字典")
-      //-   el-option(v-for="item in options", :key="item.value", :label="item.label", :value="item.value")
+    el-input(v-model.trim.lazy="optionRelationKey", placeholder="请填写字典关键名")
+    //- el-select(v-model="value", placeholder="请选择字典")
+    //-   el-option(v-for="item in options", :key="item.value", :label="item.label", :value="item.value")
 </template>
 
 <script>
@@ -60,6 +59,14 @@ export default {
     fullSetting: {
       type: Object,
       default: () => ({})
+    },
+    isGroup: {
+      type: Boolean,
+      default: false
+    },
+    isTree: {
+      type: Boolean,
+      default: false
     }
   },
   components: {

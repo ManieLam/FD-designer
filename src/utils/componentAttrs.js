@@ -116,7 +116,7 @@ export const button = (function () {
     submitAttrs: [
       ...attrs,
       { label: '提交前校验', key: 'validate', tag: 'el-switch' },
-      { label: '配置数据源', key: 'funcStr', tag: 'form-remote' }
+      { label: '配置数据源', key: 'funcRemote', tag: 'form-remote' }
     ],
     resetAttrs: [
       ...attrs,
