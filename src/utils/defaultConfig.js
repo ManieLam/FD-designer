@@ -14,6 +14,12 @@ export const formAttrs = {
 // 默认表单按钮配置
 export const formButtons = {
   cancel: { label: '取消', name: 'cancel', sort: 0, func: () => {} },
+  reset: {
+    label: '重置',
+    name: 'reset',
+    sort: 1,
+    func: () => {}
+  },
   submit: {
     label: '提交',
     name: 'submit',
@@ -25,12 +31,6 @@ export const formButtons = {
         console.info('验证结果', valid)
       })
     }
-  },
-  reset: {
-    label: '重置',
-    name: 'reset',
-    sort: 1,
-    func: () => {}
   }
 }
 
