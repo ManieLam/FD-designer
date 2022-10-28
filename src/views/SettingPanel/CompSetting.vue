@@ -1,6 +1,8 @@
 <template lang='pug'>
 .setting-form-wrap
-  .secondary-text.empty-text(v-if="!formItemConfig.name || !attrs.length") 请先拖拽组件, 再做操作
+  .secondary-text.empty-text(v-if="!formItemConfig.name || !attrs.length")
+    .secondary-text(v-show="!formItemConfig.name")  请先拖拽组件, 再做操作
+    .secondary-text(v-show="formItemConfig.name && !attrs.length")  当前组件不可配置
     .secondary-text {{formItemConfig.name}}
   .setting-wrap(v-else)
     el-tabs.setting-tab(v-model="activeName", :stretch="true")

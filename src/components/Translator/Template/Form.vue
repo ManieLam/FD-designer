@@ -3,10 +3,10 @@
     ref="form"
     id="customForm"
     v-model="formData"
-    v-bind="this.formAttrs"
-    :formFields="this.formFieds"
-    :buttonList="this.actButtons"
-    @onChange="this.onFormChange"
+    v-bind="formAttrs"
+    :formFields="formFieds"
+    :buttonList="actButtons"
+    @onChange="onFormChange"
   ></AnsoDataform>
 </template>
 <script>

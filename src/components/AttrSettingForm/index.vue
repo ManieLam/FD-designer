@@ -5,8 +5,8 @@ el-form.setting-list(v-model="data", label-position="top")
     :key="attrItem.key"
     :prop="attrItem.key"
     :is-group="!!attrItem.group")
-    .d-flex-row-between.align-items-center(slot="label")
-      span.span-label(v-if="!attrItem.labelHidden") {{attrItem.label}}
+    .d-flex-row-between.align-items-center(slot="label", v-if="!attrItem.labelHidden")
+      span.span-label {{attrItem.label}}
       span.span-tip.color-secondary.m-l-8(v-if="attrItem.tip")
         i.el-icon-info {{attrItem.tip}}
       //- span.group-collapse(
@@ -29,8 +29,8 @@ el-form.setting-list(v-model="data", label-position="top")
         :prop="groupItem.key"
         :tip="groupItem.tip"
         :label="groupItem.label")
-        template(slot="label")
-          span.span-label(v-if="!attrItem.labelHidden") {{groupItem.label}}
+        template(slot="label" v-if="!attrItem.labelHidden")
+          span.span-label {{groupItem.label}}
           span.span-tip.color-secondary.m-l-8(v-if="groupItem.tip")
             i.el-icon-info {{groupItem.tip}}
         components(

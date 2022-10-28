@@ -66,7 +66,7 @@ export default [
     ]
   },
   {
-    label: '保留数据输入',
+    label: '保留数据输入（TODO）',
     key: 'keepAliveData',
     tag: 'el-checkbox',
     labelHidden: true,
