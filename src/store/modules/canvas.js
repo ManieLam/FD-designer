@@ -69,7 +69,7 @@ const mutations = {
       states.collects[name].form = {
         attrs: { ...form.attrs, ...(attrs || {}) },
         actions: { ...form.actions, ...(actions || {}) },
-        buttons: Array.isArray(buttons) ? buttons.sort((a, b) => a?.sort - b?.sort) : { ...form.buttons }
+        buttons: Array.isArray(buttons) ? buttons.sort((a, b) => a?.sort - b?.sort) : [...form.buttons]
       }
     }
   },

@@ -39,9 +39,10 @@ export function formatParams ({ body = [], beforeRequired } = {}) {
   const params = body ? body.reduce((res, row) => {
     let paramsVal = ''
     switch (row.varType) {
-      case 'const':
+      case 'const': // 直接赋值，无需取值
         paramsVal = row.value
         break
+      // 当body中变量类型value存在`${row.varType}|${row.value}`这个格式 需要转换成动态取值
       case 'formData':
       case 'router':
       case 'localstorage':

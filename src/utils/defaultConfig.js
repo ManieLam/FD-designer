@@ -13,7 +13,7 @@ export const formAttrs = {
 
 // 默认表单按钮配置
 export const formButtons = {
-  cancel: { label: '取消', name: 'cancel', sort: 0, func: () => {} },
+  cancel: { label: '取消', name: 'cancel', sort: 0, func: () => {}, returnBack: true },
   reset: {
     label: '重置',
     name: 'reset',
