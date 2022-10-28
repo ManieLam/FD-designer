@@ -144,7 +144,7 @@ export default {
     },
     // 调整表单内顺序
     handleDragEnd (evt) {
-      console.info('handleDragEnd', evt)
+      // console.info('handleDragEnd', evt)
       const { newIndex, oldIndex } = evt
       if (newIndex !== oldIndex) {
         const temp = this.fieldList[newIndex]
