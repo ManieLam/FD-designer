@@ -28,6 +28,7 @@ draggable.list-group.drag-page-container(
 /** 拖拽的面板页面，多个画布，通过复制这个组件生成 */
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
+import { formItemTags } from '@/utils/componentAttrs.js'
 // import { mapGetters } from 'vuex'
 export default {
   name: 'DragPage',
@@ -57,29 +58,7 @@ export default {
       keyName: '',
       // formSetting: {},
       fieldList: [],
-      formItemTags: {
-        AnsoDataformText: 'text',
-        AnsoDataformInput: 'input',
-        AnsoDataformTextRange: 'textRange',
-        AnsoDataformNumber: 'number',
-        AnsoDataformNumRange: 'numberRange',
-        AnsoDataformSelect: 'select',
-        AnsoDataformSwitch: 'switch',
-        AnsoDataformSlider: 'slider',
-        AnsoDataformCheckbox: 'checkbox',
-        AnsoDataformRadio: 'radio',
-        AnsoDataformCascader: 'cascader',
-        AnsoDataformTime: 'time',
-        AnsoDataformTimeRange: 'timeRange',
-        AnsoDataformDate: 'date',
-        AnsoDataformUpload: 'file',
-        // AnsoDataformIcon: 'icon',
-        InfoRender: 'render',
-        AnsoButtonGroup: 'button',
-        AnsoLink: 'link',
-        AnsoDataformTransfer: 'transfer',
-        AnsoDataformTree: 'tree'
-      },
+      formItemTags,
       newField: {}
     }
   },
@@ -128,7 +107,7 @@ export default {
       }
     },
     handleWidgetAdd (evt) {
-      console.info('add:', evt)
+      // console.info('add:', evt)
       // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
       const tag = evt.clone?.dataset?.name
       // console.info('add-', tag)
@@ -140,7 +119,7 @@ export default {
       } : {}
       if (tag) {
         // this.fieldList.splice(newIndex, 0, element)
-        console.info('add fields')
+        // console.info('add fields')
         this.$store.commit('canvas/add', {
           name: this.canvasName,
           eIndex: newIndex,

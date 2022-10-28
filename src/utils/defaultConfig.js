@@ -34,9 +34,9 @@ export const formButtons = {
   }
 }
 
-// 默认下拉组件(select)配置属性值
+/* 表单输入元素配置属性值 */
 export const select = {
-  type: '下拉组件',
+  // type: '下拉组件',
   clearable: true,
   filterable: true,
   defaultValue: {
@@ -44,6 +44,13 @@ export const select = {
     valueType: 'isDefault'
   }, // 默认值配置
   placeholder: '请选择'
+}
+export const input = {
+  placeholder: '请输入',
+  defaultValue: {
+    customFunc: '(data, fields, field) => {\n return data[field.name]}',
+    valueType: 'isDefault'
+  }
 }
 
 // 默认选项配置
@@ -59,5 +66,6 @@ export default {
   formAttrs,
   formButtons,
   defaultOptions,
-  select
+  select,
+  input
 }

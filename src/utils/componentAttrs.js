@@ -1,10 +1,39 @@
-// class AttrUtils {
-//   constructor (config = []) {
-//     this.config = config
-//   }
+/* class AttrUtils {
+  constructor (attrs = [], actions = []) {
+    this.config = {
+      attrs,
+      actions
+    }
+  }
 
-//   init () {}
-// }
+  init () {
+    return this.config
+  }
+} */
+/* 表单组件录入的映射, key为实际所用的组件类型，value为AnsoDataform对应的form.tag标签 */
+export const formItemTags = {
+  AnsoDataformText: 'text',
+  AnsoDataformInput: 'input',
+  AnsoDataformTextRange: 'textRange',
+  AnsoDataformNumber: 'number',
+  AnsoDataformNumRange: 'numberRange',
+  AnsoDataformSelect: 'select',
+  AnsoDataformSwitch: 'switch',
+  AnsoDataformSlider: 'slider',
+  AnsoDataformCheckbox: 'checkbox',
+  AnsoDataformRadio: 'radio',
+  AnsoDataformCascader: 'cascader',
+  AnsoDataformTime: 'time',
+  AnsoDataformTimeRange: 'timeRange',
+  AnsoDataformDate: 'date',
+  AnsoDataformUpload: 'file',
+  // AnsoDataformIcon: 'icon',
+  InfoRender: 'render',
+  AnsoButtonGroup: 'button',
+  AnsoLink: 'link',
+  AnsoDataformTransfer: 'transfer',
+  AnsoDataformTree: 'tree'
+}
 
 /**
  * attrs属性名解释：
@@ -18,36 +47,31 @@
 
 const switchDefaultOptions = [{ label: '允许', value: true }, { label: '不允许', value: false }]
 
+const FormtagAttrs = {
+  type: { label: '类型', key: 'type', tag: 'AnsoDataformText' },
+  name: { label: '字段键名', key: 'name', tag: 'el-input' },
+  label: { label: '文本标签', key: 'label', tag: 'el-input' },
+  validate: { label: '校验', key: 'validate', tag: 'form-validate' },
+  placeholder: { label: '占位内容', key: 'placeholder', tag: 'el-input' },
+  defaultValue: { label: '默认值', key: 'defaultValue', tag: 'form-defaultValue' },
+  disabled: { label: '是否只读', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '可编辑', value: false }], chains: () => { } }
+}
+
+// const formtagAttrsHandler = {
+//   get: function (obj, props) {
+//     console.info('obj--', obj)
+//     console.log('props--', props)
+//     return typeof props === 'string' && formtagAttrs[props] ? formtagAttrs[props] : obj
+//   }
+// }
+
 export const select = {
   attrs: [
-    {
-      label: '类型',
-      key: 'type',
-      tag: 'AnsoDataformText'
-    },
-    {
-      label: '字段键名',
-      key: 'name',
-      tag: 'el-input'
-    },
-    {
-      label: '文本标签',
-      key: 'label',
-      tag: 'el-input'
-    },
-    {
-      label: '占位内容',
-      key: 'placeholder',
-      tag: 'el-input'
-    },
-    {
-      label: '是否只读',
-      key: 'disabled',
-      tag: 'el-checkbox',
-      labelHidden: true,
-      options: [{ label: '只读', value: true }, { label: '可编辑', value: false }],
-      chains: () => { }
-    },
+    // FormtagAttrs.type,
+    FormtagAttrs.name,
+    FormtagAttrs.label,
+    FormtagAttrs.placeholder,
+    FormtagAttrs.disabled,
     {
       label: '是否分组（TODO）',
       key: 'isGroup',
@@ -84,16 +108,8 @@ export const select = {
       key: 'filterable',
       options: switchDefaultOptions
     },
-    {
-      label: '校验',
-      key: 'validate',
-      tag: 'form-validate'
-    },
-    {
-      label: '默认值',
-      key: 'defaultValue',
-      tag: 'form-defaultValue'
-    }
+    FormtagAttrs.validate,
+    FormtagAttrs.defaultValue
   ],
   actions: [
     // {
@@ -104,6 +120,28 @@ export const select = {
       key: 'chains',
       tag: 'form-chains'
     }
+  ]
+}
+
+export const text = {
+  attrs: [
+    // FormtagAttrs.type,
+    FormtagAttrs.name,
+    FormtagAttrs.label,
+    FormtagAttrs.defaultValue
+  ]
+}
+
+export const input = {
+  // attrs: new Proxy([], formtagAttrsHandler)
+  attrs: [
+    // FormtagAttrs.type,
+    FormtagAttrs.name,
+    FormtagAttrs.label,
+    FormtagAttrs.placeholder,
+    FormtagAttrs.disabled,
+    FormtagAttrs.validate,
+    FormtagAttrs.defaultValue
   ]
 }
 
@@ -135,5 +173,7 @@ export const button = (function () {
 
 export default {
   select,
+  text,
+  input,
   button
 }
