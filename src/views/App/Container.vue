@@ -37,7 +37,7 @@
     width="60%"
     :visible.sync="settingJsonVisable")
     //- .setting-json-wrap {{ allCanvas }}
-    CodeEditor.json-codeEditor(:value="allCanvas|filterCanvasStr", mode="ace/mode/json", :readOnly="true")
+    CodeEditor.json-codeEditor(v-if="settingJsonVisable", :value="allCanvas|filterCanvasStr", mode="ace/mode/json", :readOnly="true", @onCloseDialog="settingJsonVisable=false")
   //- 查看预览的
   el-dialog(
     title="查看预览效果"
