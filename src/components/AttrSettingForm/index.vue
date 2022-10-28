@@ -9,10 +9,10 @@ el-form.setting-list(v-model="data", label-position="top")
       span.span-label(v-if="!attrItem.labelHidden") {{attrItem.label}}
       span.span-tip.color-secondary.m-l-8(v-if="attrItem.tip")
         i.el-icon-info {{attrItem.tip}}
-      span.group-collapse(
-        v-if="attrItem.group"
-        :class="attrItem.group.__collapse ? 'el-icon-arrow-right' : 'el-icon-arrow-down'"
-        @click="toggleGroup(attrItem.group)")
+      //- span.group-collapse(
+      //-   v-if="attrItem.group"
+      //-   :class="attrItem.group.__collapse ? 'el-icon-arrow-right' : 'el-icon-arrow-down'"
+      //-   @click="toggleGroup(attrItem.group)")
     components(
       v-if="attrItem.tag && !attrItem.group"
       :is="attrItem.tag"
@@ -22,7 +22,7 @@ el-form.setting-list(v-model="data", label-position="top")
       :fullSetting="data"
       @input="update")
     //- 属性组配置
-    .component-group(v-else-if="attrItem.group && !!attrItem.group.__collapse", :key="attrItem.group.key")
+    .component-group(v-else-if="attrItem.group", :key="attrItem.group.key")
       el-form-item.group-item(
         v-for="groupItem in attrItem.group"
         :key="groupItem.key"

@@ -18,9 +18,9 @@
           @update="update")
         //- 设置表单行为
         .action-setting-wrap.m-t-8(v-show="activeName==='action'")
-          el-collapse
+          el-collapse(v-model="activeCollapse")
             //- 表单初始化时
-            el-collapse-item.setting-block(title=" 表单初始化时")
+            el-collapse-item.setting-block(title="表单初始化时", name="mounted")
               //- .label.color-text-primary.font-size-base.m-b-8 表单初始化时
               .row-item
                 el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
@@ -42,7 +42,7 @@
                   .box-content__inside
                     form-remote(v-if="!!actionsData.immediateRemoteRequire", v-model="actionsData.immediateRemoteRequire", title="配置表单首次加载数据源")
             //- 配置表单按钮操作
-            el-collapse-item.setting-block(title="操作按钮")
+            el-collapse-item.setting-block(title="操作按钮", name="button")
               //- .label.color-text-primary.font-size-base.m-b-8 操作按钮
               .row-item
                 ButtonSetting(:key="canvasName", :list="buttonList", @change="updateButtons")
@@ -94,6 +94,7 @@ export default {
       // immediateRemotePrecondition: {
       //   route
       // },
+      activeCollapse: ['mounted'],
       buttonList: []
     }
   },
@@ -143,6 +144,7 @@ export default {
       this.activeName = name
     },
     update (attrs) {
+      console.info('修改表单属性：', this.attrsData)
       this.setFormState({ attrs: this.attrsData })
     },
     updateButtons (buttons) {

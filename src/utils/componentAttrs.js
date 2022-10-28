@@ -49,7 +49,7 @@ export const select = {
       chains: () => { }
     },
     {
-      label: '是否分组',
+      label: '是否分组（TODO）',
       key: 'isGroup',
       tag: 'el-checkbox',
       labelHidden: true,
@@ -57,7 +57,7 @@ export const select = {
       chains: () => { }
     },
     {
-      label: '是否多选',
+      label: '是否多选（TODO）',
       key: 'multiple',
       tag: 'el-checkbox',
       labelHidden: true,
@@ -120,12 +120,14 @@ export const button = (function () {
     ],
     resetAttrs: [
       ...attrs,
-      { label: '重置前二次提醒', key: 'tipBeforeReset', tag: 'el-switch' }
+      { label: '重置前二次提醒', key: 'tipBeforeAction', tag: 'el-switch' }
     ],
     cancelAttrs: [
       ...attrs,
-      { label: '取消前二次提醒', key: 'tipBeforeCancel', tag: 'el-switch' },
-      { label: '取消后返回页面', key: 'routeAfterCancel', tag: 'el-input', placeholder: '请输入页面路由地址' }
+      { label: '取消前二次提醒', key: 'tipBeforeAction', tag: 'el-switch' },
+      { label: '关闭弹窗', key: 'closeDialog', tag: 'el-switch' },
+      { label: '返回上一页', key: 'returnBack', tag: 'el-switch' }
+      // { label: '取消后返回页面', key: 'routeAfterAction', tag: 'el-input', placeholder: '请输入页面路由【相对地址】' }
     ],
     attrs
   }

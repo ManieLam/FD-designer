@@ -7,25 +7,25 @@
       .box-content__collapse
         .button-list-item.d-flex-v-center(v-if="hasSubmit", v-for="(attr, i) in buttonAttrs.submit", :key="i")
           .secondary-text.m-r-8(style="min-width: 100px;") {{attr.label}}
-          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.submit[attr.key]")
+          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.submit[attr.key]", v-bind="attr")
 
     el-collapse-item.list-item(name="hasReset")
       el-checkbox(slot="title", v-model="hasReset") 重置按钮
       .box-content__collapse
         .button-list-item.d-flex-v-center(v-if="hasReset", v-for="(attr, i) in buttonAttrs.reset", :key="i")
           .secondary-text.m-r-8(style="min-width: 100px;") {{attr.label}}
-          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.reset[attr.key]")
+          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.reset[attr.key]", v-bind="attr")
 
     el-collapse-item.list-item(name="hasCancel")
       el-checkbox(slot="title", v-model="hasCancel") 取消按钮
       .box-content__collapse
         .button-list-item.d-flex-v-center(v-if="hasCancel", v-for="(attr, i) in buttonAttrs.cancel", :key="i")
           .secondary-text.m-r-8(style="min-width: 100px;") {{attr.label}}
-          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.cancel[attr.key]")
+          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.cancel[attr.key]", v-bind="attr")
 
   //- 考虑步骤性质的表单，提交不一定是异步提交
   .footer-wrap.w-100.text-center.m-t-8
-    el-button(icon="el-icon-plus") 自定义操作按钮
+    el-button(icon="el-icon-plus") 自定义操作按钮（TODO）
 
 </template>
 
@@ -61,13 +61,17 @@ export default {
     buttonData: {
       deep: true,
       handler (data) {
-        if (!isEqual(data, this.list)) {
+        console.info('按钮变化', data, this.oldBtnTemp, isEqual(data, this.oldBtnTemp))
+        if (!isEqual(data, this.oldBtnTemp)) {
           this.$emit('change', Array.isArray(data) ? data : Object.values(data))
         }
       }
     }
   },
   computed: {
+    oldBtnTemp () {
+      return keyBy(cloneDeep(this.list), 'name')
+    },
     hasSubmit: {
       get () {
         return !!this.buttonData?.submit
@@ -97,7 +101,7 @@ export default {
         return this.btnObj
       },
       set (data) {
-        // console.info('修改button list', data)
+        console.info('修改button list', data)
         this.btnObj = Array.isArray(data) ? keyBy(data, 'name') : data
       }
     }
