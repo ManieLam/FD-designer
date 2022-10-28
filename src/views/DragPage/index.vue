@@ -16,6 +16,7 @@ draggable.list-group.drag-page-container(
       :fields="fieldList"
       :added="newField"
       :formConfig="formConfig"
+      @add="handleWidgetAdd"
       @remove="removeWidget"
       @update="updateCanvas")
     //- 可能多个表单
@@ -127,6 +128,7 @@ export default {
       }
     },
     handleWidgetAdd (evt) {
+      console.info('add:', evt)
       // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
       const tag = evt.clone?.dataset?.name
       // console.info('add-', tag)

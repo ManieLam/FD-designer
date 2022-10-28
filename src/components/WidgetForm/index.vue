@@ -14,8 +14,11 @@
     :disabled="formAttrs.readOnly"
     @click.native="onClick({ type: 'form', data: formAttrs })")
     Draggable.list-group.drag-page-container(
-      v-model="fieldList"
-      animation="150")
+      :value="fieldList"
+      group="form"
+      animation="150"
+      @add="handleWidgetAdd"
+      @end="handleDragEnd")
       transition-group(name="fade" tag="div" class="widget-form-list")
         .widget-form-item-wrap(v-for="(ele, index) in fieldList", :key="ele.key")
           WidgetFormItem.widget-form-item(
@@ -134,6 +137,21 @@ export default {
     onClick ({ type, data }) {
       this.selectItem = type === 'component' ? data.key : type
       this.$emit('onSelect', { type, data })
+    },
+    // 拖拽到表单内部区域时候，需要通知外部转换field格式添加
+    handleWidgetAdd (evt) {
+      this.$emit('add', evt)
+    },
+    // 调整表单内顺序
+    handleDragEnd (evt) {
+      console.info('handleDragEnd', evt)
+      const { newIndex, oldIndex } = evt
+      if (newIndex !== oldIndex) {
+        const temp = this.fieldList[newIndex]
+        const origin = this.fieldList[oldIndex]
+        this.fieldList.splice(newIndex, 1, origin)
+        this.fieldList.splice(oldIndex, 1, temp)
+      }
     },
     setFormitemAttrs () {},
     setFormAttrs () {}
