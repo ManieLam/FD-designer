@@ -103,6 +103,7 @@ export default {
       const { actions } = this.config?.form || {}
       if (actions?.immediateRemoteRequire) {
         this.$require(actions.immediateRemoteRequire).then(res => {
+          // console.info('初始化请求发起后:', res)
           this.formDataTemp = res || {}
           this.formData = res || {}
         })
@@ -161,7 +162,8 @@ export default {
           })
           .then(confirm => {
             if (confirm) {
-              this.doCancel()
+              console.info('confirm:', btn)
+              this.doCancel(btn)
             }
           })
       } else {

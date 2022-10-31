@@ -44,7 +44,7 @@
     width="60%"
     :visible.sync="previewProps.visable")
     //- FromTemp(v-if="previewProps.visable", :config="previewProps.data")
-    component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data", :isTest="true")
+    component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false")
     //- form-component(v-if="previewProps.visable", :config="previewProps.data")
   //- 导出.vue或.html
   el-dialog(
