@@ -3,6 +3,7 @@ node_modules
 /.yalc
 /dist
 yalc.lock
+/public/exportParse
 
 
 # local env files
