@@ -21,7 +21,6 @@
           el-collapse(v-model="activeCollapse")
             //- 表单初始化时
             el-collapse-item.setting-block(title="表单初始化时", name="mounted")
-              //- .label.color-text-primary.font-size-base.m-b-8 表单初始化时
               .row-item
                 el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
                 .row-item__input.box-content__inside
@@ -33,7 +32,7 @@
                 .row-item__remote(v-if="actionsData.getResourceImmediate")
                   //- 前置触发条件：路由带参数（跳转进入）
                   .box-content__inside
-                    el-dropdown.m-b-8(split-button) 前置触发条件(TODO)
+                    el-dropdown(split-button) 前置触发条件(TODO)
                       el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceWhen(byRoute)") 根据页面路由参数
                     //- .dropdown-item-content(v-if="immediateRemotePrecondition.type === 'byRoute'")
                     //-   form-list()
@@ -43,9 +42,7 @@
                     form-remote(v-if="!!actionsData.immediateRemoteRequire", v-model="actionsData.immediateRemoteRequire", title="配置表单首次加载数据源")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")
-              //- .label.color-text-primary.font-size-base.m-b-8 操作按钮
-              .row-item
-                ButtonSetting(:key="canvasName", :list="buttonList", @change="updateButtons")
+              ButtonSetting.row-item(:key="canvasName", :list="buttonList", @change="updateButtons")
 
 </template>
 
@@ -208,4 +205,7 @@ export default {
   &:hover
     // background: $--bgcolor-secondary
     color: $--color-primary
+.action-setting-wrap
+  ::v-deep .el-collapse-item__content
+    padding-bottom: 16px
 </style>

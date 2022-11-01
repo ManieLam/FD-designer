@@ -1,5 +1,5 @@
 <template lang='pug'>
-.button-list.box-content.p-t-8.p-b-8
+.button-list.box-content.p-l-8.p-r-8
   el-collapse(v-model="activeName")
     //- el-checkbox(v-model="checked") 是否需要按钮
     el-collapse-item.list-item(name="hasSubmit")
@@ -127,8 +127,8 @@ export default {
 </script>
 
 <style lang='sass' scoped>
-.list-item + .list-item
-  margin-top: 8px
+// .list-item + .list-item
+//   margin-top: 8px
 .button-list-item
   margin-top: 4px
 
