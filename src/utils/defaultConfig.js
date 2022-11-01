@@ -52,6 +52,12 @@ export const input = {
     valueType: 'isDefault'
   }
 }
+export const text = {
+  defaultValue: {
+    customFunc: '(data, fields, field) => {\n return data[field.name]}',
+    valueType: 'isDefault'
+  }
+}
 
 // 默认选项配置
 export const defaultOptions = [{
