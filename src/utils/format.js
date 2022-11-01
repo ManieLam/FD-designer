@@ -6,7 +6,7 @@ import { useEval } from '@/utils/request'
 export function formatFormRules (rules = {}) {
   return Object.entries(rules).reduce((list, [name, rule]) => {
     if (rule) {
-      if (name === 'isRegexp') list = list.concat({ ...rule, pattern: new RegExp(rule.pattern) })
+      if (name === 'isRegexp') list = list.concat(Object.assign(rule, { pattern: new RegExp(rule.pattern) }))
       if (name === 'isRequired') list.push(rule)
       if (name === 'isValidator') {
         list.push({
