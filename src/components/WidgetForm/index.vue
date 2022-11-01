@@ -25,7 +25,7 @@
             v-if="ele && ele.compTag"
             v-on="$listeners"
             v-model="formData[ele.name]"
-            :class="{'is-active': formItemConfig.name === ele.key}"
+            :class="{'is-active': selectItem === ele.key}"
             :keyName="ele.key"
             :name="ele.key"
             :compTag="ele.compTag"
@@ -35,7 +35,9 @@
           .tool-wrap
             .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
 
-    el-form-item.m-t-16.widget-form-item(@click.native.stop="onClick({ type: 'button', data: buttonList })")
+    el-form-item.m-t-16.widget-form-item(
+      :class="{'is-active': selectItem === 'button'}"
+      @click.native.stop="onClick({ type: 'button', data: buttonList })")
       el-button(
         v-for="button in buttonList"
         v-bind="button"
