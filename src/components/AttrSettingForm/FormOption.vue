@@ -21,6 +21,7 @@
           el-input(v-model="item.label")
         td
           i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  @click="remove(item, index)")
+        td
           i.el-icon-plus.color-primary.btn-radius-50(v-if="index === list.length - 1", @click="add")
   .list-async(v-if="optionType === 'optionsAsyncFunc'")
     //- 动态配置数据源
@@ -146,9 +147,9 @@ export default {
     line-height: 1.2
   th
     color: $--color-text-regular
-  .drag-list
-    // &:hover
-    //   border: 1px solid
+.drag-list
+  i:hover
+    transform: scale(1.2)
 .handle
   float: left
   padding-top: 8px

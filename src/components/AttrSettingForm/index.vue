@@ -112,8 +112,11 @@ export default {
   margin-bottom: 8px
   // padding: 8px 0
   // box-shadow: 1px 0px 5px 2px $--border-color-base
-  border-top: 1px dashed $--border-color-base
-  border-bottom: 1px dashed $--border-color-base
+  border: 1px dashed $--border-color-base
+  // border-bottom: 1px dashed $--border-color-base
+  background: #f9f9f9
+  padding-left: 8px
+  padding-right: 8px
 
 .group-collapse
   cursor: pointer

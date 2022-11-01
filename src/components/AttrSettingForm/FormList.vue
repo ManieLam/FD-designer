@@ -113,5 +113,7 @@ export default {
 </script>
 
 <style lang='sass' scoped>
-
+.drag-list
+  i:hover
+    transform: scale(1.2)
 </style>

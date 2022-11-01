@@ -357,15 +357,23 @@
   position: relative
   height: fit-content
   padding-left: 8px
-  &::before
-    content: ''
-    display: inline-block
-    width: 3px
-    height: 100%
-    background: $--bgcolor-secondary
-    position: absolute
-    left: 0
-    top: 0
+  border: 1px dashed $--border-color-base
+  // border-bottom: 1px dashed $--border-color-base
+  background: #f9f9f9
+  padding: 8px
+  & + .box-content__inside
+    margin-top: 8px
+    
+  // padding-right: 8px
+  // &::before
+  //   content: ''
+  //   display: inline-block
+  //   width: 3px
+  //   height: 100%
+  //   background: $--bgcolor-secondary
+  //   position: absolute
+  //   left: 0
+  //   top: 0
 
 // 一些hover动效
 .hover-change-scale:hover
@@ -384,6 +392,7 @@
   padding: 8px
   cursor: pointer
   line-height: 1.2
+  background: #fff
   @extend .font-size-small
   @extend .d-flex-row-between
   @extend .align-items-center
