@@ -10,7 +10,7 @@
   ></AnsoDataform>
 </template>
 <script>
-import { merge, isEqual, cloneDeep, keyBy } from 'lodash'
+import { isEqual, cloneDeep, keyBy } from 'lodash'
 import { formatFormRules, formatDefValFunc } from '@/utils/format.js'
 // import button from '../mixins/button'
 import relation from '../mixins/relation'
@@ -46,7 +46,7 @@ export default {
           name: config.name,
           label: config.label,
           relation: config.optionRelationKey || null,
-          form: merge(
+          form: Object.assign(
             config,
             {
               rules: formatFormRules(config.validate) || []
@@ -106,7 +106,7 @@ export default {
       for (const field of keys) {
         // console.info('field:', field)
         const value = formatDefValFunc(this.formData, this.formFieds, this.fieldObj[field]?.form)
-        console.info('defVal:', field, value)
+        // console.info('defVal:', field, value)
         this.$set(this.formData, field, value)
       }
     },

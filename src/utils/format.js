@@ -6,9 +6,9 @@ import { keyBy } from 'lodash'
  *  @param rules 字段规则{isRequired:<Object>, isRegexp:<Array>, isValidator:<String> }
  *  */
 export function formatFormRules (rules = {}) {
-  return Object.entries(rules).reduce((list, [name, rule]) => {
+  return Object.entries(rules).filter(([name, rule]) => !!rule).reduce((list, [name, rule]) => {
     if (rule) {
-      if (name === 'isRegexp') list = list.concat(Object.assign(rule, { pattern: new RegExp(rule.pattern) }))
+      if (name === 'isRegexp') list = list.concat(rule.map(item => Object.assign(item, { pattern: new RegExp(item.patternStr) })))
       if (name === 'isRequired') list.push(rule)
       if (name === 'isValidator') {
         list.push({

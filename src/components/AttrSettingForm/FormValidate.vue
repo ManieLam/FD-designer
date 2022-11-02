@@ -45,11 +45,11 @@ export default {
           required: true,
           message: '必填'
         },
-        isRegexp: { pattern: '', message: '' },
+        isRegexp: { patternStr: '', message: '' },
         isValidator: 'callback();'
       },
       regexpProps: [
-        { label: '正则', prop: 'pattern', placeholder: '正则表达式' },
+        { label: '正则', prop: 'patternStr', placeholder: '正则表达式' },
         { label: '错误信息', prop: 'message', placeholder: '错误信息提示' }
       ],
       // requireRule: this.value.isRequired,
