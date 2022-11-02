@@ -10,13 +10,13 @@ export default [
       label: '开启'
     }]
   },
-  {
-    // Anso-ui没有支持表单标题展示
-    label: '表单标题',
-    key: 'title',
-    tag: 'el-input',
-    placeholder: '请输入'
-  },
+  // {
+  //   // Anso-ui没有支持表单标题展示
+  //   label: '表单标题',
+  //   key: 'title',
+  //   tag: 'el-input',
+  //   placeholder: '请输入'
+  // },
   {
     label: '布局类型',
     readonly: true,
