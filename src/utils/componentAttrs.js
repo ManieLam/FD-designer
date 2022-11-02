@@ -54,7 +54,7 @@ const FormtagAttrs = {
   validate: { label: '校验', key: 'validate', tag: 'form-validate' },
   placeholder: { label: '占位内容', key: 'placeholder', tag: 'el-input' },
   defaultValue: { label: '默认值', key: 'defaultValue', tag: 'form-defaultValue' },
-  disabled: { label: '是否只读', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '可编辑', value: false }], chains: () => { } }
+  disabled: { label: '只读', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '可编辑', value: false }], chains: () => { } }
 }
 
 // const formtagAttrsHandler = {
@@ -141,7 +141,33 @@ export const input = {
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     FormtagAttrs.validate,
-    FormtagAttrs.defaultValue
+    {
+      label: '最长长度限制',
+      tag: 'el-input-number',
+      key: 'maxlength'
+    },
+    {
+      label: '最小长度限制',
+      tag: 'el-input-number',
+      key: 'minlength'
+    },
+    FormtagAttrs.defaultValue,
+    {
+      label: '显示输入字数统计',
+      tag: 'el-checkbox',
+      labelHidden: true,
+      key: 'show-word-limit'
+    },
+    {
+      label: '前缀（只支持字符串/icon）',
+      tag: 'el-input',
+      key: 'affixes-before'
+    },
+    {
+      label: '后缀（只支持字符串/icon）',
+      tag: 'el-input',
+      key: 'affixes-after'
+    }
   ]
 }
 
