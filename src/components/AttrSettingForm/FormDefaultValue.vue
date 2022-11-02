@@ -42,6 +42,7 @@
 import CodeEditor from '@/components/CodeEditor'
 import { debounce } from 'lodash'
 import { useEval } from '@/utils/request.js'
+import { presetOptions } from '@/utils/defaultConfig.js'
 // import { formatDefaultValueFunc } from '@/utils/format.js'
 export default {
   name: 'FormDefaultValue',
@@ -65,44 +66,7 @@ export default {
         { label: '关联数据', name: 'isPreset', components: '' }
       ],
       /* 预设数据可选项 */
-      presetOptions: [
-        {
-          label: '缓存数据',
-          value: 'localStorage',
-          options: [
-            { label: 'localStorage', value: 'localStorage', category: 'localStorage', meta: '请填写localStorage指定的name' }
-          ]
-        },
-        {
-          label: '时间类型',
-          value: 'local',
-          options: [
-            { label: '当前日期', value: 'localDate' },
-            { label: '当前时间', value: 'localTime' },
-            { label: '当天', value: 'localDay' },
-            { label: '隔天', value: 'localNextDay' },
-            { label: '当月', value: 'localMonth' },
-            { label: '当年', value: 'localYear' }
-          ]
-        },
-        {
-          label: '地址栏数据',
-          value: 'router',
-          meta: '请填写参数指定的名称和传参方式',
-          options: [
-            { label: '地址栏“/”后的取值', value: 'routerParams' },
-            { label: '地址栏“?”后的取值', value: 'routerQuery' }
-          ]
-        },
-        {
-          label: '自定义',
-          value: 'custom',
-          options: [
-            { label: '同表单数据自定义', value: 'customFunc' },
-            { label: '关联字段', value: 'customChainsField' }
-          ]
-        }
-      ],
+      presetOptions,
       presetInputVal: {
         valueType: 'isDefault',
         presetType: '',
@@ -139,6 +103,7 @@ export default {
         return this.presetInputVal
       },
       set (values) {
+        console.info('set value')
         this.presetInputVal = values
       }
     }
@@ -151,6 +116,12 @@ export default {
           this.presetInputVal = this.value
         }
       }
+    },
+    settingValue: {
+      deep: true,
+      handler: debounce(function (value) {
+        this.$emit('input', value)
+      }, 800)
     }
   },
   methods: {

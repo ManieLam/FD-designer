@@ -10,8 +10,8 @@
   ></AnsoDataform>
 </template>
 <script>
-import { merge, isEqual, cloneDeep } from 'lodash'
-import { formatFormRules } from '@/utils/format.js'
+import { merge, isEqual, cloneDeep, keyBy } from 'lodash'
+import { formatFormRules, formatDefValFunc } from '@/utils/format.js'
 // import button from '../mixins/button'
 import relation from '../mixins/relation'
 import { MessageBox } from 'element-ui'
@@ -82,6 +82,9 @@ export default {
         }
         return btn
       })
+    },
+    fieldObj () {
+      return keyBy(this.formFieds, 'name')
     }
   },
   methods: {
@@ -97,16 +100,35 @@ export default {
     },
     onDestory () {},
     // 设置默认值
-    setDefaultValue () {},
+    setDefaultValue () {
+      // this.formData
+      const keys = Object.keys(this.fieldObj)
+      for (const field of keys) {
+        // console.info('field:', field)
+        const value = formatDefValFunc(this.formData, this.formFieds, this.fieldObj[field]?.form)
+        console.info('defVal:', field, value)
+        this.$set(this.formData, field, value)
+      }
+    },
     // 发起异步请求
     getRemoteResource () {
       const { actions } = this.config?.form || {}
       if (actions?.immediateRemoteRequire) {
-        this.$require(actions.immediateRemoteRequire).then(res => {
-          // console.info('初始化请求发起后:', res)
-          this.formDataTemp = res || {}
-          this.formData = res || {}
-        })
+        this.$require(actions.immediateRemoteRequire)
+          .then(res => {
+            // console.info('初始化请求发起后:', res)
+            this.formDataTemp = res || {}
+            this.formData = res || {}
+            // 受anso-ui，表单在赋值后触发校验
+            this.$nextTick(() => {
+              this.onClearValidate()
+            })
+            return res
+          })
+          .then(res => {
+            this.setDefaultValue()
+            // this.formatDefValFunc()
+          })
       }
     },
     // 内置的按钮重置函数
