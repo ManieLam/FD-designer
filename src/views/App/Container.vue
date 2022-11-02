@@ -35,6 +35,7 @@
   el-dialog(
     title="查看配置文件"
     width="60%"
+    :close-on-click-modal="false"
     :visible.sync="settingJsonVisable")
     //- .setting-json-wrap {{ allCanvas }}
     CodeEditor.json-codeEditor(v-if="settingJsonVisable", :value="allCanvas|filterCanvasStr", mode="ace/mode/json", :readOnly="true", @onCloseDialog="settingJsonVisable=false")
@@ -42,6 +43,7 @@
   el-dialog(
     title="查看预览效果"
     width="60%"
+    :close-on-click-modal="false"
     :visible.sync="previewProps.visable")
     //- FromTemp(v-if="previewProps.visable", :config="previewProps.data")
     component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false")
@@ -50,6 +52,7 @@
   el-dialog(
     title="选择导出的类型"
     width="50%"
+    :close-on-click-modal="false"
     :visible.sync="toExportProps.visable")
     .toexport-radio-block
       .block-item(id="export-json", @click="exportJson") 配置文件
