@@ -5,7 +5,7 @@
   .search-async-wrap.p-l-8.p-r-8.box-content__inside(v-if="filterAble")
     //- span.label.secondary-text.m-r-8 设置远程搜索
     //- el-switch.m-r-8(v-model="isAsync", @change="updateAsyncAttrs")
-    el-button(@click="toggleAsyncSetting") {{ asyncFunc.name ? '重新选择数据源' : '开启远程搜索' }}
+    el-button(@click="toggleAsyncSetting") {{ asyncFunc.name ? '重新选择数据源' : '开启远程搜索(TODO)' }}
     el-button(v-show="asyncFunc.name", type="text", @click="cancelAsync") 取消远程搜索
     .list-column__default.m-t-4(v-show="asyncFunc.name")
       .left-wrap
