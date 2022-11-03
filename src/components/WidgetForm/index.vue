@@ -25,7 +25,7 @@
             v-if="ele && ele.compTag"
             v-on="$listeners"
             v-model="formData[ele.name]"
-            :class="{'is-active': selectItem === ele.key || formItemConfig.key === ele.key }"
+            :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }"
             :keyName="ele.key"
             :name="ele.key"
             :compTag="ele.compTag"
