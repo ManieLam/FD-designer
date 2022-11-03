@@ -27,9 +27,8 @@ el-form.setting-list(v-model="data", label-position="top")
         v-for="groupItem in attrItem.group"
         :key="groupItem.key"
         :prop="groupItem.key"
-        :tip="groupItem.tip"
-        :label="groupItem.label")
-        template(slot="label" v-if="!attrItem.labelHidden")
+        :tip="groupItem.tip")
+        .d-flex-row-between.align-items-center(slot="label", v-if="!groupItem.labelHidden")
           span.span-label {{groupItem.label}}
           span.span-tip.color-secondary.m-l-8(v-if="groupItem.tip")
             i.el-icon-info {{groupItem.tip}}

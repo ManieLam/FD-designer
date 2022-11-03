@@ -73,14 +73,6 @@ export const select = {
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     {
-      label: '是否分组（TODO）',
-      key: 'isGroup',
-      tag: 'el-checkbox',
-      labelHidden: true,
-      options: [{ label: '分组', value: true }, { label: '不分', value: false }],
-      chains: () => { }
-    },
-    {
       label: '是否多选（TODO）',
       key: 'multiple',
       tag: 'el-checkbox',
@@ -96,10 +88,23 @@ export const select = {
     },
     {
       label: '选项',
-      key: 'options',
-      tag: 'form-option',
-      tip: '选项配置的方式只允许一种'
-      // tag: 'el-select'
+      group: [
+        {
+          label: '配置',
+          key: 'options',
+          tag: 'form-option',
+          tip: '选项配置的方式只允许一种'
+          // tag: 'el-select'
+        },
+        {
+          label: '是否分组（TODO）',
+          key: 'isGroup',
+          tag: 'el-checkbox',
+          labelHidden: true,
+          options: [{ label: '分组', value: true }, { label: '不分', value: false }],
+          chains: () => { }
+        }
+      ]
     },
     {
       label: '搜索',
@@ -151,23 +156,27 @@ export const input = {
       tag: 'el-input-number',
       key: 'minlength'
     },
-    FormtagAttrs.defaultValue,
     {
       label: '显示输入字数统计',
       tag: 'el-checkbox',
       labelHidden: true,
       key: 'show-word-limit'
     },
-    {
-      label: '前缀（只支持字符串/icon）',
-      tag: 'el-input',
-      key: 'affixes-before'
-    },
-    {
-      label: '后缀（只支持字符串/icon）',
-      tag: 'el-input',
-      key: 'affixes-after'
-    }
+    FormtagAttrs.defaultValue
+    // {
+    //   label: '前缀（只支持字符串/icon）TODO',
+    //   // tag: 'el-input',
+    //   tag: 'form-affixes',
+    //   key: 'affixes-prepend',
+    //   type: 'prepend'
+    // },
+    // {
+    //   label: '后缀（只支持字符串/icon）TODO',
+    //   // tag: 'el-input',
+    //   tag: 'form-affixes',
+    //   key: 'affixes-append',
+    //   type: 'append'
+    // }
   ]
 }
 
