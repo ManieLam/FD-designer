@@ -5,5 +5,6 @@ export default {
   'form-chains': () => import('./FormChains.vue'),
   'form-list': () => import('./FormList.vue'),
   'form-defaultValue': () => import('./FormDefaultValue.vue'),
-  'form-remote': () => import('./FormRemote.vue')
+  'form-remote': () => import('./FormRemote.vue'),
+  'form-affixes': () => import('./FormAffixes.vue')
 }
