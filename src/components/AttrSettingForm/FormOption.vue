@@ -1,5 +1,5 @@
 <template lang='pug'>
-.form-option-container.box-content__inside
+.form-option-container
   //- ul.list-wrap
   //-   li(v-for="item in list",:key="item.value", :value="item.value") {{item.label}}
   .radio-list.m-b-8
