@@ -162,14 +162,14 @@ export const input = {
       labelHidden: true,
       key: 'show-word-limit'
     },
-    FormtagAttrs.defaultValue
-    // {
-    //   label: '前缀（只支持字符串/icon）TODO',
-    //   // tag: 'el-input',
-    //   tag: 'form-affixes',
-    //   key: 'affixes-prepend',
-    //   type: 'prepend'
-    // },
+    FormtagAttrs.defaultValue,
+    {
+      label: '前缀',
+      // tag: 'el-input',
+      tag: 'form-affixes',
+      key: 'affixes-prepend',
+      type: 'prepend'
+    }
     // {
     //   label: '后缀（只支持字符串/icon）TODO',
     //   // tag: 'el-input',
