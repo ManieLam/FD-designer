@@ -314,7 +314,7 @@ export default {
 
 .code-editor__collapse
   ::v-deep .el-collapse-item .el-collapse-item__header
-    background-color: $--bgcolor-secondary
+    background-color: #fff
     &.is-active
       border-bottom: 1px dotted $--border-active
     // margin-bottom: 8px
