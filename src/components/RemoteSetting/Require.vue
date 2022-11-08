@@ -315,6 +315,7 @@ export default {
 .code-editor__collapse
   ::v-deep .el-collapse-item .el-collapse-item__header
     background-color: #fff
+    padding-left: 8px
     &.is-active
       border-bottom: 1px dotted $--border-active
     // margin-bottom: 8px

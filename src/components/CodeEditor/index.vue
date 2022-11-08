@@ -34,6 +34,7 @@ export default {
   methods: {
     initEditor () {
       this.editor = new this.CodeEditor({
+        key: this.generatedId,
         name: this.generatedId,
         command: this.value,
         mode: this.mode,
