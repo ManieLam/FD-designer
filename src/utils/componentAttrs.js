@@ -147,7 +147,7 @@ export const input = {
     FormtagAttrs.disabled,
     FormtagAttrs.validate,
     {
-      label: '最长长度限制',
+      label: '最大长度限制',
       tag: 'el-input-number',
       key: 'maxlength'
     },
@@ -167,16 +167,16 @@ export const input = {
       label: '前缀',
       // tag: 'el-input',
       tag: 'form-affixes',
-      key: 'affixes-prepend',
-      type: 'prepend'
+      key: 'prepend',
+      affixesType: 'prepend'
+    },
+    {
+      label: '后缀',
+      // tag: 'el-input',
+      tag: 'form-affixes',
+      key: 'append',
+      affixesType: 'append'
     }
-    // {
-    //   label: '后缀（只支持字符串/icon）TODO',
-    //   // tag: 'el-input',
-    //   tag: 'form-affixes',
-    //   key: 'affixes-append',
-    //   type: 'append'
-    // }
   ]
 }
 
