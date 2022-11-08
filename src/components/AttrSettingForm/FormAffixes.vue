@@ -1,10 +1,11 @@
 <template lang='pug'>
 .form-affixes.d-flex
-  el-select(v-model="inputType", style="flex: 1;")
+  el-select(v-model="type", style="flex: 1;")
     el-option(v-for="opt in options", :key="opt.value", :label="opt.label", :value="opt.value")
   .input(style="flex: 2;")
-    el-input(v-show="inputType === 'string'", v-model="content", placeholder="请输入文本内容")
-    el-select.select-icon(v-show="inputType === 'icon'", v-model="content", placeholder="请选择图标")
+    el-input(v-show="type === 'string'", v-model="content", placeholder="请输入文本内容")
+    el-input(v-show="type === 'icon'", v-model="content", placeholder="请输入图标名称")
+    //- el-select.select-icon(v-show="type === 'icon'", v-model="content", placeholder="请选择图标")
 
 </template>
 
@@ -13,7 +14,7 @@
 export default {
   name: 'FormAffixes',
   props: {
-    type: {
+    affixesType: {
       type: String,
       default: 'append'
     },
@@ -39,12 +40,12 @@ export default {
     isIcon () {
       return this.value?.icon
     },
-    inputType: {
+    type: {
       get () {
-        return this.value.inputType || 'string'
+        return this.value.type || 'string'
       },
       set (value) {
-        this.$emit('input', { content: this.content, inputType: value })
+        this.$emit('input', { content: this.content, type: value, affixesType: this.affixesType })
       }
     },
     content: {
@@ -52,7 +53,7 @@ export default {
         return this.value.content
       },
       set (value) {
-        this.$emit('input', { content: value, inputType: this.inputType })
+        this.$emit('input', { content: value, type: this.type, affixesType: this.affixesType })
       }
     }
   },
