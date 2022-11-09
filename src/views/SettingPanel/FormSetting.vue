@@ -29,16 +29,16 @@
 
               .row-item.p-t-16
                 el-checkbox(v-model="actionsData.getResourceImmediate") 获取初始化数据
-                .row-item__remote(v-if="actionsData.getResourceImmediate")
+                .row-item__remote.box-content__inside(v-if="actionsData.getResourceImmediate")
                   //- 前置触发条件：路由带参数（跳转进入）
-                  .box-content__inside
+                  .box-content
                     el-dropdown(split-button) 前置触发条件(TODO)
                       el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceWhen(byRoute)") 根据页面路由参数
                     //- .dropdown-item-content(v-if="immediateRemotePrecondition.type === 'byRoute'")
                     //-   form-list()
 
                   //- 动态配置数据源
-                  .box-content__inside
+                  .box-content.m-t-8
                     form-remote(v-if="!!actionsData.immediateRemoteRequire", v-model="actionsData.immediateRemoteRequire", title="配置表单首次加载数据源")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")

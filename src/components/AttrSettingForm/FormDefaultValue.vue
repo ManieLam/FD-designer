@@ -44,7 +44,6 @@
 /** 默认值 */
 import CodeEditor from '@/components/CodeEditor'
 import { debounce } from 'lodash'
-import { useEval } from '@/utils/request.js'
 import { presetOptions } from '@/utils/defaultConfig.js'
 // import { formatDefaultValueFunc } from '@/utils/format.js'
 export default {
