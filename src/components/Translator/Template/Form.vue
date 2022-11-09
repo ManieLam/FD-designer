@@ -105,8 +105,7 @@ export default {
       const keys = Object.keys(this.fieldObj)
       for (const field of keys) {
         // console.info('field:', field)
-        const value = formatDefValFunc(this.formData, this.formFieds, this.fieldObj[field]?.form)
-        // console.info('defVal:', field, value)
+        const value = formatDefValFunc.call(this, this.formData, this.formFieds, this.fieldObj[field]?.form)
         this.$set(this.formData, field, value)
       }
     },

@@ -19,17 +19,12 @@ export const httpHeader = (props, timeStamp) => {
 export function useEval (funcStr = '', cb) {
   ((_cb) => {
     const func = eval(funcStr)
-    // console.log('_cb----')
+    // console.log('_cb1----')
     // console.info(_cb)
-    // console.log('func------')
+    // console.log('func2------')
     // console.info(func)
     // console.info(_cb(func))
     return _cb(func)
-    // try {
-    //   _cb(func)
-    // } catch (error) {
-    //   console.error('useEval', error)
-    // }
   })(cb)
 }
 

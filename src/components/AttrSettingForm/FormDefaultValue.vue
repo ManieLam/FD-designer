@@ -1,5 +1,8 @@
 <template lang='pug'>
 .box-content__inside
+  //- 选择数据源
+  el-select(v-model="dataForm", placeholder="请选择数据源")
+    el-option(v-for="resource in resourceList", :key="resource", :label="resource.name") {{ resource.label }}
   el-radio-group(v-model="settingValue.valueType")
     el-radio(v-for="radio in valueTypeGroups", :key="radio.name", :label="radio.name") {{ radio.label }}
   //- 预设数据配置
@@ -24,7 +27,7 @@
     .additional-input.m-t-8(v-if="settingValue.presetType==='customFunc'")
       CodeEditor(
         v-if="settingValue.presetType==='customFunc'"
-        :value="settingValue.customFunc"
+        :value="String(settingValue.customFunc)"
         key="setValueByCustom"
         @change="formatFuncByStr")
         //- pre.code-editor-desc__pre(slot="code-pre") (data, fields, field) => {
@@ -86,7 +89,11 @@ export default {
         customFunc: '',
         customChainsField: ''
         // customFuncPlaceholder: '\n return data[field.name]'
-      }
+      },
+      presetCustomFunc: '(data, fields, field) => {\n return data[field.name] \n}',
+      // 数据源
+      dataForm: '', // 默认值指定的数据源
+      resourceList: [] // 数据源列表
     }
   },
   // filters: {
@@ -103,7 +110,7 @@ export default {
         return this.presetInputVal
       },
       set (values) {
-        console.info('set value')
+        // console.info('set value', values)
         this.presetInputVal = values
       }
     }
@@ -113,7 +120,14 @@ export default {
       immediate: true,
       handler (name, oldName) {
         if (name !== oldName) {
+          // console.info('set default')
+          const reDef = this.value.presetType === 'customFunc' && !this.value.customFunc ? this.presetCustomFunc : null
           this.presetInputVal = this.value
+          if (reDef) {
+            this.presetInputVal.customFunc = reDef
+          }
+          // console.info('--', this.presetInputVal)
+          // this.value.presetType === 'customFunc' && !this.value.customFunc ? { customFunc: this.presetOptions?.[3]?.options?.[0]?.valFunc } : {}
         }
       }
     },
@@ -127,14 +141,15 @@ export default {
   methods: {
     formatFuncByStr: debounce(function (str) {
       // console.info('formatFunByStr', str)
-      this.settingValue.customFunc = function (data, fields, field) {
-        // const ruleStr = `(data, fields, field) => {\n ${str} \n}`
-        useEval(str, (func) => func(data, fields, field))
-      }
+      this.settingValue.customFunc = str
+      // this.settingValue.customFunc = function (data, fields, field) {
+      //   // const ruleStr = `(data, fields, field) => {\n ${str} \n}`
+      //   useEval(str, (func) => func(data, fields, field))
+      // }
     }, 800)
-  },
-  mounted () {
-    this.presetInputVal = this.value
+  // },
+  // mounted () {
+  //   this.presetInputVal = this.value
   }
 
 }

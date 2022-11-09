@@ -154,10 +154,10 @@ export const presetOptions = [
       {
         label: '同表单数据自定义(TODO)',
         value: 'customFunc',
-        valFunc: (data, fields, field) => {}
+        valFunc: (data, fields, field) => { return data[field.name] }
       },
       {
-        label: '关联字段(TODO)',
+        label: '关联字段',
         meta: '表单内数据字段',
         value: 'customChainsField',
         valFunc: (data, fields, field) => {

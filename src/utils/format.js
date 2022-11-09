@@ -23,7 +23,7 @@ export function formatFormRules (rules = {}) {
   }, [])
 }
 
-/** 解译单个默认值 */
+/** 解译单个默认值, presetOptions存在4种选项 */
 export const defValOptTree = presetOptions.reduce((r, c) => {
   if (c.options && Array.isArray(c.options)) {
     return Object.assign(r, keyBy(c.options, 'value'))
@@ -32,11 +32,18 @@ export const defValOptTree = presetOptions.reduce((r, c) => {
 }, {})
 
 export function formatDefValFunc (value = {}, fields = [], field = {}) {
-  const { valueType, presetType } = field?.defaultValue || {}
+  const { valueType, presetType, customFunc } = field?.defaultValue || {}
   if (!presetType || valueType === 'isDefault') return value[field?.name]
   if (presetType) {
-    const valFunc = defValOptTree[presetType]?.valFunc
-    return valFunc ? valFunc(value, fields, field) : null
+    const target = defValOptTree[presetType]
+    if (presetType === 'customFunc') {
+      let res = null
+      useEval.call(this, customFunc, (func) => { res = func.call(this, value, fields, field) })
+      // console.info('res:', res)
+      return res
+    } else {
+      return target?.valFunc?.call(this, value, fields, field)
+    }
   }
 }
 
