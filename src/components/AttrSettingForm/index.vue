@@ -19,6 +19,7 @@ el-form.setting-list(v-model="data", label-position="top")
       v-model.lazy="data[attrItem.key]"
       v-bind="attrItem"
       v-on="$listeners"
+      :key="`${value.key}_${attrItem.key}`"
       :fullSetting="data"
       @input="update")
     //- 属性组配置

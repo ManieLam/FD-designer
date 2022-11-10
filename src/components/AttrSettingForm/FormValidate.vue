@@ -8,6 +8,11 @@
     .validate-item
       el-checkbox(v-model="validType.isRegexp") 正则判断
       form-list(v-if="validType.isRegexp", :columnProps="regexpProps", :draggable="false", v-model="regexpRule")
+        template(v-slot:patternStr="scoped")
+          //- regexpRule[scoped.index].patternStr
+          el-input(:value="scoped.value", placeholder="输入表达式", clearable, @input="inputRegex($event, scoped)")
+            el-select(slot="append", v-model="regexSelectVal", placeholder="请选择", filterable, @change="selectRegex($event, scoped)")
+              el-option(v-for="regex in regexOptions", :key="`regex_${regex.name}`", :value="regex.name", :label="regex.label")
     .validate-item
       el-checkbox(v-model="validType.isValidator") 自定义规则
       CodeEditor(
@@ -22,6 +27,7 @@
 /** 表单校验 */
 import { isEqual } from 'lodash'
 import CodeEditor from '@/components/CodeEditor'
+import regexOptions from '@/utils/regex.js'
 export default {
   name: 'FormValidate',
   components: {
@@ -31,6 +37,9 @@ export default {
     value: {
       type: Object,
       default: () => ({})
+    },
+    widget: {
+      type: String
     }
   },
   data () {
@@ -55,7 +64,9 @@ export default {
       // requireRule: this.value.isRequired,
       requireData: this.value.isRequired || {},
       regexpList: this.value.isRegexp || [],
-      validatorFunc: this.value.isValidator || ''
+      validatorFunc: this.value.isValidator || '',
+      regexOptions: Object.values(regexOptions), // 正则选项
+      regexSelectVal: null // 选择的正则选项
     }
   },
   watch: {
@@ -113,6 +124,19 @@ export default {
         isRequired: isRequired ? this.requireRule : null,
         isRegexp: isRegexp ? this.regexpRule : null,
         isValidator: isValidator ? this.validatorRule : null
+      }
+    }
+  },
+  methods: {
+    selectRegex (value, scoped) {
+      const target = regexOptions[value]
+      this.$set(scoped.data, 'message', `仅限${target?.label}`)
+      this.$set(scoped.data, 'patternStr', String(target?.regex).replace(/\//g, ''))
+    },
+    inputRegex (value, scoped) {
+      this.$set(this.regexpRule[scoped.index], 'patternStr', value)
+      if (!value) {
+        this.$set(this.regexpRule[scoped.index], 'message', '')
       }
     }
   }
