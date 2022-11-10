@@ -9,7 +9,7 @@ table.list-options
   tbody(v-if="!draggable")
     tr.drag-list(v-for="(item, index) in actList", :key="index")
       td(v-for="prop in columnProps", :key="prop.prop")
-        slot(v-bind[prop.prop]="item")
+        slot(v-bind[prop.prop]="item", :name="prop.prop", :index="index", :data="item", :value="item[prop.prop]")
           el-input(v-model="item[prop.prop]", :placeholder="prop.placeholder")
       td
         i.el-icon-minus.color-primary.btn-radius-50(:disabled="actList.length===1",  @click="remove(item, index)")
@@ -105,9 +105,6 @@ export default {
         this.$delete(this.actList, index)
       }
     }
-  // },
-  // mounted () {
-  //   if (!this.list || !this.list.length) this.add()
   }
 }
 </script>
