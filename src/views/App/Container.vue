@@ -188,6 +188,7 @@ export default {
       // this.$refs.dragPage.save()
       localStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
       localStorage.setItem('Canvas-editing', this.canvasName)
+      this.$message.success('保存成功')
     },
     async initCanvas () {
       await this.$store.commit('canvas/init')
