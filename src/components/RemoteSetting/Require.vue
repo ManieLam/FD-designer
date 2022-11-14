@@ -53,11 +53,17 @@ el-dialog.async-required-dialog(
                 .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
                   :class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
                   @click="toggleCustomList('header')")
-              ParamsList(v-show="hasHeader", v-model="apiData.header", :editAble="true", :isSelection="true")
+              ParamsList(v-show="hasHeader", key="header", v-model="apiData.header", :editAble="true")
+
+            el-form-item(prop="pathData")
+              .d-flex-row-between.align-items-center(slot="label")
+                .label-left 请求参数（Path）
+                .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(:class="!hasPathData ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'" @click="toggleCustomList('pathData')")
+              ParamsList(v-show="hasPathData", key="pathData", v-model="apiData.pathData", :editAble="true")
 
             el-form-item(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
-                .label-left 请求参数
+                .label-left 请求参数（Query）
                 .label-right
                   .cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
                     :class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
@@ -69,8 +75,7 @@ el-dialog.async-required-dialog(
                         div 表单存在默认请求多个数据源时，则以列表形式传递
                         div 该选项会影响所有该接口，请求参数的数据范围
                       i.icon.el-icon-info.m-l-8
-
-              ParamsList(v-show="hasBody", v-model="apiData.body", :editAble="true", :isSelection="true")
+              ParamsList(v-show="hasBody", key="body", v-model="apiData.body", :editAble="true")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
             //-   el-switch(v-model="apiData.immediate")
@@ -184,6 +189,9 @@ export default {
     hasBody () {
       return this.apiData?.body != null
     },
+    hasPathData () {
+      return this.apiData?.pathData != null
+    },
     dialogVisabled: {
       get () {
         return this.value
@@ -281,7 +289,7 @@ export default {
       })
     },
     toggleCustomList (type) {
-      // console.log('toggleCustomList:', type)
+      console.log('toggleCustomList:', type)
       const data = this.apiData[type]
       if (data) {
         this.$set(this.apiData, type, null)

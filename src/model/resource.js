@@ -32,7 +32,8 @@ export function ApiData (config = {}) {
     method: 'GET',
     url: '',
     header: null,
-    body: null,
+    body: null, // query参数
+    pathData: null, // path参数
     dataHandle: [],
     isFullDose: false,
     beforeRequired: ApiDataHandles.beforeRequired,
