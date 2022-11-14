@@ -17,20 +17,23 @@ el-dialog.async-required-dialog(
       el-button-group.right-wrap__top
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
         el-button(type="primary", @click="testLink") 测试链接
-        el-button(type="primary", title="保存至全局，允许下次继续使用", @click="save") 保存至全局
+        el-button(type="primary", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
         el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 选中当前
     .bottom-wrap.d-flex-row-between
+      //- 左
       .left-wrap.m-r-8
-        .left-api-list.d-flex-row-between.align-items-center.hover-change-bgColor(v-for="(apiItem, index) in apiList", :key="apiItem.name", @click.stop="editApi(apiItem, index)")
+        .left-api-row.d-flex-row-between.align-items-center.hover-change-bgColor(v-for="(apiItem, index) in apiList", :key="apiItem.name", :data-name="apiItem.name", @click.stop="editApi(apiItem, index)")
           .left
             .d-flex-v-center
-              i.el-icon-check.color-primary.m-r-8(v-show="apiItem.name === apiData.name && apiData.__index === index")
+              i.el-icon-check.color-primary.m-r-8(v-show="apiItem.name === apiData.name")
               .color-warning {{apiItem.method}}
               .secondary-text.m-l-8 {{apiItem.url}}
             .color-text-secondary.font-size-small.m-l-8 {{ apiItem.demo || ''}}
           .right
-            .el-icon-delete.hover-change-scale.hover-change-color__danger(@click.stop.prevent="removeApi(apiItem, index)")
+            .el-icon-delete.hover-change-scale.hover-change-color__danger(title="删除", @click.stop.prevent="removeApi(apiItem, index)")
+            .el-icon-copy-document.hover-change-scale.hover-change-color__warning.m-l-8(title="复制", @click.stop.prevent="copeApi(apiItem, index)")
         el-empty.left-empty(v-show="!apiList.length", description="暂无数据源，请添加")
+      //- 右
       .right-wrap
         .right-custom-data
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
@@ -55,9 +58,18 @@ el-dialog.async-required-dialog(
             el-form-item(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求参数
-                .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
-                  :class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
-                  @click="toggleCustomList('body')")
+                .label-right
+                  .cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
+                    :class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
+                    @click="toggleCustomList('body')")
+                  el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否默认表单全量数据提交
+                    el-tooltip(placement="top")
+                      template(slot="content")
+                        div 除字典以外的数据，
+                        div 表单存在默认请求多个数据源时，则以列表形式传递
+                        div 该选项会影响所有该接口，请求参数的数据范围
+                      i.icon.el-icon-info.m-l-8
+
               ParamsList(v-show="hasBody", v-model="apiData.body", :editAble="true", :isSelection="true")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
@@ -185,13 +197,33 @@ export default {
     editApi (api, index) {
       this.apiData = {
         ...cloneDeep(api),
-        name: `${api.url}_${api.method}`,
-        __index: index
+        name: api?.name || `${api.url}_${api.method}`
       }
     },
     removeApi (api, index) {
       if (index >= 0) {
         this.$delete(this.apiList, index)
+      }
+    },
+    copeApi (api, index) {
+      if (api.url) {
+        const nUrl = `${api.url}_copie`
+        const nIndex = index + 1
+        // this.apiList.splice(nIndex, 0, new ApiData({
+        //   ...api,
+        //   url: nUrl,
+        //   name: `${nUrl}_${api.method}`,
+        //   __index: nIndex
+        // }))
+        this.globalSave(new ApiData({
+          ...api,
+          url: nUrl,
+          name: null,
+          _edit: false
+        }), nIndex)
+        this.$nextTick(() => {
+          this.apiData = this.apiList[nIndex]
+        })
       }
     },
     addApi () {
@@ -215,17 +247,21 @@ export default {
       this.apiData = new ApiData()
       // this.dataHandleFunc = this.apiData.dataHandleFunc
     },
-    save () {
-      const apiData = Object.assign(this.apiData, { name: this.apiData.name || `${this.apiData.url}_${this.apiData.method}` })
-      if (this.apiData?.__index == null) {
-        this.apiList.push(Object.assign(apiData, { __index: this.apiList.length }))
-        // this.$gbImport.gbApiRequires.push(this.apiData)
-      } else {
-        const { __index } = this.apiData
-        if (__index > -1) {
-          this.$set(this.apiList, __index, apiData)
-          // this.$set(this.$gbImport.gbApiRequires, __index, this.apiData)
+    globalSave (data = this.apiData, nIndex = null) {
+      const apiData = Object.assign(data, {
+        name: data?.name || `${data.url}_${data.method}`,
+        _edit: typeof data._edit === 'boolean' ? data._edit : true
+      })
+      if (!data?._edit) {
+        if (!isNaN(nIndex) && nIndex !== null) {
+          this.apiList.splice(nIndex, 0, apiData)
+        } else {
+          this.apiList.push(apiData)
         }
+        // this.$gbImport.gbApiRequires.push(data)
+      } else {
+        const index = this.apiList.findIndex(api => api.name === apiData.name)
+        this.$set(this.apiList, index, apiData)
       }
     },
     chooseChange () {
@@ -301,14 +337,29 @@ export default {
       margin-left: 4px
       margin-right: 4px
 
-.left-api-list
+.left-api-row
   border: 1px solid $--border-color-base
   padding: 8px
   cursor: pointer
+  position: relative
   // &:hover
   //   background: $--bgcolor-secondary
-  & + .left-api-list
+  & + .left-api-row
     margin-top: 8px
+  // &::before
+  //   content: attr(data-name)
+  //   background: rgba(0,0,0, 0.7)
+  //   color: #fff
+  //   padding: 1px 6px
+  //   font-size: 10px
+  //   // height: 15px
+  //   position: absolute
+  //   right: 0
+  //   top: 0
+  //   display: none
+  // &:hover
+  //   &::before
+  //     display: block
   .left
     line-height: 1.2
 

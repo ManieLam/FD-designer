@@ -1,14 +1,16 @@
 <template lang='pug'>
 .form-remote
-  el-button(@click="setAsyncVisible = !setAsyncVisible") {{ remoteData.url ? '重新选择数据源' : '配置数据源' }}
-  .list-column__default.m-t-4(v-show="remoteData.url")
+  el-button(v-show="!remoteData || !remoteData.url", @click="setAsyncVisible = !setAsyncVisible") {{ remoteData.url ? '重新选择数据源' : '配置数据源' }}
+  .list-column__default.m-t-4(v-show="remoteData.url", :key="remoteData.name", @click="setAsyncVisible = !setAsyncVisible")
     .left-wrap
       .d-flex-v-center
-        i.el-icon-check.color-primary.m-r-8
+        i.el-icon-paperclip.color-primary.m-r-8(title="数据源")
         .color-warning {{remoteData.method}}
         .secondary-text.m-l-8 {{remoteData.url}}
       .color-text-secondary.font-size-small.m-l-8 {{ remoteData.demo || ''}}
     .right-wrap
+      i.el-icon-edit(title="重新选择数据源")
+      i.el-icon-delete.m-l-8(title="移除当前", @click.prevent="remove")
   RemoteSettingRequire(
     key="option"
     v-model="setAsyncVisible"
@@ -33,6 +35,10 @@ export default {
     title: {
       type: String,
       default: '数据源配置'
+    },
+    isMulti: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -53,6 +59,9 @@ export default {
   methods: {
     getAsyncSeting (data) {
       this.remoteData = data
+    },
+    remove () {
+      this.remoteData = {}
     }
   }
 }

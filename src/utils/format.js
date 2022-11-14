@@ -56,6 +56,16 @@ export const getURLQuery = () => {
   }, {})
 }
 
+export function getURLAll (key) {
+  if (this?.$router) {
+    const { query, params } = this.$route
+    return params?.[key] || query?.[key] || ''
+  } else {
+    const queryObj = getURLQuery()
+    return queryObj[key]
+  }
+}
+
 export default {
   formatFormRules,
   formatDefValFunc

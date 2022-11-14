@@ -8,7 +8,7 @@
     v-on="$listeners"
     @selection-change="handleSelectionChange")
     //- el-table-column(v-if="isSelection", type="selection", width="38", :selectable="selectAble")
-    el-table-column(label="Key", prop="key", width="180")
+    el-table-column(label="参数key", prop="key", width="180")
       template(slot-scope="scope")
         .edit-input(v-if="editAble")
           slot(v-bind.column-name="scope")
@@ -19,7 +19,7 @@
               @input="changeInput($event, 'key', scope.$index)")
               //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.key }}
-    el-table-column(label="Value", prop="value")
+    el-table-column(label="取值范围 + 数值key", prop="value")
       template(slot-scope="scope")
         .column-item.d-flex-v-center(v-if="editAble")
           slot(v-bind.column-value="scope")
@@ -31,7 +31,7 @@
               :is="varTags[scope.row.varType].tag"
               :clearable="true"
               style="margin-top: 1px;"
-              placeholder="value"
+              placeholder="请输入数值的key"
               @input="changeInput($event, 'value', scope.$index)")
             //- el-input(
             //-   v-show="!scope.row.varType || scope.row.varType==='const' || scope.row.varType === 'field'"
@@ -52,10 +52,10 @@
           //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.value }}
     slot(name="custom-columns")
-    el-table-column(label="operation", width="80")
+    el-table-column(label="操作", width="80")
       template(slot-scope="scope")
-        .icon.el-icon-plus.m-r-8.cursor-pointer.hover-change-scale(@click="addItem(scope)")
-        .icon.el-icon-minus.cursor-pointer.hover-change-scale(@click="removeItem(scope)")
+        .icon.el-icon-plus.m-r-8.cursor-pointer.hover-change-scale(:key="`add_${scope.$index}`", @click="addItem(scope)")
+        .icon.el-icon-minus.cursor-pointer.hover-change-scale(:key="`remove_${scope.$index}`", @click="removeItem(scope)")
         //- .secondary-text(v-else, :value="scope.row.Value")
 </template>
 
@@ -87,7 +87,8 @@ export default {
     return {
       valueTypeOptions: [
         { label: '定值', value: 'const', tag: 'el-input' },
-        { label: '表单数据', value: 'formData', tag: 'el-input' },
+        { label: '表单录入数据', value: 'formData', tag: 'el-input' },
+        { label: '表单全量数据', value: 'fullData', tag: 'el-input' },
         { label: '路由数据', value: 'router', tag: 'el-input' },
         { label: '本地缓存', value: 'localstorage', tag: 'el-input' }
       ]
@@ -109,6 +110,9 @@ export default {
     },
     varTags () {
       return keyBy(this.valueTypeOptions, 'value')
+    },
+    listLen () {
+      return this.list?.length
     }
   },
   watch: {
@@ -135,7 +139,9 @@ export default {
     },
     removeItem (row) {
       const { $index } = row
-      this.$delete(this.list, $index)
+      if (this.list.length > 1) {
+        this.$delete(this.list, $index)
+      }
     },
     addItem (row) {
       const { $index } = row
@@ -151,4 +157,6 @@ export default {
     line-height: 1.2
   th
     color: $--color-text-regular
+.icon.el-icon-minus[hidden]
+  display: none
 </style>

@@ -34,6 +34,7 @@ export function ApiData (config = {}) {
     header: null,
     body: null,
     dataHandle: [],
+    isFullDose: false,
     beforeRequired: ApiDataHandles.beforeRequired,
     afterRequired: ApiDataHandles.afterRequired,
     error: ApiDataHandles.error,

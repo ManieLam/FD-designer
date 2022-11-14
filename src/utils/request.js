@@ -29,29 +29,12 @@ export function useEval (funcStr = '', cb) {
 }
 
 /* 参数格式转换 */
-export function formatParams ({ body = [], beforeRequired } = {}) {
-  // console.info('body:', body)
-  const params = body ? body.reduce((res, row) => {
-    let paramsVal = ''
-    switch (row.varType) {
-      case 'const': // 直接赋值，无需取值
-        paramsVal = row.value
-        break
-      // 当body中变量类型value存在`${row.varType}|${row.value}`这个格式 需要转换成动态取值
-      case 'formData':
-      case 'router':
-      case 'localstorage':
-        paramsVal = `${row.varType}|${row.value}`
-        break
-    }
-    res[row.key] = paramsVal
-    return res
-  }, {}) : {}
+export function formatParams ({ body = {}, beforeRequired } = {}) {
   if (beforeRequired?.__isChange) {
     // console.info('beforeRequired:', beforeRequired)
-    useEval(beforeRequired.funcInput, (func) => func(params))
+    useEval(beforeRequired.funcInput, (func) => func(body))
   }
-  return params
+  return body
 }
 
 export const httpOptions = (props) => {

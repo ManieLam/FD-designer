@@ -2,16 +2,15 @@
   <AnsoDataform
     ref="form"
     id="customForm"
-    v-model="formData"
+    v-model="fullData"
     v-bind="formAttrs"
     :formFields="formFieds"
     :buttonList="actButtons"
-    @onChange="onFormChange"
   ></AnsoDataform>
 </template>
 <script>
-import { isEqual, cloneDeep, keyBy } from 'lodash'
-import { formatFormRules, formatDefValFunc } from '@/utils/format.js'
+import { isEqual, cloneDeep, keyBy, pick } from 'lodash'
+import { formatFormRules, formatDefValFunc, getURLAll } from '@/utils/format.js'
 // import button from '../mixins/button'
 import relation from '../mixins/relation'
 import { MessageBox } from 'element-ui'
@@ -31,8 +30,8 @@ export default {
   },
   data () {
     return {
-      formDataTemp: {},
-      formData: {},
+      fullDataTemp: {},
+      fullData: {},
       relations: {}
     }
   },
@@ -69,7 +68,7 @@ export default {
       return this.formItems.filter(field => field.filterAbleType === 'filterAbleAsyncFunc')
     },
     hasChangeData () {
-      return !isEqual(this.formData, this.formDataTemp)
+      return !isEqual(this.fullData, this.fullDataTemp)
     },
     actButtons () {
       const buttons = cloneDeep(this.config?.form.buttons)
@@ -85,6 +84,10 @@ export default {
     },
     fieldObj () {
       return keyBy(this.formFieds, 'name')
+    },
+    // 表单录入数据
+    formData () {
+      return pick(this.fullData, Object.keys(this.fieldObj))
     }
   },
   methods: {
@@ -101,23 +104,26 @@ export default {
     onDestory () {},
     // 设置默认值
     setDefaultValue () {
-      // this.formData
+      // this.fullData
       const keys = Object.keys(this.fieldObj)
       for (const field of keys) {
         // console.info('field:', field)
-        const value = formatDefValFunc.call(this, this.formData, this.formFieds, this.fieldObj[field]?.form)
-        this.$set(this.formData, field, value)
+        const value = formatDefValFunc.call(this, this.fullData, this.formFieds, this.fieldObj[field]?.form)
+        this.$set(this.fullData, field, value)
       }
     },
     // 发起异步请求
     getRemoteResource () {
       const { actions } = this.config?.form || {}
       if (actions?.immediateRemoteRequire) {
-        this.$require(actions.immediateRemoteRequire)
+        this.$require({
+          ...actions.immediateRemoteRequire,
+          body: this.formatSubmitParams(actions.immediateRemoteRequire)
+        })
           .then(res => {
             // console.info('初始化请求发起后:', res)
-            this.formDataTemp = res || {}
-            this.formData = res || {}
+            this.fullDataTemp = res || {}
+            this.fullData = res || {}
             // 受anso-ui，表单在赋值后触发校验
             this.$nextTick(() => {
               this.onClearValidate()
@@ -191,16 +197,36 @@ export default {
         this.doCancel(btn)
       }
     },
-    formatSubmitParams (params = []) {
-      const formParams = Object.entries(this.formData).map(([name, value]) => {
-        return {
-          key: name,
-          value,
-          varType: 'const' // 无需动态取值
+    formatBodyParams ({ body: bodyParams, datas = {} } = {}) {
+      return Array.from(bodyParams).reduce((res, item) => {
+        let value = null
+        switch (item.varType) {
+          case 'const':
+            value = item.value; break
+          case 'formData':
+            value = this.formData[item.value]; break
+          case 'fullData':
+            value = this.fullData[item.value]; break
+          case 'router':
+            value = getURLAll.call(this, item.value); break
+          case 'localstorage':
+            // const storageData = localStorage.getItem(item.value)
+            // console.log(typeof storageData)
+            // value = JSON.parse(storageData)
+            value = localStorage.getItem(item.value); break
         }
-      })
-      // TODO 当body中变量类型value存在`${row.varType}|${row.value}`这个格式 需要转换成动态取值
-      return [].concat(params, formParams)
+        res[item.key] = value
+        return res
+      }, {})
+    },
+    /**
+     * @return body 数据 <Object>
+     * TODO 多数据源转换
+     * */
+    formatSubmitParams ({ isFullDose, body = [] }) {
+      const range = isFullDose ? this.fullData : this.formData
+      const bodyParams = body && body.length ? this.formatBodyParams({ body, datas: range }) : {}
+      return Object.assign({}, range, bodyParams)
     },
     // 内置的按钮提交事件
     onFormSubmit (btn) {
@@ -210,7 +236,7 @@ export default {
           if (valid && btn.funcRemote) {
             this.$require({
               ...btn.funcRemote,
-              body: this.formatSubmitParams(btn.body)
+              body: this.formatSubmitParams(btn.funcRemote)
             }).then(res => {
               // console.info('on after submit', res)
               this.$emit('onAfterSubmit', res)
@@ -229,25 +255,8 @@ export default {
     this.getRelation()
   },
   mounted () {
-    // console.info('form mounted:', this.isTest)
-    // this.onMounted()
     this.onClearValidate()
     this.getRemoteResource()
-  // },
-  // render (h) {
-  //   return (
-  //     <div>
-  //       <AnsoDataform
-  //         ref="form"
-  //         id="customForm"
-  //         v-model="formData"
-  //         formFields={this.formFieds}
-  //         buttonList={this.actButtons}
-  //         props={this.formAttrs}
-  //         onChange={this.onFormChange}
-  //       ></AnsoDataform>
-  //     </div>
-  //   )
   }
 }
 </script>
