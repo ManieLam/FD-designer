@@ -10,14 +10,16 @@
 </template>
 <script>
 import { isEqual, cloneDeep, keyBy, pick } from 'lodash'
-import { formatFormRules, formatDefValFunc, getURLAll } from '@/utils/format.js'
+import { formatFormRules, formatDefValFunc } from '@/utils/format.js'
 // import button from '../mixins/button'
-import relation from '../mixins/relation'
+import relationMixin from '../mixins/relation'
+import requireMixin from '../mixins/require'
+
 import { MessageBox } from 'element-ui'
 // import { useEval } from '@/utils/request.js'
 export default {
   name: 'FormTemp',
-  mixins: [relation],
+  mixins: [relationMixin, requireMixin],
   props: {
     config: {
       type: Object,
@@ -104,7 +106,6 @@ export default {
     onDestory () {},
     // 设置默认值
     setDefaultValue () {
-      // this.fullData
       const keys = Object.keys(this.fieldObj)
       for (const field of keys) {
         // console.info('field:', field)
@@ -116,10 +117,8 @@ export default {
     getRemoteResource () {
       const { actions } = this.config?.form || {}
       if (actions?.immediateRemoteRequire) {
-        this.$require({
-          ...actions.immediateRemoteRequire,
-          body: this.formatSubmitParams(actions.immediateRemoteRequire)
-        })
+        const requireObj = this.formatRequire(actions.immediateRemoteRequire)
+        this.$require(requireObj)
           .then(res => {
             // console.info('初始化请求发起后:', res)
             this.fullDataTemp = res || {}
@@ -197,47 +196,13 @@ export default {
         this.doCancel(btn)
       }
     },
-    formatBodyParams ({ body: bodyParams, datas = {} } = {}) {
-      return Array.from(bodyParams).reduce((res, item) => {
-        let value = null
-        switch (item.varType) {
-          case 'const':
-            value = item.value; break
-          case 'formData':
-            value = this.formData[item.value]; break
-          case 'fullData':
-            value = this.fullData[item.value]; break
-          case 'router':
-            value = getURLAll.call(this, item.value); break
-          case 'localstorage':
-            // const storageData = localStorage.getItem(item.value)
-            // console.log(typeof storageData)
-            // value = JSON.parse(storageData)
-            value = localStorage.getItem(item.value); break
-        }
-        res[item.key] = value
-        return res
-      }, {})
-    },
-    /**
-     * @return body 数据 <Object>
-     * TODO 多数据源转换
-     * */
-    formatSubmitParams ({ isFullDose, body = [] }) {
-      const range = isFullDose ? this.fullData : this.formData
-      const bodyParams = body && body.length ? this.formatBodyParams({ body, datas: range }) : {}
-      return Object.assign({}, range, bodyParams)
-    },
     // 内置的按钮提交事件
     onFormSubmit (btn) {
-      console.log('on submit', btn)
       if (btn.validate) {
         this.$refs.form.$refs.dataform.validate(valid => {
           if (valid && btn.funcRemote) {
-            this.$require({
-              ...btn.funcRemote,
-              body: this.formatSubmitParams(btn.funcRemote)
-            }).then(res => {
+            const requireObj = this.formatRequire(btn.funcRemote)
+            this.$require(requireObj).then(res => {
               // console.info('on after submit', res)
               this.$emit('onAfterSubmit', res)
             })

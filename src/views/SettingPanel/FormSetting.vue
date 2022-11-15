@@ -39,7 +39,7 @@
 
                   //- 动态配置数据源
                   .box-content.m-t-8
-                    form-remote(v-if="!!actionsData.immediateRemoteRequire", v-model="actionsData.immediateRemoteRequire", title="配置表单首次加载数据源")
+                    form-remote(v-if="!!actionsData.immediateRemoteRequire", v-model="actionsData.immediateRemoteRequire", key="immediateRemoteRequire", title="配置表单首次加载数据源")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")
               ButtonSetting.row-item(:key="canvasName", :list="buttonList", @change="updateButtons")

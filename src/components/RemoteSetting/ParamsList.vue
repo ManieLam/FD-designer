@@ -2,6 +2,7 @@
 .custom-list-container
   el-table.list-handMade.box-content__inside.p-b-8(
     :data="list"
+    :key="keyName"
     ref="table"
     style="width: 100%"
     row-key="__key"
@@ -81,7 +82,11 @@ export default {
     //   type: Boolean,
     //   default: false
     // },
-    selectAble: Function
+    selectAble: Function,
+    keyName: {
+      type: String,
+      default: ''
+    }
   },
   data () {
     return {
@@ -139,8 +144,9 @@ export default {
     },
     removeItem (row) {
       const { $index } = row
-      if (this.list.length > 1) {
-        this.$delete(this.list, $index)
+      this.$delete(this.list, $index)
+      if (this.list.length === 0) {
+        this.$emit('onClearAll')
       }
     },
     addItem (row) {

@@ -51,6 +51,7 @@ const mutations = {
 
 const actions = {
   updateList ({ commit, state }, sources = []) {
+    // console.info('updateList:')
     state.list = sources
     commit('saveStorage', sources)
   }

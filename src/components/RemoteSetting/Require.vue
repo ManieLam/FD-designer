@@ -53,13 +53,13 @@ el-dialog.async-required-dialog(
                 .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
                   :class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
                   @click="toggleCustomList('header')")
-              ParamsList(v-show="hasHeader", key="header", v-model="apiData.header", :editAble="true")
+              ParamsList(v-show="hasHeader", keyName="header", v-model="apiData.header", :editAble="true", @onClearAll="toggleCustomList('header')")
 
             el-form-item(prop="pathData")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求参数（Path）
                 .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(:class="!hasPathData ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'" @click="toggleCustomList('pathData')")
-              ParamsList(v-show="hasPathData", key="pathData", v-model="apiData.pathData", :editAble="true")
+              ParamsList(v-show="hasPathData", keyName="pathData", v-model="apiData.pathData", :editAble="true", @onClearAll="toggleCustomList('pathData')")
 
             el-form-item(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
@@ -75,7 +75,7 @@ el-dialog.async-required-dialog(
                         div 表单存在默认请求多个数据源时，则以列表形式传递
                         div 该选项会影响所有该接口，请求参数的数据范围
                       i.icon.el-icon-info.m-l-8
-              ParamsList(v-show="hasBody", key="body", v-model="apiData.body", :editAble="true")
+              ParamsList(v-show="hasBody", keyName="body", v-model="apiData.body", :editAble="true", @onClearAll="toggleCustomList('body')")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
             //-   el-switch(v-model="apiData.immediate")
@@ -103,9 +103,9 @@ el-dialog.async-required-dialog(
 
 <script>
 import ParamsList from './ParamsList'
-import { cloneDeep, keyBy } from 'lodash'
+import { cloneDeep, keyBy, isEqual, debounce } from 'lodash'
 import CodeEditor from '@/components/CodeEditor/index'
-import { ApiData, ApiDataHandles } from '@/model/resource.js'
+import { ApiData, ApiDataHandles, ApiBodyParams } from '@/model/resource.js'
 export default {
   name: 'RemoteSettingRequire',
   props: {
@@ -168,13 +168,19 @@ export default {
     chosenData: {
       deep: true,
       immediate: true,
-      handler (data) {
-        this.apiData = new ApiData(data)
+      handler (data, oldData) {
+        if (!isEqual(data, oldData)) {
+          this.apiData = new ApiData(data)
+          this.apiData.pathData = this.getPathParamByUrl(data.url, data.pathData)
+        }
       }
     },
     apiList (list) {
       this.$store.dispatch('resources/updateList', list)
-    }
+    },
+    'apiData.url': debounce(function (path) {
+      this.apiData.pathData = this.getPathParamByUrl(path)
+    }, 1800)
   },
   computed: {
     apiList () {
@@ -288,6 +294,7 @@ export default {
         console.info(res)
       })
     },
+    // 切换自定义请求头部/请求参数列表开关
     toggleCustomList (type) {
       console.log('toggleCustomList:', type)
       const data = this.apiData[type]
@@ -298,6 +305,29 @@ export default {
         this.$set(this.apiData, type, [])
       }
     },
+    // 对请求地址格式化，与请求参数(path)的联动关系
+    getPathParamByUrl (path, params = this.apiData.pathData) {
+      let pathParams = Array.from(params || [])
+      if (path) {
+        const regex = /(\$\{)(\w+)(\})/g
+        const params = path.match(regex)
+        if (params && params.length) {
+          const keys = params.map(w => w.match(/\w+/)?.[0])
+          const objs = keyBy(pathParams, 'key')
+          let i = keys.length - 1
+          // 自动生成path参数列表
+          while (!objs[keys[i]] && i >= 0) {
+            const val = new ApiBodyParams({ key: keys[i], __key: new Date().getTime() + i })
+            pathParams = [...pathParams, val]
+            --i
+          }
+          return pathParams
+        } else {
+          return []
+        }
+      }
+    },
+    // 格式化自定义数据处理方法
     formatFuncByStr (str, handle) {
       const { funcDefault, name } = handle
       const funcInput = funcDefault.replace(/\{[^}]+\}/g, `{ ${str} }`)
