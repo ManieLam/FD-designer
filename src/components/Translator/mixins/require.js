@@ -39,12 +39,12 @@ export default {
       return Object.assign({}, range, bodyParams)
     },
     /**
-     * @return 格式化后的请求地址
-      */
-    formatPath ({ url = '', pathData = [] }) {
+    * @return 格式化后的请求地址
+    */
+    formatPath ({ url = '', pathData = [], body = [] }) {
       if (url && pathData.length) {
         const paramsVal = this.formatBodyParams({ body: pathData })
-        const newPath = url.replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
+        const newPath = url.split('?')?.[0].replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
           return paramsVal[p2] || ''
         })
         return newPath

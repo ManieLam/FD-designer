@@ -39,8 +39,19 @@ el-dialog.async-required-dialog(
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
             //- el-form-item(label="名称", prop="name")
             //-   el-input(v-model="apiData.name", placeholder="接口标识名称，请使用英文或数字")
-
-            el-form-item(label="请求地址", prop="url")
+            //- 请求地址
+            el-form-item.position-relative(prop="url")
+              .d-flex-row-between.align-items-center.label-absolute(slot="label")
+                //- i.icon.el-icon-
+                .label-left 请求地址
+                .label-right
+                  el-tooltip(placement="top")
+                    template(slot="content")
+                      div 地址格式：
+                      div 1. 请输入相对地址
+                      div 2. 动态地址参数请使用${xxx}的格式填入，并在相应下面【请求参数】中补充对应的取值方式。
+                      div 3. "?"后的query参数，格式为："xxx=${xxx}"。"="前方为参数key，后方可选填。并在相应下面【请求参数】中补充对应的取值方式。
+                    i.icon.el-icon-info.m-l-8
               el-input(v-model="apiData.url", placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置")
 
             el-form-item(label="请求方式", prop="method")
@@ -171,7 +182,7 @@ export default {
       handler (data, oldData) {
         if (!isEqual(data, oldData)) {
           this.apiData = new ApiData(data)
-          this.apiData.pathData = this.getPathParamByUrl(data.url, data.pathData)
+          this.analyseUrl(data)
         }
       }
     },
@@ -179,7 +190,7 @@ export default {
       this.$store.dispatch('resources/updateList', list)
     },
     'apiData.url': debounce(function (path) {
-      this.apiData.pathData = this.getPathParamByUrl(path)
+      this.analyseUrl(this.apiData)
     }, 1800)
   },
   computed: {
@@ -266,6 +277,7 @@ export default {
         name: data?.name || `${data.url}_${data.method}`,
         _edit: typeof data._edit === 'boolean' ? data._edit : true
       })
+      console.info('保存全局:', data)
       if (!data?._edit) {
         if (!isNaN(nIndex) && nIndex !== null) {
           this.apiList.splice(nIndex, 0, apiData)
@@ -305,26 +317,35 @@ export default {
         this.$set(this.apiData, type, [])
       }
     },
-    // 对请求地址格式化，与请求参数(path)的联动关系
-    getPathParamByUrl (path, params = this.apiData.pathData) {
-      let pathParams = Array.from(params || [])
-      if (path) {
-        const regex = /(\$\{)(\w+)(\})/g
-        const params = path.match(regex)
-        if (params && params.length) {
-          const keys = params.map(w => w.match(/\w+/)?.[0])
-          const objs = keyBy(pathParams, 'key')
-          let i = keys.length - 1
-          // 自动生成path参数列表
-          while (!objs[keys[i]] && i >= 0) {
-            const val = new ApiBodyParams({ key: keys[i], __key: new Date().getTime() + i })
-            pathParams = [...pathParams, val]
-            --i
-          }
-          return pathParams
-        } else {
-          return []
+    getParamByUrl (path, originParams, regex = /(\$\{)(\w+)(\})/g) {
+      let pathParams = Array.from(originParams || [])
+      // const regex = /(\$\{)(\w+)(\})/g
+      const params = path.match(regex)
+      if (params && params.length) {
+        const keys = params.map(k => k.match(/\w+/)?.[0])
+        const objs = keyBy(pathParams, 'key')
+        let i = keys.length - 1
+        // 自动生成path参数列表
+        while (!objs[keys[i]] && i >= 0) {
+          const val = new ApiBodyParams({ key: keys[i], __key: new Date().getTime() + i })
+          pathParams = [...pathParams, val]
+          --i
         }
+        return pathParams
+      }
+    },
+    // 对请求地址格式化，与请求参数(path)的联动关系
+    analyseUrl ({ url, pathData, body }) {
+      if (url) {
+        const [part1, part2] = url.split('?')
+        if (part1) {
+          this.apiData.pathData = this.getParamByUrl(part1, pathData)
+        }
+        if (part2) {
+          this.apiData.body = this.getParamByUrl(part2, body, /(\w+)=/g)
+        }
+      } else {
+        return []
       }
     },
     // 格式化自定义数据处理方法
@@ -412,4 +433,10 @@ export default {
   min-height: 200px
   height: 100%
   width: 100%
+
+.label-absolute
+  position: absolute
+  left: 10px
+  top: 0
+
 </style>
