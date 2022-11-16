@@ -41,8 +41,8 @@ export default {
     /**
     * @return 格式化后的请求地址
     */
-    formatPath ({ url = '', pathData = [], body = [] }) {
-      if (url && pathData.length) {
+    formatPath ({ url = '', pathData = [] }) {
+      if (url && pathData?.length) {
         const paramsVal = this.formatBodyParams({ body: pathData })
         const newPath = url.split('?')?.[0].replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
           return paramsVal[p2] || ''
