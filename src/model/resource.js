@@ -39,7 +39,8 @@ export function ApiData (config = {}) {
     beforeRequired: ApiDataHandles.beforeRequired,
     afterRequired: ApiDataHandles.afterRequired,
     error: ApiDataHandles.error,
-    name: config.url ? `${config.url}_${config.method}` : '', // 关键名称自动生成
+    name: config.name || new Date().getTime(), // 关键名称自动生成
+    group: '', // 组名， 默认为空代表全局
     ...config
   }
 }

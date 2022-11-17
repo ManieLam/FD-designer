@@ -12,7 +12,6 @@
       i.el-icon-edit(title="重新选择数据源")
       i.el-icon-delete.m-l-8(title="移除当前", @click.prevent="remove")
   RemoteSettingRequire(
-    key="option"
     v-model="setAsyncVisible"
     :title="title"
     :chosenData="remoteData"

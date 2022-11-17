@@ -15,30 +15,34 @@ el-dialog.async-required-dialog(
           span {{apiData.url}}
           span(v-show="apiData.demo") {{apiData.demo}}
       el-button-group.right-wrap__top
+        el-button(icon="el-icon-plus", @click="addGroup") 新增分组
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
         el-button(type="primary", @click="testLink") 测试链接
-        el-button(type="primary", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
-        el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 选中当前
+        el-button(type="primary", :disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存
+        el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
     .bottom-wrap.d-flex-row-between
       //- 左
       .left-wrap.m-r-8
-        .left-api-row.d-flex-row-between.align-items-center.hover-change-bgColor(v-for="(apiItem, index) in apiList", :key="apiItem.name", :data-name="apiItem.name", @click.stop="editApi(apiItem, index)")
-          .left
-            .d-flex-v-center
-              i.el-icon-check.color-primary.m-r-8(v-show="apiItem.name === apiData.name")
-              .color-warning {{apiItem.method}}
-              .secondary-text.m-l-8 {{apiItem.url}}
-            .color-text-secondary.font-size-small.m-l-8 {{ apiItem.demo || ''}}
-          .right
-            .el-icon-delete.hover-change-scale.hover-change-color__danger(title="删除", @click.stop.prevent="removeApi(apiItem, index)")
-            .el-icon-copy-document.hover-change-scale.hover-change-color__warning.m-l-8(title="复制", @click.stop.prevent="copeApi(apiItem, index)")
+        ApiGroup.left-api-group(
+          v-for="(list, title) in apiGroup"
+          :key="title"
+          :apiData="apiData"
+          :title="title"
+          :list="list"
+          :full="apiGroup"
+          @upgrade="upgradeGroup"
+          @remove="removeGroup"
+          @addApi="addApi"
+          @editApi="editApi"
+          @removeApi="removeApi"
+          @copeApi="copeApi")
         el-empty.left-empty(v-show="!apiList.length", description="暂无数据源，请添加")
       //- 右
       .right-wrap
         .right-custom-data
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
-            //- el-form-item(label="名称", prop="name")
-            //-   el-input(v-model="apiData.name", placeholder="接口标识名称，请使用英文或数字")
+            el-form-item(label="所属分组", prop="group")
+              el-input(v-model="apiData.group", placeholder="请输入分组标题名称")
             //- 请求地址
             el-form-item.position-relative(prop="url")
               .d-flex-row-between.align-items-center.label-absolute(slot="label")
@@ -114,7 +118,8 @@ el-dialog.async-required-dialog(
 
 <script>
 import ParamsList from './ParamsList'
-import { cloneDeep, keyBy, isEqual, debounce } from 'lodash'
+import ApiGroup from './ApiGroup.vue'
+import { keyBy, isEqual, debounce, groupBy } from 'lodash'
 import CodeEditor from '@/components/CodeEditor/index'
 import { ApiData, ApiDataHandles, ApiBodyParams } from '@/model/resource.js'
 export default {
@@ -132,7 +137,8 @@ export default {
   },
   components: {
     ParamsList,
-    CodeEditor
+    CodeEditor,
+    ApiGroup
   },
   filters: {
     filterPrePlaceholder (desc) {
@@ -187,6 +193,7 @@ export default {
       }
     },
     apiList (list) {
+      /* 受vue2影响，无监听到数组对象内部属性更新，重新再触发一次 */
       this.$store.dispatch('resources/updateList', list)
     },
     'apiData.url': debounce(function (path) {
@@ -194,8 +201,14 @@ export default {
     }, 1800)
   },
   computed: {
-    apiList () {
-      return this.$store.getters.getResources
+    apiList: {
+      get () {
+        return this.$store.getters.getResources
+      },
+      set (list) {
+        console.log('更新apiList')
+        this.$store.dispatch('resources/updateList', list)
+      }
     },
     apiNames () {
       return Object.keys(keyBy(this.apiList, 'name'))
@@ -216,79 +229,86 @@ export default {
       set (value) {
         this.$emit('input', value)
       }
+    },
+    // api分组
+    apiGroup () {
+      return groupBy(this.apiList, (api) => api.group || '全局')
     }
   },
   methods: {
-    editApi (api, index) {
-      this.apiData = {
-        ...cloneDeep(api),
-        name: api?.name || `${api.url}_${api.method}`
-      }
+    getApiName ({ name, group } = {}) {
+      return name || new Date().getTime()
     },
-    removeApi (api, index) {
+    addGroup () {
+      const newLen = Object.keys(this.apiGroup).filter(key => /^新建/.test(key)).length
+      this.apiData = new ApiData({
+        group: `新建分组${newLen + 1}`,
+        // name: `${newLen + 1}_${new Date().getTime()}`,
+        // name: this.getApiName(),
+        _edit: true
+      })
+      this.$nextTick(() => {
+        // this.globalSave(this.apiData)
+        this.apiList.push(this.apiData)
+      })
+    },
+    upgradeGroup (list, title) {
+      console.info('upgradeGroup:', arguments)
+      // this.$set(this.apiGroup, title, list)
+    },
+    removeGroup (title) {
+      this.apiList = this.apiList.filter(row => row.group !== title)
+      this.apiData = {}
+    },
+    editApi (api, index) {
+      this.apiData = api
+    },
+    removeApi (api) {
+      const index = this.apiList.findIndex(row => row.name === api.name)
       if (index >= 0) {
         this.$delete(this.apiList, index)
+        this.apiData = {}
       }
     },
-    copeApi (api, index) {
+    copeApi (api) {
       if (api.url) {
         const nUrl = `${api.url}_copie`
-        const nIndex = index + 1
-        // this.apiList.splice(nIndex, 0, new ApiData({
-        //   ...api,
-        //   url: nUrl,
-        //   name: `${nUrl}_${api.method}`,
-        //   __index: nIndex
-        // }))
-        this.globalSave(new ApiData({
+        const oIndex = this.apiList.findIndex(row => row.name === api.name)
+        const nIndex = oIndex + 1
+        this.apiData = new ApiData({
           ...api,
           url: nUrl,
-          name: null,
+          name: new Date().getTime(), // 置为空，重新赋值
           _edit: false
-        }), nIndex)
+        })
         this.$nextTick(() => {
-          this.apiData = this.apiList[nIndex]
+          // this.globalSave(this.apiData, nIndex)
+          this.apiList.splice(nIndex, 0, this.apiData)
         })
       }
     },
-    addApi () {
-      /* if (this.apiData?.name || this.apiData?.url) {
-        this.$confirm('当前编辑内容未保存是否继续?', '提示', {
-          confirmButtonText: '丢弃当前，并继续',
-          cancelButtonText: '保存，并继续',
-          type: 'warning'
-        }).then(() => {
-          this.apiData = new ApiData()
-        }).catch(() => {
-          // 取消
-          this.save()
-          this.$nextTick(() => {
-            this.apiData = new ApiData()
-          })
-        })
-      } else {
+    addApi (api) {
+      if (!api || !api.group) {
         this.apiData = new ApiData()
-      } */
-      this.apiData = new ApiData()
+      } else {
+        this.apiList.push(api)
+        this.apiData = api
+      }
       // this.dataHandleFunc = this.apiData.dataHandleFunc
     },
+    /* 全局保存：修改 + 新增 */
     globalSave (data = this.apiData, nIndex = null) {
-      const apiData = Object.assign(data, {
-        name: data?.name || `${data.url}_${data.method}`,
-        _edit: typeof data._edit === 'boolean' ? data._edit : true
-      })
-      console.info('保存全局:', data)
-      if (!data?._edit) {
-        if (!isNaN(nIndex) && nIndex !== null) {
-          this.apiList.splice(nIndex, 0, apiData)
-        } else {
-          this.apiList.push(apiData)
-        }
-        // this.$gbImport.gbApiRequires.push(data)
+      const index = this.apiList.findIndex(api => api.name === data.name)
+      if (index >= 0) {
+        console.info('保存全局1:', data)
+        this.$set(this.apiList, index, data)
       } else {
-        const index = this.apiList.findIndex(api => api.name === apiData.name)
-        this.$set(this.apiList, index, apiData)
+        console.info('保存全局2:', data)
+        this.apiList.push(data)
       }
+      this.$nextTick(() => {
+        this.$message.success('全局保存成功')
+      })
     },
     chooseChange () {
       this.$refs.apiForm.validate(valid => {
@@ -396,31 +416,9 @@ export default {
       margin-left: 4px
       margin-right: 4px
 
-.left-api-row
-  border: 1px solid $--border-color-base
-  padding: 8px
-  cursor: pointer
-  position: relative
-  // &:hover
-  //   background: $--bgcolor-secondary
-  & + .left-api-row
+.left-api-group
+  & + .left-api-group
     margin-top: 8px
-  // &::before
-  //   content: attr(data-name)
-  //   background: rgba(0,0,0, 0.7)
-  //   color: #fff
-  //   padding: 1px 6px
-  //   font-size: 10px
-  //   // height: 15px
-  //   position: absolute
-  //   right: 0
-  //   top: 0
-  //   display: none
-  // &:hover
-  //   &::before
-  //     display: block
-  .left
-    line-height: 1.2
 
 .code-editor__collapse
   ::v-deep .el-collapse-item .el-collapse-item__header

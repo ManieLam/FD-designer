@@ -16,11 +16,15 @@
 
 import { gbApiRequires } from '@/utils/import' // 假设这个属于公共导入的配置
 import { ApiData } from '@/model/resource'
+import { groupBy } from 'lodash'
 
 const formatResource = gbApiRequires.map(r => ApiData(r))
 
 const state = {
-  list: formatResource || []
+  /* 全部全局接口的一维数组，包含业务或默认全局 */
+  list: formatResource || [],
+  /* 分组情况 */
+  groups: {}
 }
 const mutations = {
   init (states) {
@@ -46,12 +50,23 @@ const mutations = {
   },
   saveStorage (states) {
     localStorage.setItem('Resource-all', JSON.stringify(states.list))
+  },
+  /* 格式化分组 */
+  initGroup (states) {
+    states.groups = groupBy(states.list, (api) => api.group || 'global')
+  },
+  addGroup (states, name) {
+    if (!states.groups[name]) {
+      states.groups[name] = []
+    }
+  },
+  updateGroup (states, name, list) {
+
   }
 }
 
 const actions = {
   updateList ({ commit, state }, sources = []) {
-    // console.info('updateList:')
     state.list = sources
     commit('saveStorage', sources)
   }
