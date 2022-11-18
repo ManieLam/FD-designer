@@ -2,8 +2,8 @@
 .form-remote
   el-button(v-show="!remoteData || !remoteData.url", @click="setAsyncVisible = !setAsyncVisible") {{ remoteData.url ? '重新选择数据源' : '配置数据源' }}
   .list-column__default.m-t-4(v-show="remoteData.url", :key="remoteData.name", @click="setAsyncVisible = !setAsyncVisible")
-    .left-wrap
-      .d-flex-v-center
+    .left-wrap(style="width: 88%")
+      .d-flex-v-center(style="text-overflow: ellipsis;overflow: hidden;")
         i.el-icon-paperclip.color-primary.m-r-8(title="数据源")
         .color-warning {{remoteData.method}}
         .secondary-text.m-l-8 {{remoteData.url}}

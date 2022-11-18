@@ -3,12 +3,19 @@
   .list-title.d-flex-row-between.align-items-center.box-content__tip.cursor-pointer
     .title.d-flex-1
       .secondary-text(v-show="!entering", @dblclick.stop.prevent.self="toggleInput") {{groupTitle}} ({{resourceList.length}})
-      el-popover(placement="top", width="160", v-model="popVisabled")
+      el-popover(placement="top", width="160", v-model="popVisabled", trigger="manual", :disabled="disablePopover")
         p 已存在同名分组，是否合并？
         div(style="text-align:right;margin: 0")
           el-button(size="mini", type="text", @click="cancelChangeTitle") 取消
           el-button.color-primary(size="mini", type="text", @click="onChangeTitle") 确定
-        el-input.input(slot="reference", v-show="entering", ref="inputTitle", size="mini", v-model="groupTitle", @keyup.enter.native.stop="toggleInput", @blur="toggleInput")
+        el-input.input(
+          slot="reference"
+          v-show="entering"
+          ref="inputTitle"
+          size="mini"
+          v-model="groupTitle"
+          @keyup.enter.native.stop="toggleInput"
+          @blur="toggleInput")
     .tools.cursor-pointer
       //- 新增分组子数据源
       i.el-icon-plus.hover-change-scale.hover-change-color__primary(title="新增子数据源", @click.stop="addApi")
@@ -75,6 +82,7 @@ export default {
       collapse: true,
       entering: false,
       popVisabled: false, // 是否允许修改分组标题名称
+      // disablePopover: true, // 是否允许显示提示
       readyRemoveGroup: false // 是否准备删除分组
     }
   },
@@ -86,6 +94,9 @@ export default {
       set (list) {
         this.$emit('upgrade', list, this.title)
       }
+    },
+    disablePopover () {
+      return !(this.entering && this.popVisabled)
     }
   },
   methods: {
@@ -101,8 +112,10 @@ export default {
     concatGroup () {},
     /* input结束 */
     toggleInput (e) {
-      if (e.type === 'blur') {
+      if (e.type === 'blur' && !this.popVisabled) {
+        // keyup.enter时候会再次触发
         this.entering = false
+        this.cancelChangeTitle()
         return
       }
       if (!this.entering) {
@@ -114,9 +127,10 @@ export default {
         })
       } else {
         // 更新分组内所有数据源名称
-        if (this.full[this.groupTitle]) {
+        if (this.full[encodeURI(this.groupTitle)]) {
           this.popVisabled = true
         } else {
+          this.popVisabled = false
           this.onChangeTitle()
         }
       }
@@ -127,7 +141,10 @@ export default {
     },
     onChangeTitle () {
       this.entering = false
-      this.resourceList = this.resourceList.map(row => { row.group = this.groupTitle })
+      this.resourceList = this.resourceList.map(row => {
+        row.group = this.groupTitle
+        return row
+      })
     }
   }
 }

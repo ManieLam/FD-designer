@@ -15,19 +15,20 @@ el-dialog.async-required-dialog(
           span {{apiData.url}}
           span(v-show="apiData.demo") {{apiData.demo}}
       el-button-group.right-wrap__top
-        el-button(icon="el-icon-plus", @click="addGroup") 新增分组
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
-        el-button(type="primary", @click="testLink") 测试链接
-        el-button(type="primary", :disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存
-        el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
     .bottom-wrap.d-flex-row-between
       //- 左
       .left-wrap.m-r-8
+        .left-wrap-tool.d-flex-row-between.d-flex-v-center
+          .text.d-flex-1 可选数据源
+          el-button-group
+            el-button(icon="el-icon-plus", title="新增分组", @click="addGroup")
+            el-button(icon="el-icon-folder-checked", title="保存分组", @click="globalSaveGroup")
         ApiGroup.left-api-group(
           v-for="(list, title) in apiGroup"
           :key="title"
           :apiData="apiData"
-          :title="title"
+          :title="decodeURI(title)"
           :list="list"
           :full="apiGroup"
           @upgrade="upgradeGroup"
@@ -38,8 +39,8 @@ el-dialog.async-required-dialog(
           @copeApi="copeApi")
         el-empty.left-empty(v-show="!apiList.length", description="暂无数据源，请添加")
       //- 右
-      .right-wrap
-        .right-custom-data
+      .right-wrap.d-flex-column
+        .right-custom-data.d-flex-1
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
             el-form-item(label="所属分组", prop="group")
               el-input(v-model="apiData.group", placeholder="请输入分组标题名称")
@@ -114,6 +115,11 @@ el-dialog.async-required-dialog(
 
             el-form-item(label="备注", prop="demo")
               el-input(v-model="apiData.demo")
+        .right-bottom__fixed
+          el-button-group.text-center
+            el-button(@click="testLink") 测试链接
+            el-button(type="primary", :disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存修改
+            el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
 </template>
 
 <script>
@@ -206,7 +212,6 @@ export default {
         return this.$store.getters.getResources
       },
       set (list) {
-        console.log('更新apiList')
         this.$store.dispatch('resources/updateList', list)
       }
     },
@@ -232,28 +237,22 @@ export default {
     },
     // api分组
     apiGroup () {
-      return groupBy(this.apiList, (api) => api.group || '全局')
+      return groupBy(this.apiList, (api) => encodeURI(api.group || '全局'))
     }
   },
   methods: {
-    getApiName ({ name, group } = {}) {
-      return name || new Date().getTime()
-    },
     addGroup () {
-      const newLen = Object.keys(this.apiGroup).filter(key => /^新建/.test(key)).length
+      const newLen = Object.keys(this.apiGroup).filter(key => /^新建/.test(decodeURI(key))).length
       this.apiData = new ApiData({
-        group: `新建分组${newLen + 1}`,
-        // name: `${newLen + 1}_${new Date().getTime()}`,
-        // name: this.getApiName(),
-        _edit: true
+        group: `新建分组${newLen + 1}`
       })
       this.$nextTick(() => {
         // this.globalSave(this.apiData)
-        this.apiList.push(this.apiData)
+        this.apiList.unshift(this.apiData)
       })
     },
     upgradeGroup (list, title) {
-      console.info('upgradeGroup:', arguments)
+      // console.info('upgradeGroup:', arguments)
       // this.$set(this.apiGroup, title, list)
     },
     removeGroup (title) {
@@ -278,8 +277,7 @@ export default {
         this.apiData = new ApiData({
           ...api,
           url: nUrl,
-          name: new Date().getTime(), // 置为空，重新赋值
-          _edit: false
+          name: new Date().getTime() // 重新赋值
         })
         this.$nextTick(() => {
           // this.globalSave(this.apiData, nIndex)
@@ -291,7 +289,7 @@ export default {
       if (!api || !api.group) {
         this.apiData = new ApiData()
       } else {
-        this.apiList.push(api)
+        this.apiList.unshift(api)
         this.apiData = api
       }
       // this.dataHandleFunc = this.apiData.dataHandleFunc
@@ -300,23 +298,29 @@ export default {
     globalSave (data = this.apiData, nIndex = null) {
       const index = this.apiList.findIndex(api => api.name === data.name)
       if (index >= 0) {
-        console.info('保存全局1:', data)
         this.$set(this.apiList, index, data)
       } else {
-        console.info('保存全局2:', data)
-        this.apiList.push(data)
+        this.apiList.unshift(data)
       }
       this.$nextTick(() => {
-        this.$message.success('全局保存成功')
+        this.$message.success('数据源保存成功')
       })
     },
+    /* 全局保存数据源分组 */
+    globalSaveGroup () {
+      this.$store.dispatch('resources/updateList', this.apiList)
+      setTimeout(() => {
+        this.$message.success('数据源分组保存成功')
+      }, 500)
+    },
+    /* 确认选中当前数据 */
     chooseChange () {
       this.$refs.apiForm.validate(valid => {
         if (valid) {
           this.$emit('chosen', this.apiData)
           this.dialogVisabled = false
         } else {
-          console.warn('请选择一个数据源')
+          this.$message.warning('请选择一个数据源')
         }
       })
     },
@@ -328,7 +332,6 @@ export default {
     },
     // 切换自定义请求头部/请求参数列表开关
     toggleCustomList (type) {
-      console.log('toggleCustomList:', type)
       const data = this.apiData[type]
       if (data) {
         this.$set(this.apiData, type, null)
@@ -403,7 +406,18 @@ export default {
 .right-wrap
   flex: 1 0 auto
   max-width: 70%
-  overflow-y: auto
+  // overflow-y: auto
+  position: relative
+  transform: translate(0)
+  .right-custom-data
+    height: 100%
+    overflow-y: auto
+  .right-bottom__fixed
+    width: 100%
+    text-align: center
+    background: #fff
+    padding-top: 8px
+    box-shadow: 0px -3px 2px rgb(220 223 230 / 30%)
 
 .left-wrap, .right-wrap
   border: 1px solid $--border-color-base
