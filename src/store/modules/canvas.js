@@ -30,6 +30,7 @@ const mutations = {
     } else {
       states.collects[name] = new CanvasData({ fields: [element] }, defaultFormAttrs)
     }
+    states.editingName = name
   },
   /* 删除 */
   deleteWidget (states, { name, eIndex }) {
@@ -86,6 +87,9 @@ const mutations = {
       // canvas.fields[findex].form = omit(form, ['label', 'name'])
       canvas.fields[findex] = attrs
     }
+  },
+  /* 记录画布异步请求资源 */
+  updateCanvasResource () {
   },
   /* 导出、全部导出 */
   export (states, name, isAll = false) {}

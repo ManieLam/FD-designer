@@ -19,11 +19,25 @@ el-dialog.async-required-dialog(
     .bottom-wrap.d-flex-row-between
       //- 左
       .left-wrap.m-r-8
-        .left-wrap-tool.d-flex-row-between.d-flex-v-center
-          .text.d-flex-1 可选数据源
-          el-button-group
-            el-button(icon="el-icon-plus", title="新增分组", @click="addGroup")
-            el-button(icon="el-icon-folder-checked", title="保存分组", @click="globalSaveGroup")
+        .left-wrap-tool
+          .d-flex-row-between.d-flex-v-center
+            .d-flex-1.text 可选数据源
+              //- el-checkbox(v-model="allSelectedVisable") 查看画布内已选的数据源
+            el-button-group
+              el-button(icon="el-icon-finished"
+                :type="allSelectedVisable? 'primary' : ''"
+                title="查看画布内已选的数据源"
+                @click="showSelected")
+              el-button(icon="el-icon-plus", title="新增分组", @click="addGroup")
+              el-button(icon="el-icon-upload2", title="保存分组", @click="globalSaveGroup")
+          .search-bar.m-t-8
+            el-input(v-model.trim="apiSearchVal"
+              clearable
+              size="mini"
+              placeholder="请输入请求地址筛选数据源"
+              @keyup.enter.native="filterApi"
+              @clear="clearSearch")
+              i(slot="prefix", class="el-input__icon el-icon-search")
         ApiGroup.left-api-group(
           v-for="(list, title) in apiGroup"
           :key="title"
@@ -37,10 +51,12 @@ el-dialog.async-required-dialog(
           @editApi="editApi"
           @removeApi="removeApi"
           @copeApi="copeApi")
-        el-empty.left-empty(v-show="!apiList.length", description="暂无数据源，请添加")
+        el-empty.left-empty(v-show="!apiList.length", description="暂无数据源可选，请添加")
+        //- 查看查看画布内已选的数据源
+        .left-api-group()
       //- 右
       .right-wrap.d-flex-column
-        .right-custom-data.d-flex-1
+        .right-custom-data.d-flex-1.p-r-8
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
             el-form-item(label="所属分组", prop="group")
               el-input(v-model="apiData.group", placeholder="请输入分组标题名称")
@@ -115,10 +131,11 @@ el-dialog.async-required-dialog(
 
             el-form-item(label="备注", prop="demo")
               el-input(v-model="apiData.demo")
-        .right-bottom__fixed
-          el-button-group.text-center
+        .right-bottom__fixed.d-flex-row-between
+          el-button-group
             el-button(@click="testLink") 测试链接
-            el-button(type="primary", :disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存修改
+            el-button(type="success", :disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
+          el-button-group
             el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
 </template>
 
@@ -184,7 +201,13 @@ export default {
         url: { required: true, message: '必填', trigger: 'change' },
         method: { required: true, message: '必填', trigger: 'change' }
       },
-      funcEditVisibles: []
+      funcEditVisibles: [],
+      /* 查看所有已选api */
+      allSelectedVisable: false,
+      /* 筛选内容 */
+      isFilterIng: false, // 筛选中
+      filterList: [], // 筛选的列表
+      apiSearchVal: '' // 筛选的数据
     }
   },
   watch: {
@@ -212,6 +235,7 @@ export default {
         return this.$store.getters.getResources
       },
       set (list) {
+        console.log('set apiList global')
         this.$store.dispatch('resources/updateList', list)
       }
     },
@@ -237,10 +261,33 @@ export default {
     },
     // api分组
     apiGroup () {
-      return groupBy(this.apiList, (api) => encodeURI(api.group || '全局'))
+      const list = this.isFilterIng ? this.filterList : this.apiList
+      return groupBy(list, (api) => encodeURI(api.group || '全局'))
+    // },
+    // // 表单内已选数据源
+    // formApiList () {
+    //   const
     }
   },
   methods: {
+    /* 筛选api */
+    filterApi () {
+      if (!this.apiSearchVal) return
+      // console.info('搜索')
+      this.isFilterIng = true
+      const regex = new RegExp(this.apiSearchVal, 'ig')
+      this.filterList = this.apiList.filter(row => regex.test(row.url))
+    },
+    clearSearch () {
+      this.filterList = []
+      this.isFilterIng = false
+      this.apiData = new ApiData()
+    },
+    /* 查看画布已选所有 */
+    showSelected () {
+      this.allSelectedVisable = !this.allSelectedVisable
+    },
+    /* 新增分组 */
     addGroup () {
       const newLen = Object.keys(this.apiGroup).filter(key => /^新建/.test(decodeURI(key))).length
       this.apiData = new ApiData({
@@ -257,7 +304,7 @@ export default {
     },
     removeGroup (title) {
       this.apiList = this.apiList.filter(row => row.group !== title)
-      this.apiData = {}
+      this.apiData = new ApiData()
     },
     editApi (api, index) {
       this.apiData = api
@@ -266,7 +313,7 @@ export default {
       const index = this.apiList.findIndex(row => row.name === api.name)
       if (index >= 0) {
         this.$delete(this.apiList, index)
-        this.apiData = {}
+        this.apiData = new ApiData()
       }
     },
     copeApi (api) {
@@ -325,10 +372,16 @@ export default {
       })
     },
     testLink () {
-      console.info('测试发起请求:', this.apiData)
-      this.$require(this.apiData).then(res => {
-        console.info(res)
-      })
+      this.$message.info('请到预览中查看效果')
+      // console.info('测试发起请求:', this.apiData)
+      // if (!this.apiData.url) {
+      //   return this.$message.warning('请选择一个数据源')
+      // }
+      // const func = requireTranslate.methods?.formatRequire?.call(this, this.apiData)
+      // console.info(func)
+      // this.$require(func).then(res => {
+      //   console.info(res)
+      // })
     },
     // 切换自定义请求头部/请求参数列表开关
     toggleCustomList (type) {
@@ -357,7 +410,7 @@ export default {
         return pathParams
       }
     },
-    // 对请求地址格式化，与请求参数(path)的联动关系
+    // 对请求地址格式化，与请求参数(path\query)的联动关系
     analyseUrl ({ url, pathData, body }) {
       if (url) {
         const [part1, part2] = url.split('?')

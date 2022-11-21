@@ -2,11 +2,11 @@
 .form-remote
   el-button(v-show="!remoteData || !remoteData.url", @click="setAsyncVisible = !setAsyncVisible") {{ remoteData.url ? '重新选择数据源' : '配置数据源' }}
   .list-column__default.m-t-4(v-show="remoteData.url", :key="remoteData.name", @click="setAsyncVisible = !setAsyncVisible")
-    .left-wrap(style="width: 88%")
-      .d-flex-v-center(style="text-overflow: ellipsis;overflow: hidden;")
+    .left-wrap.d-flex-1(style="overflow: hidden;")
+      .d-flex-v-center
         i.el-icon-paperclip.color-primary.m-r-8(title="数据源")
         .color-warning {{remoteData.method}}
-        .secondary-text.m-l-8 {{remoteData.url}}
+        .secondary-text.m-l-8(style="text-overflow: ellipsis;overflow: hidden;") {{remoteData.url}}
       .color-text-secondary.font-size-small.m-l-8 {{ remoteData.demo || ''}}
     .right-wrap
       i.el-icon-edit(title="重新选择数据源")
