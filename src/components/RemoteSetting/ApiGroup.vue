@@ -18,18 +18,18 @@
           @blur="toggleInput")
     .tools.cursor-pointer
       //- 新增分组子数据源
-      i.el-icon-plus.hover-change-scale.hover-change-color__primary(title="新增子数据源", @click.stop="addApi")
+      i.el-icon-plus.hover-change-scale.hover-change-color__primary(v-if="editable", title="新增子数据源", @click.stop="addApi")
       //- 移除分组
       el-popover(placement="top", width="160", v-model="readyRemoveGroup")
         p 确定移除该分组吗？该操作会同步清空组内子资源。
         div(style="text-align:right;margin: 0")
           el-button(size="mini", type="text", @click="readyRemoveGroup=false") 取消
           el-button(size="mini", type="text", @click="removeGroup") 确定
-        i.el-icon-delete.hover-change-scale.hover-change-color__danger(slot="reference", title="移除分组")
+        i.el-icon-delete.hover-change-scale.hover-change-color__danger(v-if="editable", slot="reference", title="移除分组")
       //- 收缩/展开
       i.hover-change-scale(:class="collapse ? 'el-icon-arrow-down' : 'el-icon-arrow-right'", @click.prevent="collapse=!collapse")
 
-  .list-content.m-t-8.m-b-16(v-show="collapse")
+  .list-content.m-t-8.m-b-8(v-show="collapse")
     .list-row.d-flex-row-between.align-items-center.hover-change-bgColor(
       v-for="(apiItem) in resourceList"
       :key="apiItem.name"
@@ -74,12 +74,20 @@ export default {
     full: {
       type: Object,
       default: () => ({})
+    },
+    editable: {
+      type: Boolean,
+      default: true
+    },
+    collapseDefault: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
     return {
       groupTitle: this.title,
-      collapse: true,
+      collapse: this.collapseDefault,
       entering: false,
       popVisabled: false, // 是否允许修改分组标题名称
       // disablePopover: true, // 是否允许显示提示
@@ -112,6 +120,7 @@ export default {
     concatGroup () {},
     /* input结束 */
     toggleInput (e) {
+      if (!this.editable) return
       if (e.type === 'blur' && !this.popVisabled) {
         // keyup.enter时候会再次触发
         this.entering = false

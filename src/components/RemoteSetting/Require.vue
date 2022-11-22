@@ -18,16 +18,16 @@ el-dialog.async-required-dialog(
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
     .bottom-wrap.d-flex-row-between
       //- 左
-      .left-wrap.m-r-8
+      .left-wrap.m-r-8.d-flex-column
         .left-wrap-tool
           .d-flex-row-between.d-flex-v-center
             .d-flex-1.text 可选数据源
               //- el-checkbox(v-model="allSelectedVisable") 查看画布内已选的数据源
             el-button-group
-              el-button(icon="el-icon-finished"
-                :type="allSelectedVisable? 'primary' : ''"
-                title="查看画布内已选的数据源"
-                @click="showSelected")
+              //- el-button(icon="el-icon-finished"
+              //-   :type="allSelectedVisable? 'primary' : ''"
+              //-   title="查看画布内已选的数据源"
+              //-   @click="showSelected")
               el-button(icon="el-icon-plus", title="新增分组", @click="addGroup")
               el-button(icon="el-icon-upload2", title="保存分组", @click="globalSaveGroup")
           .search-bar.m-t-8
@@ -37,23 +37,28 @@ el-dialog.async-required-dialog(
               placeholder="请输入请求地址筛选数据源"
               @keyup.enter.native="filterApi"
               @clear="clearSearch")
-              i(slot="prefix", class="el-input__icon el-icon-search")
-        ApiGroup.left-api-group(
-          v-for="(list, title) in apiGroup"
-          :key="title"
-          :apiData="apiData"
-          :title="decodeURI(title)"
-          :list="list"
-          :full="apiGroup"
-          @upgrade="upgradeGroup"
-          @remove="removeGroup"
-          @addApi="addApi"
-          @editApi="editApi"
-          @removeApi="removeApi"
-          @copeApi="copeApi")
-        el-empty.left-empty(v-show="!apiList.length", description="暂无数据源可选，请添加")
+              el-button(slot="append", class="el-input__icon el-icon-search", @click="filterApi")
+        .left-wrap-list.d-flex-1
+          ApiGroup.left-api-group(
+            v-for="(list, title) in apiGroup"
+            :key="title"
+            :apiData="apiData"
+            :title="decodeURI(title)"
+            :list="list"
+            :full="apiGroup"
+            @upgrade="upgradeGroup"
+            @remove="removeGroup"
+            @addApi="addApi"
+            @editApi="editApi"
+            @removeApi="removeApi"
+            @copeApi="copeApi")
+          el-empty.left-empty(v-show="!apiList.length", description="暂无数据源可选，请添加")
         //- 查看查看画布内已选的数据源
-        .left-api-group()
+        //- ApiGroup.left-api-group(
+        //-   :editable="false"
+        //-   :list="canvasResources"
+        //-   :collapseDefault="false"
+        //-   title="已选数据源")
       //- 右
       .right-wrap.d-flex-column
         .right-custom-data.d-flex-1.p-r-8
@@ -134,7 +139,7 @@ el-dialog.async-required-dialog(
         .right-bottom__fixed.d-flex-row-between
           el-button-group
             el-button(@click="testLink") 测试链接
-            el-button(type="success", :disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
+            el-button(:disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
           el-button-group
             el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
 </template>
@@ -204,6 +209,7 @@ export default {
       funcEditVisibles: [],
       /* 查看所有已选api */
       allSelectedVisable: false,
+      canvasResources: [],
       /* 筛选内容 */
       isFilterIng: false, // 筛选中
       filterList: [], // 筛选的列表
@@ -281,7 +287,7 @@ export default {
     clearSearch () {
       this.filterList = []
       this.isFilterIng = false
-      this.apiData = new ApiData()
+      // this.apiData = new ApiData()
     },
     /* 查看画布已选所有 */
     showSelected () {
