@@ -67,7 +67,7 @@ export default {
     },
     // 需要发起异步搜索的字段
     remoteSearch () {
-      return this.formItems.filter(field => field.filterAbleType === 'filterAbleAsyncFunc')
+      return this.formItems.filter(field => field.filterAbleType === 'filterApi')
     },
     hasChangeData () {
       return !isEqual(this.fullData, this.fullDataTemp)
@@ -116,8 +116,8 @@ export default {
     // 发起异步请求
     getRemoteResource () {
       const { actions } = this.config?.form || {}
-      if (actions?.immediateRemoteRequire) {
-        const requireObj = this.formatRequire(actions.immediateRemoteRequire)
+      if (actions?.immediateRemoteApi) {
+        const requireObj = this.formatRequire(actions.immediateRemoteApi)
         this.$require(requireObj)
           .then(res => {
             // console.info('初始化请求发起后:', res)
@@ -200,16 +200,16 @@ export default {
     onFormSubmit (btn) {
       if (btn.validate) {
         this.$refs.form.$refs.dataform.validate(valid => {
-          if (valid && btn.funcRemote) {
-            const requireObj = this.formatRequire(btn.funcRemote)
+          if (valid && btn.funcApi) {
+            const requireObj = this.formatRequire(btn.funcApi)
             this.$require(requireObj).then(res => {
               // console.info('on after submit', res)
               this.$emit('onAfterSubmit', res)
             })
           }
         })
-      } else if (btn.funcRemote) {
-        this.$require(btn.funcRemote).then(res => {
+      } else if (btn.funcApi) {
+        this.$require(btn.funcApi).then(res => {
           // console.info('on after submit', res)
           this.$emit('onAfterSubmit', res)
         })
