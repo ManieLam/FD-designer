@@ -7,14 +7,14 @@ export default {
         const { optionType } = field?.form || {}
         if (optionType === 'optionRelationKey') {
           res.fByKey.push(field?.form)
-        } else if (optionType === 'optionsAsyncFunc') {
+        } else if (optionType === 'optionApi') {
           res.fByRemote.push(field?.form)
         }
         return res
       }, { fByKey: [], fByRemote: [] })
     },
     getRelation () {
-      const { getRelationImmediate, relationResource: gbResource } = this.config?.form?.actions || {}
+      const { getRelationImmediate, relationApi: gbResource } = this.config?.form?.actions || {}
       if (getRelationImmediate) {
         const { fByKey, fByRemote } = this.getRelationFields()
 
@@ -42,7 +42,7 @@ export default {
         }
         if (fByRemote?.length) {
           // 根据每个字段配置了动态异步获取relation，赋值
-          Promise.all(fByRemote.map(f => this.$require(f.optionsAsyncFunc)
+          Promise.all(fByRemote.map(f => this.$require(f.optionApi)
             .then(res => { return res || {} })))
             .then((results) => {
               results.forEach((r, i) => {

@@ -7,7 +7,7 @@ export const CanvasData = function ({ fields = [], formAttrs = {}, formActions =
     form: {
       attrs: Object.assign(defaultFormAttrs, formAttrs),
       actions: {
-        immediateRemoteRequire: {},
+        immediateRemoteApi: {},
         getResourceImmediate: false, // 是否立即发起数据请求
         getRelationImmediate: true, // 是否立即加载relation
         ...formActions
@@ -15,6 +15,7 @@ export const CanvasData = function ({ fields = [], formAttrs = {}, formActions =
       buttons: Object.values(formButtons).sort((a, b) => a?.sort - b?.sort)
     },
     groups: {},
+    resources: {},
     template: 'Form'
   }
 }

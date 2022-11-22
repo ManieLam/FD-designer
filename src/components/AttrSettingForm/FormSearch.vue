@@ -50,11 +50,11 @@ export default {
     },
     asyncFunc: {
       get () {
-        return this.fullSetting.filterAbleAsyncFunc || {}
+        return this.fullSetting.filterApi || {}
       },
       set (data) {
-        this.$emit('updateAnAttr', { name: 'filterAbleAsyncFunc', value: data.name ? data : null })
-        this.$emit('updateAnAttr', { name: 'filterAbleType', value: data.name ? 'filterAbleAsyncFunc' : null })
+        this.$emit('updateAnAttr', { name: 'filterApi', value: data.name ? data : null })
+        this.$emit('updateAnAttr', { name: 'filterAbleType', value: data.name ? 'filterApi' : null })
       }
     }
   },

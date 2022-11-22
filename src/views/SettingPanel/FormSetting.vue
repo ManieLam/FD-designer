@@ -24,8 +24,8 @@
               .row-item
                 el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
                 .row-item__input.box-content__inside
-                  //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource", placeholder="输入字典接口")
-                  form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationResource")
+                  //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi", placeholder="输入字典接口")
+                  form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi")
 
               .row-item.p-t-16
                 el-checkbox(v-model="actionsData.getResourceImmediate") 获取初始化数据
@@ -39,7 +39,7 @@
 
                   //- 动态配置数据源
                   .box-content.m-t-8
-                    form-remote(v-if="!!actionsData.immediateRemoteRequire", v-model="actionsData.immediateRemoteRequire", key="immediateRemoteRequire", title="配置表单首次加载数据源")
+                    form-remote(v-if="!!actionsData.immediateRemoteApi", v-model="actionsData.immediateRemoteApi", key="immediateRemoteApi", title="配置表单首次加载数据源")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")
               ButtonSetting.row-item(:key="canvasName", :list="buttonList", @change="updateButtons")
@@ -125,13 +125,13 @@ export default {
     // }
   },
   computed: {
-    immediateRemoteRequire: {
+    immediateRemoteApi: {
       get () {
-        return this.actionsData.immediateRemoteRequire || {}
+        return this.actionsData.immediateRemoteApi || {}
       },
       set (datas) {
-        // this.actionsData.immediateRemoteRequire = datas
-        this.$set(this.actionsData, 'immediateRemoteRequire', datas)
+        // this.actionsData.immediateRemoteApi = datas
+        this.$set(this.actionsData, 'immediateRemoteApi', datas)
         this.setFormState({ actions: this.actionsData })
       }
     }
@@ -166,7 +166,7 @@ export default {
     //   })
     },
     getAsyncSeting (data) {
-      this.immediateRemoteRequire = data
+      this.immediateRemoteApi = data
     },
     getAttrUpdate (data) {
       console.info('getAttrUpdate:', data)

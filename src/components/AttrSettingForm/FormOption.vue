@@ -23,7 +23,7 @@
           i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  @click="remove(item, index)")
         td
           i.el-icon-plus.color-primary.btn-radius-50(v-if="index === list.length - 1", @click="add")
-  .list-async(v-if="optionType === 'optionsAsyncFunc'")
+  .list-async(v-if="optionType === 'optionApi'")
     //- 动态配置数据源
     el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.url ? '重新选择数据源' : '配置数据源' }}
     .list-column__default.m-t-4(v-show="asyncFunc.url")
@@ -78,10 +78,10 @@ export default {
     return {
       optionType: this.fullSetting.optionType || 'options',
       optionTypes: [
-        // 以取值命名value，方便数据同时存在options/optionsAsyncFunc后
+        // 以取值命名value，方便数据同时存在options/optionApi后
         { label: '手动添加', value: 'options' },
         { label: '动态字典', value: 'optionRelationKey' },
-        { label: '动态数据源', value: 'optionsAsyncFunc' },
+        { label: '动态数据源', value: 'optionApi' },
         { label: '批量导入', value: 'optionsImport', disabled: true }
       ],
       setAsyncVisible: false,
@@ -107,10 +107,10 @@ export default {
     },
     asyncFunc: {
       get () {
-        return this.fullSetting.optionsAsyncFunc || {}
+        return this.fullSetting.optionApi || {}
       },
       set (data) {
-        this.$emit('updateAnAttr', { name: 'optionsAsyncFunc', value: data })
+        this.$emit('updateAnAttr', { name: 'optionApi', value: data })
       }
     },
     optionRelationKey: {
