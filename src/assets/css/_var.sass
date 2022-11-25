@@ -1,0 +1,100 @@
+$--zindex-overhigh: 999
+$--zindex-high: 99
+$--zindex-middle: 9
+$--zindex-low: 1
+
+$--color-info: #e5e5e5
+$--divider-color: rgba(0, 0, 0, 0.06)
+
+/*滚动条尺寸*/
+$--scroll-size-default: 7px
+/*滚动条里面小方块默认颜色*/
+$--scroll-thumb-default: rgba(0,0,0,0.45)
+/*表格的滚动条里面小方块*/
+$--scroll-thumb-table: #d2d2d2
+/*表格的滚动条里面轨道*/
+$--scroll-track-table: #f7f7f7
+
+/* 框架界面色彩 */
+// tagview及底层内容框架背景色
+$--content-background: #F8F9FA
+$--tagview-height: 30px
+
+/* 边距设置 */
+$--space-size-small: 8px
+$--space-size-middle: 16px
+$--space-size-large: 24px
+// 表格外边距
+$--table-space-size-default: 24px // 表格外边距变量
+$--table-space-size-inner: 16px // 表格内元素边距变量
+
+/* 自定义 */
+$--bgcolor-secondary: #ecf5ff
+// $--bgcolor-secondary: rgba(87, 168, 206, 0.2)
+// $--border-active: #0A4078
+$--border-active: #c6e2ff
+
+// 左侧tab高亮样式，同设计稿
+@mixin custom-tab_left
+  display: block !important
+  // background: #fff
+  height: 100%
+  .el-tabs__header.is-left .el-tabs__nav-wrap
+    padding: 24px 10px !important
+  .el-tabs__header.is-left + .el-tabs__content
+    // height: 99%
+    margin-top: 0
+    flex: 1
+    // margin-top: 8px
+    background: #fff
+    height: 100%
+    overflow-y: auto
+    > .main-tabs-pane
+      height: 100%
+      .tab-pane-content
+        overflow-y: auto
+        height: 100%
+        display: flex
+        flex-direction: column
+  // .el-tabs__item.is-left.is-active
+    // background: #fff
+
+// 状态的小标签, 颜色、背景色允许自定义
+@mixin flag-block ($bgColor, $color)
+  display: inline-block
+  text-align: center
+  // margin-right: $--margin-primary
+  background: $bgColor
+  color: $color
+  padding: 0 $--padding-primary
+  font-weight: 400
+  min-width: 50px
+  @include font-secondary
+
+// 侧拉按钮（半圆带小箭头）
+@mixin side-pull-icon ($translateX, $rotate, $left, $right)
+  position: relative
+  .toggle-btn
+    @include side-left($left)
+    @include side-right($right)
+    position: absolute
+    border: 1px solid #dfdfdf
+    border-radius: 50%
+    padding: 5px
+    cursor: pointer
+    display: flex
+    top: 50%
+    transform: rotate($rotate) translateX($translateX)
+    color: #8C8C8C
+    width: 33px
+    height: 33px
+    text-align: center
+    justify-content: center
+    align-items: center
+    &:hover
+      color: $--color-primary
+      border-color: $--color-primary
+@mixin side-left ($left)
+  left: $left
+@mixin side-right ($right)
+  right: $right

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+    <!-- <script src="lib/ace/ace.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.10.1/ace.js" rel="prefetch"></script>
+    <!-- <script src="lib/ace/tomorrow_night_eighties.js" type="text/javascript" charset="utf-8"></script> -->
+    <script>
+      // (function () {
+      //   window.JSCodeEditor = function (config = {}) {
+      //     if (config.name) {
+      //       const name = config.name
+      //       const options = config.options || {}
+      //       console.info('画布名称:', name)
+      //       const editor = ace.edit(name, {
+      //         // theme: "ace/theme/tomorrow_night_eighties",
+      //         mode: 'ace/mode/javascript',
+      //         autoScrollEditorIntoView: true,
+      //         // FontSize: '16px',
+      //         // Keybinding: 'Sublime',
+      //         wrap: true,
+      //         // EnableAutoInden: true,
+      //         ...options
+      //       })
+      //       // editor.session.setMode('ace/mode/javascript')
+      //       // // editor.setTheme('ace/theme/twilight')
+      //       // editor.renderer.setScrollMargin(10, 10)
+      //       // editor.setOptions({
+      //       //   // "scrollPastEnd": 0.8,
+              
+      //       // })
+      //       return editor
+      //     }
+      //   }
+      // })()
+    </script>
+  </body>
+</html>
