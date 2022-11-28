@@ -6,7 +6,8 @@ el-dialog.async-required-dialog(
   width="70%"
   center
   :append-to-body="true"
-  :close-on-click-modal="false")
+  :close-on-click-modal="false"
+  @close="$emit('refuse')")
   .async-required-container
     .top-wrap.d-flex-row-between.m-b-8
       .left-wrap__top {{apiData.name ? '已选中:' : '请选择一个数据源'}}
@@ -41,6 +42,7 @@ el-dialog.async-required-dialog(
         .left-wrap-list.d-flex-1
           ApiGroup.left-api-group(
             v-for="(list, title) in apiGroup"
+            v-bind="$attrs"
             :key="title"
             :apiData="apiData"
             :title="decodeURI(title)"
@@ -62,6 +64,7 @@ el-dialog.async-required-dialog(
       //- 右
       .right-wrap.d-flex-column
         .right-custom-data.d-flex-1.p-r-8
+          //- 接口配置
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
             el-form-item(label="所属分组", prop="group")
               el-input(v-model="apiData.group", placeholder="请输入分组标题名称")

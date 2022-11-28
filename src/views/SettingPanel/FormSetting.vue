@@ -26,6 +26,8 @@
                 .row-item__input.box-content__inside
                   //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi", placeholder="输入字典接口")
                   form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi")
+                  .tip-text.m-l-8.secondary-text.m-t-8
+                    i.icon.el-icon-info 请在对应的字段配置【属性/选项/动态字典】,否则不生效。
 
               .row-item.p-t-16
                 el-checkbox(v-model="actionsData.getResourceImmediate") 获取初始化数据
@@ -34,12 +36,14 @@
                   .box-content
                     el-dropdown(split-button) 前置触发条件(TODO)
                       el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceWhen(byRoute)") 根据页面路由参数
-                    //- .dropdown-item-content(v-if="immediateRemotePrecondition.type === 'byRoute'")
-                    //-   form-list()
 
                   //- 动态配置数据源
                   .box-content.m-t-8
-                    form-remote(v-if="!!actionsData.immediateRemoteApi", v-model="actionsData.immediateRemoteApi", key="immediateRemoteApi", title="配置表单首次加载数据源")
+                    form-remote-list(
+                      v-if="!!actionsData.immediateRemoteApi"
+                      v-model="actionsData.immediateRemoteApi"
+                      key="immediateRemoteApi"
+                      title="配置表单首次加载数据源")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")
               ButtonSetting.row-item(:key="canvasName", :list="buttonList", @change="updateButtons")
@@ -127,7 +131,7 @@ export default {
   computed: {
     immediateRemoteApi: {
       get () {
-        return this.actionsData.immediateRemoteApi || {}
+        return this.actionsData.immediateRemoteApi || []
       },
       set (datas) {
         // this.actionsData.immediateRemoteApi = datas

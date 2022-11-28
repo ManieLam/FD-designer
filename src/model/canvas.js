@@ -7,7 +7,7 @@ export const CanvasData = function ({ fields = [], formAttrs = {}, formActions =
     form: {
       attrs: Object.assign(defaultFormAttrs, formAttrs),
       actions: {
-        immediateRemoteApi: {},
+        immediateRemoteApi: [],
         getResourceImmediate: false, // 是否立即发起数据请求
         getRelationImmediate: true, // 是否立即加载relation
         ...formActions

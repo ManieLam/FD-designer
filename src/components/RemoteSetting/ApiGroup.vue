@@ -38,7 +38,7 @@
       @click.stop="$emit('editApi', apiItem)")
       .left
         .d-flex-v-center
-          i.el-icon-check.color-primary.m-r-8(v-show="apiData && apiItem.name === apiData.name")
+          i.el-icon-check.color-primary.m-r-8(v-show="(apiData && apiItem.name === apiData.name) || isSelected.includes(apiItem.name)")
           .color-warning {{apiItem.method}}
           .secondary-text.m-l-8.d-flex-1 {{apiItem.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ apiItem.demo || ''}}
@@ -58,6 +58,10 @@ export default {
     //   type: Object,
     //   default: () => ({})
     // },
+    isSelected: {
+      type: Array,
+      default: () => ([])
+    },
     /* 当前选中的数据源 */
     apiData: {
       type: Object,
