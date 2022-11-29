@@ -349,7 +349,7 @@
 // 圆形的小按钮
 .btn-radius-50
   display: inline-block
-  padding: 2px
+  padding: 4px
   border-radius: 50%
   border: 1px solid $--border-color-base
   cursor: pointer
@@ -384,6 +384,15 @@
     top: 50%
     transform: translateY(-10px)
 
+.box-content__title
+  border: 1px solid #dfdfdf
+  padding: 0 8px 8px
+  .title
+    padding: 8px
+    @extend .box-content__tip
+    @extend .primary-text
+
+
 // 一些hover动效
 .hover-change-scale:hover
   transform: scale(1.2)
@@ -402,6 +411,23 @@
   @extend .border-hover
 .hover-change-shadow:hover, .hover-change-shadow:active
   box-shadow: -1px 3px 2px rgb(220 223 230 / 30%), 0px 2px 4px 0px rgb(0 0 0 / 20%)
+.hover-change-underline
+  // outline: 1px solid transparent
+  // padding: 4px
+  position: relative
+  &:hover, &:active
+    &::after
+      content: ''
+      bottom: 0
+      left: 0
+      position: absolute
+      display: inline-block
+      width: 100%
+      line-height: 1.2
+      margin-top: 2px
+      outline: 2px double $--color-primary
+      // border-radius: 50%
+
 
 // 列表展示 - 左右布局
 .list-column__default
@@ -427,6 +453,5 @@
   color: $--color-primary
   margin: 0
   font-size: 16px
-
 
 /** ===== 公用一些自定义样式 END ===== **/

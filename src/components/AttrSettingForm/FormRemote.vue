@@ -9,15 +9,16 @@
         .secondary-text.m-l-8(style="text-overflow: ellipsis;overflow: hidden;") {{remoteData.url}}
       .color-text-secondary.font-size-small.m-l-8 {{ remoteData.demo || ''}}
     .right-wrap
-      i.el-icon-edit(title="重新选择数据接口")
-      i.el-icon-delete.m-l-8(title="移除当前", @click.prevent="remove")
+      i.el-icon-edit.hover-change-underline(title="重新选择数据接口")
+      i.el-icon-delete.hover-change-underline.m-l-8(title="移除当前", @click.prevent="remove")
+      slot(name="remote-operation")
   RemoteSettingRequire(
     v-model="setAsyncVisible"
-    v-on="$listeners"
     v-bind="$attrs"
     :title="title"
     :chosenData="remoteData"
-    @chosen="getAsyncSeting")
+    @chosen="getAsyncSeting"
+    @refuse="$emit('refuse')")
 </template>
 
 <script>
@@ -49,7 +50,6 @@ export default {
         return this.value
       },
       set (value) {
-        console.info('改变了:', value)
         this.$emit('input', value)
       }
     }
@@ -60,7 +60,9 @@ export default {
     },
     remove () {
       this.remoteData = {}
-      this.$emit('remove')
+      this.$nextTick(() => {
+        this.$emit('remove')
+      })
     }
   }
 }
