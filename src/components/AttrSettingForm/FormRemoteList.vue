@@ -16,10 +16,11 @@
         @refuse="dialogClosed(i)"
         @remove="removeResource(api, i)")
         template(v-slot:remote-operation)
-          i.el-icon-s-flag.m-l-8.hover-change-underline(v-if="!api.isDefault", title="设置默认数据集", @click.prevent.stop="setDefault(api)")
+          i.el-icon-s-flag.btn-icon__small.m-l-8(:disabled="api.isDefault", title="设置默认数据集", @click.stop="setDefault(api)")
     .row-button.m-t-4(v-show="!!remoteList.length")
       i.el-icon-plus.color-primary.btn-radius-50.hover-change-scale(@click="addResource")
       i.el-icon-connection.btn-radius-50.hover-change-scale(:is-active="isSetRule", :title="isSetRule ? '已设置执行规则' : '设置执行规则' ", @click="toggleRules")
+      i.el-icon-delete.color-primary.btn-radius-50.hover-change-scale(title="清空已选", @click.prevent.stop="clearAll")
 
   //- 规则设置
   el-dialog(
@@ -42,9 +43,8 @@
         v-model="executByRule"
         :apiList="remoteList")
       .bottom-wrap.text-right.m-t-16
-        el-button-group
-          el-button(@click="ruleSettingVisible=false;isSetRule=false") 取消
-          el-button(type="primary", @click="submitRule") 确定
+        el-button(@click="ruleSettingVisible=false;isSetRule=false") 取消
+        el-button(type="primary", @click="submitRule") 确定
 
 </template>
 
@@ -152,9 +152,13 @@ export default {
       this.$emit('chosenRule', this.ruleData)
     },
     setDefault (api) {
+      if (api.isDefault) return
       const def = this.remoteList.find(r => !!r.isDefault)
       if (def) def.isDefault = false
       this.$set(api, 'isDefault', true)
+    },
+    clearAll () {
+      this.remoteList = []
     }
   },
   mounted () {

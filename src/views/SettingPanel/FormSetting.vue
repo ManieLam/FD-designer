@@ -23,14 +23,21 @@
             el-collapse-item.setting-block(title="表单初始化时", name="mounted")
               .row-item
                 el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
+                  el-tooltip(class="item", effect="dark", content="- 必须在需要匹配字典的字段属性中配置对应的字典名，位置【属性/选项/动态字典】。", placement="top-start")
+                    i.icon.el-icon-info.m-l-4
                 .row-item__input.box-content__inside
                   //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi", placeholder="输入字典接口")
                   form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi")
-                  .tip-text.m-l-8.secondary-text.m-t-8
-                    i.icon.el-icon-info 请在对应的字段配置【属性/选项/动态字典】,否则不生效。
 
               .row-item.p-t-16
                 el-checkbox(v-model="actionsData.getResourceImmediate") 获取初始化数据
+                  el-tooltip(class="item", effect="dark", placement="top-start")
+                    div(slot="content")
+                      p - 支持多个接口。
+                      p - 默认数据集：存在多个数据集合时，默认第一个请求数据为默认数据集，通过【请求规则】可修改默认指定。
+                      p - 字段取值：非默认数据集的字段取值，请在字段属性中，指定数据集合。
+                    i.icon.el-icon-info.m-l-4
+
                 .row-item__remote.box-content__inside(v-if="actionsData.getResourceImmediate")
                   //- 前置触发条件：路由带参数（跳转进入）
                   .box-content
@@ -42,6 +49,7 @@
                     form-remote-list(
                       v-if="!!actionsData.immediateRemoteApi"
                       v-model="actionsData.immediateRemoteApi"
+                      :rule="actionsData.immediateRemoteRule"
                       key="immediateRemoteApi"
                       title="配置表单首次加载数据源")
             //- 配置表单按钮操作

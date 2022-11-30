@@ -340,6 +340,7 @@
   color: $--border-color-base
   display: inline-block
 
+/* 一些按钮配置 */
 // 聚焦的按钮
 .btn-focus.el-button--primary:focus
   border: 1px dashed
@@ -358,6 +359,19 @@
   + .btn-radius-50
     margin-left: 5px
 
+// 带icon的小按钮
+.btn-icon__small
+  @extend .hover-change-underline
+  padding: 4px 0
+  & + .btn-icon__small
+    margin-left: 8px
+  &[disabled]
+    color: $--color-text-regular
+    cursor: not-allowed
+    // pointer-events: none
+  
+
+/* 一些内容盒子 */
 .box-content__inside
   position: relative
   height: fit-content
