@@ -143,7 +143,8 @@ el-dialog.async-required-dialog(
           el-button-group
             el-button(@click="testLink") 测试链接
             el-button(:disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
-          el-button-group
+          .button-group
+            el-checkbox.p-r-8(v-model="isContinues") 保存后，继续添加下一个
             el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
 </template>
 
@@ -164,6 +165,11 @@ export default {
     chosenData: {
       type: Object,
       default: () => ({})
+    },
+    // 是否多选
+    isMulti: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -216,7 +222,8 @@ export default {
       /* 筛选内容 */
       isFilterIng: false, // 筛选中
       filterList: [], // 筛选的列表
-      apiSearchVal: '' // 筛选的数据
+      apiSearchVal: '', // 筛选的数据
+      isContinues: false // 是否持续性添加
     }
   },
   watch: {

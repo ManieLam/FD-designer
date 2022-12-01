@@ -36,14 +36,14 @@
         el-radio-button(label="inSetting") 根据规则执行(TODO)
       .secondary-text.m-t-8.radio-tip-content(v-show="executiveMode === 'inParallel' || executiveMode === 'inSeries'")
         i.el-icon-info.p-r-8
-        i {{ executiveMode === 'inParallel' ? '并联时，所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。' : '串联时，从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作' }}
+        i {{ executiveMode === 'inParallel' ? '【默认】并联时，所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。' : '串联时，从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作' }}
       //- 根据规则执行
       ApiRule.remote-rule-wrap.m-t-8(
         v-show="executiveMode === 'inSetting'"
         v-model="executByRule"
         :apiList="remoteList")
       .bottom-wrap.text-right.m-t-16
-        el-button(@click="ruleSettingVisible=false;isSetRule=false") 取消
+        el-button(@click="ruleSettingVisible=false; isSetRule=false") 取消
         el-button(type="primary", @click="submitRule") 确定
 
 </template>
@@ -71,10 +71,10 @@ export default {
   data () {
     return {
       ruleSettingVisible: false,
-      isSetRule: false,
+      isSetRule: this.rule?.executiveMode,
       /* 设置规则 */
-      executiveMode: 'inParallel',
-      executByRule: ''
+      executiveMode: 'inParallel', // 执行规则（串联、并联、自定义）
+      executByRule: '' // 自定义规则字符串
     }
   },
   computed: {
@@ -137,7 +137,7 @@ export default {
     removeResource (api, i) {
       this.$delete(this.remoteList, i)
       this.$nextTick(() => {
-        if (this.remoteList.length) {
+        if (this.remoteList.length && this.remoteList[i]) {
           // 自动将下一个接口置为默认
           this.$set(this.remoteList[i], 'isDefault', true)
         }
@@ -147,6 +147,7 @@ export default {
       this.ruleSettingVisible = !this.ruleSettingVisible
     },
     submitRule () {
+      console.info('选中选项')
       this.ruleSettingVisible = false
       this.isSetRule = true
       this.$emit('chosenRule', this.ruleData)

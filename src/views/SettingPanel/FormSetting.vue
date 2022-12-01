@@ -34,7 +34,7 @@
                   el-tooltip(class="item", effect="dark", placement="top-start")
                     div(slot="content")
                       p - 支持多个接口。
-                      p - 默认数据集：存在多个数据集合时，默认第一个请求数据为默认数据集，通过【请求规则】可修改默认指定。
+                      p - 默认数据集：存在多个数据集合时，默认第一个请求数据为默认数据集，可修改默认指定。
                       p - 字段取值：非默认数据集的字段取值，请在字段属性中，指定数据集合。
                     i.icon.el-icon-info.m-l-4
 
@@ -51,7 +51,8 @@
                       v-model="actionsData.immediateRemoteApi"
                       :rule="actionsData.immediateRemoteRule"
                       key="immediateRemoteApi"
-                      title="配置表单首次加载数据源")
+                      title="配置表单首次加载数据源"
+                      @chosenRule="chosenRemoteRule")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")
               ButtonSetting.row-item(:key="canvasName", :list="buttonList", @change="updateButtons")
@@ -185,6 +186,9 @@ export default {
     },
     getResourceWhen (type) {
       this.$set(this.actionsData, 'immediateRemotePrecondition', this.immediateRemotePrecondition)
+    },
+    chosenRemoteRule (rule = {}) {
+      this.$set(this.actionsData, 'immediateRemoteRule', rule)
     }
   }
 }

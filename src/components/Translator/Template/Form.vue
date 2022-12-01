@@ -32,6 +32,7 @@ export default {
   },
   data () {
     return {
+      formDataCollect: new Map(), // [key('methods_url'), data:<Object>]
       fullDataTemp: {},
       fullData: {},
       relations: {}
@@ -114,25 +115,37 @@ export default {
       }
     },
     // 发起异步请求
-    getRemoteResource () {
+    requireImmediateRemote () {
       const { actions } = this.config?.form || {}
       if (actions?.immediateRemoteApi) {
-        const requireObj = this.formatRequire(actions.immediateRemoteApi)
-        this.$require(requireObj)
-          .then(res => {
-            // console.info('初始化请求发起后:', res)
-            this.fullDataTemp = res || {}
-            this.fullData = res || {}
-            // 受anso-ui，表单在赋值后触发校验
-            this.$nextTick(() => {
-              this.onClearValidate()
-            })
-            return res
-          })
-          .then(res => {
-            this.setDefaultValue()
-            // this.formatDefValFunc()
-          })
+        // TODO 设置规则后，根据规则发起请求
+        /**
+         * 并发：promise.all
+         * 串行：队列 next
+        */
+        // const requireObj = this.formatRequire(actions.immediateRemoteApi)
+        // const requireArr = actions.immediateRemoteApi.map(req => this.$require(this.formatRequire(req)))
+        // Promise.all(requireArr)
+        console.info(actions.immediateRemoteRule)
+        this.formatMultiRequire({
+          requires: actions.immediateRemoteApi,
+          rules: actions.immediateRemoteRule
+        })
+        // console.info(func)
+        // .then(res => {
+        //   // console.info('初始化请求发起后:', res)
+        //   this.fullDataTemp = res || {}
+        //   this.fullData = res || {}
+        //   // 受anso-ui，表单在赋值后触发校验
+        //   this.$nextTick(() => {
+        //     this.onClearValidate()
+        //   })
+        //   return res
+        // })
+        // .then(res => {
+        //   this.setDefaultValue()
+        //   // this.formatDefValFunc()
+        // })
       }
     },
     // 内置的按钮重置函数
@@ -221,7 +234,7 @@ export default {
   },
   mounted () {
     this.onClearValidate()
-    this.getRemoteResource()
+    this.requireImmediateRemote()
   }
 }
 </script>

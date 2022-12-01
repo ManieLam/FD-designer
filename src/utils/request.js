@@ -83,29 +83,37 @@ axios.interceptors.response.use(
 )
 
 export function fetch (props) {
-  return axios(httpOptions(props))
-    .then(
-      async (response) => {
-        const { __isChange, funcInput, funcDefault } = props.afterRequired || {}
-        let res = {}
-        await useEval(__isChange ? funcInput : funcDefault, function (func) {
-          res = func(response)
-        })
-        return res
-      },
-      (reject) => {
-        if (props.error?.__isChange) {
-          return useEval(props.error.funcInput, (func) => func(reject))
+  return new Promise((resolve, reject) => {
+    return axios(httpOptions(props))
+      .then(
+        async (response) => {
+          // console.info('is success', response)
+          const { __isChange, funcInput, funcDefault } = props.afterRequired || {}
+          let res = {}
+          await useEval(__isChange ? funcInput : funcDefault, function (func) {
+            res = func(response)
+          })
+          resolve(res)
+          return res
+        },
+        (rej) => {
+          // console.info('is reject', rej)
+          if (props.error?.__isChange) {
+            return useEval(props.error.funcInput, (func) => func(rej))
+          }
+          reject(false)
+          return false
         }
+      )
+      .catch((error) => {
+        console.info('被错误捕获了')
+        if (error.response) {
+          Message.error(error.response.statusText)
+        }
+        reject(error)
         return false
-      }
-    )
-    .catch((error) => {
-      if (error.response) {
-        Message.error(error.response.statusText)
-      }
-      return false
-    })
+      })
+  })
 }
 
 export default fetch
