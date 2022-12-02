@@ -93,7 +93,7 @@ export default {
       valueTypeOptions: [
         { label: '定值', value: 'const', tag: 'el-input' },
         { label: '表单录入数据', value: 'formData', tag: 'el-input' },
-        { label: '表单全量数据', value: 'fullData', tag: 'el-input' },
+        { label: '当前表单全量数据', value: 'fullData', tag: 'el-input' },
         { label: '路由数据', value: 'router', tag: 'el-input' },
         { label: '本地缓存', value: 'localstorage', tag: 'el-input' }
       ]

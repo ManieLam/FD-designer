@@ -145,7 +145,9 @@ el-dialog.async-required-dialog(
             el-button(:disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
           .button-group
             el-checkbox.p-r-8(v-model="isContinues") 保存后，继续添加下一个
-            el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
+            el-button-group
+              el-button(@click="$emit('refuse')") 取消
+              el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
 </template>
 
 <script>
@@ -238,7 +240,7 @@ export default {
       }
     },
     apiList (list) {
-      /* 受vue2影响，无监听到数组对象内部属性更新，重新再触发一次 */
+      console.log('watch is change')
       this.$store.dispatch('resources/updateList', list)
     },
     'apiData.url': debounce(function (path) {
@@ -248,11 +250,13 @@ export default {
   computed: {
     apiList: {
       get () {
-        return this.$store.getters.getResources
+        // apiStorageList
+        return this.apiStorageList
       },
       set (list) {
-        console.log('set apiList global')
-        this.$store.dispatch('resources/updateList', list)
+        console.log('set apiList global', list)
+        // 当使用array.splice/array.unshift等会影响到array自身的，都不会触发这里
+        this.apiStorageList = list
       }
     },
     apiNames () {
@@ -310,7 +314,6 @@ export default {
         group: `新建分组${newLen + 1}`
       })
       this.$nextTick(() => {
-        // this.globalSave(this.apiData)
         this.apiList.unshift(this.apiData)
       })
     },
@@ -360,10 +363,11 @@ export default {
     /* 全局保存：修改 + 新增 */
     globalSave (data = this.apiData, nIndex = null) {
       const index = this.apiList.findIndex(api => api.name === data.name)
+      const newData = { ...data, __isGlobal: true }
       if (index >= 0) {
-        this.$set(this.apiList, index, data)
+        this.$set(this.apiList, index, newData)
       } else {
-        this.apiList.unshift(data)
+        this.apiList.unshift(newData)
       }
       this.$nextTick(() => {
         this.$message.success('数据源保存成功')
@@ -380,8 +384,14 @@ export default {
     chooseChange () {
       this.$refs.apiForm.validate(valid => {
         if (valid) {
-          this.$emit('chosen', this.apiData)
-          this.dialogVisabled = false
+          this.$emit('chosen', this.apiData, this.isContinues)
+          if (!this.isContinues) {
+            this.dialogVisabled = false
+          } else {
+            this.apiData = new ApiData()
+            console.info('is apiData clear')
+            // this.$set(this, 'apiData', {})
+          }
         } else {
           this.$message.warning('请选择一个数据源')
         }

@@ -39,7 +39,7 @@ export function ApiData (config = {}) {
     beforeRequired: ApiDataHandles.beforeRequired,
     afterRequired: ApiDataHandles.afterRequired,
     error: ApiDataHandles.error,
-    name: config.name || new Date().getTime(), // 关键名称自动生成
+    name: config.name || new Date().getTime(), // 关键名称自动生成, 不用`地址+方法`的格式，因为参数可能不同，任意一项不同都认为新的接口
     group: '', // 组名， 默认为空代表全局
     ...config
   }

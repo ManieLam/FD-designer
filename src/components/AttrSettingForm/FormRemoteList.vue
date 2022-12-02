@@ -1,24 +1,32 @@
 <template lang='pug'>
 .form-remote-list
-  el-button(v-show="!remoteList || !remoteList.length", @click="addResource") 配置数据接口
+  el-button(v-show="!remoteList || !remoteList.length", @click="handleAdd") 配置数据接口
   //- .list-column__default.m-t-4
   .list-column
     .d-flex-1.m-r-4
-      form-remote.form-remote-item(
+      RemoteInfo.form-remote-item(
         v-for="(api, i) in remoteList"
         v-bind="$attrs"
         :value="api"
         :key="`api_${i}`"
         :ref="`api_${i}`"
-        :isSelected="remoteNames"
         :is-default="api.isDefault"
-        @input="getNewResource($event, i)"
-        @refuse="dialogClosed(i)"
-        @remove="removeResource(api, i)")
-        template(v-slot:remote-operation)
+        @edit="handleEdit(api, i)"
+        @remove="handleRemove(api, i)")
+        template(v-slot:operation-append)
           i.el-icon-s-flag.btn-icon__small.m-l-8(:disabled="api.isDefault", title="设置默认数据集", @click.stop="setDefault(api)")
+    RemoteSettingRequire(
+      v-if="setAsyncVisible"
+      v-model="setAsyncVisible"
+      :title="title"
+      :isMulti="true"
+      :chosenData="apiDataPatch"
+      :isSelected="remoteNames"
+      @chosen="chosenResource"
+      @refuse="hanldeRefuse")
+    //- 列表操作
     .row-button.m-t-4(v-show="!!remoteList.length")
-      i.el-icon-plus.color-primary.btn-radius-50.hover-change-scale(@click="addResource")
+      i.el-icon-plus.color-primary.btn-radius-50.hover-change-scale(@click="handleAdd")
       i.el-icon-connection.btn-radius-50.hover-change-scale(:is-active="isSetRule", :title="isSetRule ? '已设置执行规则' : '设置执行规则' ", @click="toggleRules")
       i.el-icon-delete.color-primary.btn-radius-50.hover-change-scale(title="清空已选", @click.prevent.stop="clearAll")
 
@@ -53,6 +61,8 @@
 import { ApiData } from '@/model/resource.js'
 import { isEqual } from 'lodash'
 import ApiRule from '@/components/RuleCollection/ApiRule'
+import RemoteInfo from '../RemoteSetting/RemoteInfo'
+import RemoteSettingRequire from '../RemoteSetting/Require'
 export default {
   name: 'FormRemoteList',
   props: {
@@ -63,15 +73,23 @@ export default {
     rule: {
       type: Object,
       default: () => ({})
+    },
+    title: {
+      type: String,
+      default: '数据源配置'
     }
   },
   components: {
-    ApiRule
+    ApiRule,
+    RemoteInfo,
+    RemoteSettingRequire
   },
   data () {
     return {
-      ruleSettingVisible: false,
+      setAsyncVisible: false, // 配置接口信息是否可见
+      ruleSettingVisible: false, // 配置接口规则是否可见
       isSetRule: this.rule?.executiveMode,
+      apiDataPatch: new ApiData(),
       /* 设置规则 */
       executiveMode: 'inParallel', // 执行规则（串联、并联、自定义）
       executByRule: '' // 自定义规则字符串
@@ -106,35 +124,33 @@ export default {
     getAsyncSeting (data) {
       this.remoteList = data
     },
-    getNewResource (api, index) {
-      console.info('获取到新的接口', api, index)
-      if (api) {
-        // 保持唯一性
-        const hasOne = this.remoteList.some(r => isEqual(r, api))
-        if (!hasOne) {
-          this.$set(this.remoteList, index, { ...api, isDefault: api.isDefault || index === 0 })
-        } else {
-          this.$message.warning('重复选择同一个接口')
-        }
-      }
-    },
-    addResource () {
-      this.remoteList.push(new ApiData({ url: '/' }))
+    handleAdd () {
+      // this.remoteList.push(new ApiData({ url: '/' }))
+      this.apiDataPatch = new ApiData({ url: '/' })
       this.$nextTick(() => {
-        const nIndex = this.remoteList.length - 1
-        if (nIndex >= 0) {
-          this.$refs[`api_${nIndex}`][0].setAsyncVisible = true
-        }
+        // const nIndex = this.remoteList.length - 1
+        // if (nIndex >= 0) {
+        //   this.$refs[`api_${nIndex}`][0].setAsyncVisible = true
+        // }
+        this.setAsyncVisible = true
       })
     },
-    dialogClosed (i) {
+    // 取消新增
+    hanldeRefuse (i) {
       // console.info('弹窗关闭', this.remoteList[i]?.url?.length)
       // 清除伪数据
-      if (this.remoteList[i]?.url?.length <= 1) {
-        this.$delete(this.remoteList, i)
-      }
+      // if (this.remoteList[i]?.url?.length <= 1) {
+      //   this.$delete(this.remoteList, i)
+      // }
+      this.apiDataPatch = new ApiData({ url: '/' })
     },
-    removeResource (api, i) {
+    // 手动编辑
+    handleEdit (api, i) {
+      this.apiDataPatch = { ...api, _isEdit: i }
+      this.setAsyncVisible = true
+    },
+    // 手动移除
+    handleRemove (api, i) {
       this.$delete(this.remoteList, i)
       this.$nextTick(() => {
         if (this.remoteList.length && this.remoteList[i]) {
@@ -142,6 +158,35 @@ export default {
           this.$set(this.remoteList[i], 'isDefault', true)
         }
       })
+    },
+    // 确定选中
+    chosenResource (api) {
+      // console.info('获取到新的接口', api)
+      if (!api) return
+      const newApi = { ...this.apiDataPatch, ...api }
+      const { url: newUrl, method: newMethod, _isEdit, name } = newApi
+      // console.info('isEdit-', _isEdit)
+      if (!_isEdit) {
+        // 新增
+        this.apiDataPatch = newApi
+        // 保持唯一性
+        const hasExist = this.remoteList.some(({ url, method }) => isEqual({ url, method }, { url: newUrl, method: newMethod }))
+        if (!hasExist) {
+          const len = this.remoteList.length
+          // 首位为默认数据集
+          this.$set(this.remoteList, len, { ...newApi, isDefault: len === 1 })
+        } else {
+          // this.$message.warning('重复选择同一个接口')
+        }
+      } else {
+        // 编辑
+        const { url: oldUrl, method: oldMethod } = this.apiDataPatch
+        const isSame = isEqual({ url: newUrl, method: newMethod }, { url: oldUrl, method: oldMethod })
+        this.$set(this.remoteList, _isEdit, {
+          ...newApi,
+          name: isSame ? name : new Date().getTime() // 一旦url、method改变，则认为新的接口
+        })
+      }
     },
     toggleRules () {
       this.ruleSettingVisible = !this.ruleSettingVisible

@@ -30,6 +30,7 @@
       i.hover-change-scale(:class="collapse ? 'el-icon-arrow-down' : 'el-icon-arrow-right'", @click.prevent="collapse=!collapse")
 
   .list-content.m-t-8.m-b-8(v-show="collapse")
+    //- 存在全局的数据接口列表
     .list-row.d-flex-row-between.align-items-center.hover-change-bgColor(
       v-for="(apiItem) in resourceList"
       :key="apiItem.name"
@@ -38,6 +39,7 @@
       @click.stop="$emit('editApi', apiItem)")
       .left
         .d-flex-v-center
+          //- 选中的标识
           i.el-icon-check.color-primary.m-r-8(v-show="(apiData && apiItem.name === apiData.name) || isSelected.includes(apiItem.name)")
           .color-warning {{apiItem.method}}
           .secondary-text.m-l-8.d-flex-1 {{apiItem.url}}
@@ -86,6 +88,11 @@ export default {
     collapseDefault: {
       type: Boolean,
       default: true
+    },
+    // 允许多选
+    multiSelectAble: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
