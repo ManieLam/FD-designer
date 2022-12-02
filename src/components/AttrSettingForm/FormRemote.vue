@@ -80,11 +80,11 @@ export default {
         // 新增
         this.remoteData = {
           ...api,
-          name: isSame ? api.name : `` // 一旦url、method改变，则认为新的接口; 一旦修改为全局，则改为全局的name
+          name: isSame ? api.name : '' // 一旦url、method改变，则认为新的接口; 一旦修改为全局，则改为全局的name
         }
-      } else {
-        // 编辑
-        this.
+      // } else {
+      //   // 编辑
+      //   this.
       }
     },
     // 手动编辑
