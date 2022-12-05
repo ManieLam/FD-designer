@@ -143,10 +143,11 @@ export default {
       //   this.$delete(this.remoteList, i)
       // }
       this.apiDataPatch = new ApiData({ url: '/' })
+      this.setAsyncVisible = false
     },
     // 手动编辑
     handleEdit (api, i) {
-      this.apiDataPatch = { ...api, _isEdit: i }
+      this.apiDataPatch = { ...api, _isEdit: i + 1 }
       this.setAsyncVisible = true
     },
     // 手动移除
@@ -164,7 +165,7 @@ export default {
       // console.info('获取到新的接口', api)
       if (!api) return
       const newApi = { ...this.apiDataPatch, ...api }
-      const { url: newUrl, method: newMethod, _isEdit, name } = newApi
+      const { url: newUrl, method: newMethod, _isEdit } = newApi
       // console.info('isEdit-', _isEdit)
       if (!_isEdit) {
         // 新增
@@ -173,19 +174,20 @@ export default {
         const hasExist = this.remoteList.some(({ url, method }) => isEqual({ url, method }, { url: newUrl, method: newMethod }))
         if (!hasExist) {
           const len = this.remoteList.length
-          // 首位为默认数据集
-          this.$set(this.remoteList, len, { ...newApi, isDefault: len === 1 })
+          // 根据列表长度判断, 首位为默认数据集, 默认追尾添加到列表中
+          this.$set(this.remoteList, len, { ...newApi, isDefault: len === 0 })
         } else {
           // this.$message.warning('重复选择同一个接口')
         }
       } else {
         // 编辑
-        const { url: oldUrl, method: oldMethod } = this.apiDataPatch
-        const isSame = isEqual({ url: newUrl, method: newMethod }, { url: oldUrl, method: oldMethod })
-        this.$set(this.remoteList, _isEdit, {
-          ...newApi,
-          name: isSame ? name : new Date().getTime() // 一旦url、method改变，则认为新的接口
-        })
+        // const { url: oldUrl, method: oldMethod } = this.apiDataPatch
+        // const isSame = isEqual({ url: newUrl, method: newMethod }, { url: oldUrl, method: oldMethod })
+        // this.$set(this.remoteList, _isEdit - 1, {
+        //   ...newApi,
+        //   name: isSame || api.__isGlobal ? name : new Date().getTime() // 一旦url、method改变，则认为新的接口,保留全局类型接口的name用于重启弹窗出现全局选中标识
+        // })
+        this.$set(this.remoteList, _isEdit - 1, newApi)
       }
     },
     toggleRules () {

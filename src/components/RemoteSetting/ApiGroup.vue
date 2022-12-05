@@ -39,8 +39,8 @@
       @click.stop="$emit('editApi', apiItem)")
       .left
         .d-flex-v-center
-          //- 选中的标识
-          i.el-icon-check.color-primary.m-r-8(v-show="(apiData && apiItem.name === apiData.name) || isSelected.includes(apiItem.name)")
+          //- 选中的标识 (apiData && apiItem.name === apiData.name) ||
+          i.el-icon-check.color-primary.m-r-8(v-show="multiSelectAble ? isSelected.includes(apiItem.name) : apiData && apiItem.name === apiData.name")
           .color-warning {{apiItem.method}}
           .secondary-text.m-l-8.d-flex-1 {{apiItem.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ apiItem.demo || ''}}

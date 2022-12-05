@@ -19,7 +19,6 @@
   //-     slot(name="remote-operation")
   RemoteInfo.form-remote-item(
     :value="remoteData"
-    :key="remoteData.name"
     @edit="handleEdit"
     @remove="handleRemove")
   RemoteSettingRequire(
@@ -36,7 +35,7 @@
 /** 远程请求配置 */
 import RemoteSettingRequire from '../RemoteSetting/Require'
 import RemoteInfo from '../RemoteSetting/RemoteInfo'
-import { isEqual } from 'lodash'
+// import { isEqual } from 'lodash'
 export default {
   name: 'FormRemote',
   components: {
@@ -71,25 +70,12 @@ export default {
   },
   methods: {
     chosenResource (api) {
-      // this.remoteData = !data ? {} : data
-      const { url: newUrl, method: newMethod } = api
-      const { url: oldUrl, method: oldMethod } = this.remoteData
-      const isSame = isEqual({ url: newUrl, method: newMethod }, { url: oldUrl, method: oldMethod })
       if (!api) return
-      if (!api._isEdit) {
-        // 新增
-        this.remoteData = {
-          ...api,
-          name: isSame ? api.name : '' // 一旦url、method改变，则认为新的接口; 一旦修改为全局，则改为全局的name
-        }
-      // } else {
-      //   // 编辑
-      //   this.
-      }
+      this.remoteData = api
     },
     // 手动编辑
-    handleEdit (api, i) {
-      this.remoteData = { ...api, _isEdit: i }
+    handleEdit () {
+      this.remoteData = { ...this.remoteData, _isEdit: true }
       this.setAsyncVisible = true
     },
     handleRemove () {

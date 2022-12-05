@@ -48,6 +48,7 @@ el-dialog.async-required-dialog(
             :title="decodeURI(title)"
             :list="list"
             :full="apiGroup"
+            :multiSelectAble="isMulti"
             @upgrade="upgradeGroup"
             @remove="removeGroup"
             @addApi="addApi"
@@ -194,6 +195,7 @@ export default {
   data () {
     return {
       key: new Date().getTime(),
+      originGlobalApi: null, // 记录选中的全局接口对象,用于判断是否有修改变动
       apiData: new ApiData(),
       apiMethods: ['GET', 'POST', 'PATCH', 'SET', 'DELETE'],
       apiStorageList: this.$store.getters.getResources,
@@ -326,6 +328,7 @@ export default {
       this.apiData = new ApiData()
     },
     editApi (api, index) {
+      this.originGlobalApi = api
       this.apiData = api
     },
     removeApi (api) {
@@ -371,6 +374,7 @@ export default {
       }
       this.$nextTick(() => {
         this.$message.success('数据源保存成功')
+        this.originGlobalApi = newData
       })
     },
     /* 全局保存数据源分组 */
@@ -384,13 +388,22 @@ export default {
     chooseChange () {
       this.$refs.apiForm.validate(valid => {
         if (valid) {
-          this.$emit('chosen', this.apiData, this.isContinues)
+          const newData = this.apiData
+          // console.info('originGlobalApi:', this.originGlobalApi)
+          // 通过判断当前是否修改了url或method, 如果是, 则认为非全局性的接口
+          const { method: oMethod, url: oUrl } = this.originGlobalApi || {}
+          const { method: nMethod, url: nUrl } = this.apiData
+          const unChanged = isEqual({ method: oMethod, url: oUrl }, { method: nMethod, url: nUrl })
+          // console.info('unChanged:', unChanged)
+          newData.name = unChanged ? this.apiData.name : new Date().getTime()
+          // console.log('是否改名:', unChanged ? '是' : '否', newData.name)
+          newData.__isGlobal = unChanged
+          this.$emit('chosen', newData, this.isContinues)
           if (!this.isContinues) {
             this.dialogVisabled = false
           } else {
+            // 继续添加下一个, 初始化接口数据
             this.apiData = new ApiData()
-            console.info('is apiData clear')
-            // this.$set(this, 'apiData', {})
           }
         } else {
           this.$message.warning('请选择一个数据源')
