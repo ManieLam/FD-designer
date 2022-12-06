@@ -329,7 +329,7 @@ export default {
     },
     editApi (api, index) {
       this.originGlobalApi = api
-      this.apiData = api
+      this.apiData = new ApiData(api)
     },
     removeApi (api) {
       const index = this.apiList.findIndex(row => row.name === api.name)
