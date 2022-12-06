@@ -10,7 +10,7 @@
 </template>
 <script>
 import { isEqual, cloneDeep, keyBy, pick } from 'lodash'
-import { formatFormRules, formatDefValFunc } from '@/utils/format.js'
+import { formatFormRules } from '@/utils/format.js'
 // import button from '../mixins/button'
 import relationMixin from '../mixins/relation'
 import requireMixin from '../mixins/require'
@@ -105,15 +105,6 @@ export default {
       this.$refs.form.$refs.dataform.clearValidate()
     },
     onDestory () {},
-    // 设置默认值
-    setDefaultValue () {
-      const keys = Object.keys(this.fieldObj)
-      for (const field of keys) {
-        // console.info('field:', field)
-        const value = formatDefValFunc.call(this, this.fullData, this.formFieds, this.fieldObj[field]?.form)
-        this.$set(this.fullData, field, value)
-      }
-    },
     // 发起异步请求
     requireImmediateRemote () {
       const { actions } = this.config?.form || {}

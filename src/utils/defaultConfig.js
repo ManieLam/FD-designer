@@ -152,7 +152,7 @@ export const presetOptions = [
     label: '自定义',
     options: [
       {
-        label: '同表单数据自定义(TODO)',
+        label: '同表单数据自定义',
         value: 'customFunc',
         valFunc: (data, fields, field) => { return data[field.name] }
       },

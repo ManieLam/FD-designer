@@ -9,6 +9,7 @@
       component(
         :ref="tab.name"
         :is="tab.components"
+        :key="tab.name"
         v-bind="$attrs"
         v-on="$listeners")
 </template>

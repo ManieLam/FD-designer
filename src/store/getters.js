@@ -1,6 +1,14 @@
 const getters = {
   /* 获取画布信息 */
   canvasViews: state => state.canvas.collects,
+  getCurView: state => {
+    const curName = state.canvas.editingName
+    if (curName) {
+      return state.canvas.collects[curName]
+    } else {
+      return {}
+    }
+  },
   getCanvasView: (state) => (name) => state.canvas.collects[name] || {},
   canvasCount: state => Object.keys(state.canvas.collects)?.length,
   /* 获取api请求设置 */

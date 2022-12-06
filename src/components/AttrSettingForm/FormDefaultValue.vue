@@ -1,13 +1,22 @@
 <template lang='pug'>
 .box-content__inside
-  //- 选择数据源
-  el-select(v-model="dataForm", placeholder="请选择数据源")
-    el-option(v-for="resource in resourceList", :key="resource", :label="resource.name") {{ resource.label }}
   el-radio-group(v-model="settingValue.valueType")
     el-radio(v-for="radio in valueTypeGroups", :key="radio.name", :label="radio.name") {{ radio.label }}
+  //- 选择数据源
+  .m-r-8.d-flex-v-center
+    label 数据源:
+    el-select.d-flex-1.m-l-8(style="width: calc(100% - 10px)", v-model="settingValue.apiName", placeholder="请选择数据源")
+      el-option(
+        v-for="resource in resourceList"
+        :key="resource.value"
+        :label="resource.label"
+        :value="resource.value"
+        size="mini")
+        span(style="float: left") {{ resource.label }}
+        span(style="float: right; color: #8492a6; font-size: 13px") {{ resource.desc }}
   //- 预设数据配置
-  .content-item(v-if="settingValue.valueType==='isPreset'")
-    el-select(v-model="settingValue.presetType", placeholder="请选择关联的数据类型")
+  .content-item.m-t-8(v-if="settingValue.valueType==='isPreset'")
+    el-select(v-model="settingValue.presetType", placeholder="请选择关联的数据类型", style="width: calc(100% - 10px)")
       el-option-group(
         v-for="opt in presetOptions"
         :label="opt.label"
@@ -41,7 +50,8 @@
 </template>
 
 <script>
-/** 默认值 */
+/** 默认值
+ * 关联数据api列表: form.actions.immediateRemoteApi */
 import CodeEditor from '@/components/CodeEditor'
 import { debounce } from 'lodash'
 import { presetOptions } from '@/utils/defaultConfig.js'
@@ -86,32 +96,34 @@ export default {
         routerQuery: '',
         // 自定义表单默认值方法
         customFunc: '',
-        customChainsField: ''
+        customChainsField: '',
+        // 默认值指定的数据源
+        apiName: ''
         // customFuncPlaceholder: '\n return data[field.name]'
       },
-      presetCustomFunc: '(data, fields, field) => {\n return data[field.name] \n}',
-      // 数据源
-      dataForm: '', // 默认值指定的数据源
-      resourceList: [] // 数据源列表
+      presetCustomFunc: '(data, fields, field) => {\n return data[field.name] \n}'
     }
   },
-  // filters: {
-  //   filterPlaceholder (str) {
-  //     const regexp = /\{[^}]+\}/g
-  //     console.info(str)
-  //     console.info(regexp.test(str))
-  //     return str
-  //   }
-  // },
   computed: {
     settingValue: {
       get () {
         return this.presetInputVal
       },
       set (values) {
-        // console.info('set value', values)
         this.presetInputVal = values
       }
+    },
+    /* 数据源列表 */
+    resourceList () {
+      const cView = this.$store.getters.getCurView
+      const list = cView?.form?.actions?.immediateRemoteApi || []
+      return list.map(row => {
+        return {
+          label: `[${row.method}] ${row.url}`,
+          value: row.name,
+          desc: row.isDefault ? '默认' : ''
+        }
+      })
     }
   },
   watch: {

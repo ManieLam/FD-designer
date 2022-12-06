@@ -3,7 +3,7 @@
  * formData: 表单录入数据
  * fullData: 表单录入数据 + 所有数据源数据
  * */
-import { getURLAll } from '@/utils/format.js'
+import { getURLAll, formatDefValFunc } from '@/utils/format.js'
 import { cloneDeep } from 'lodash'
 
 export default {
@@ -65,6 +65,25 @@ export default {
         body: this.formatSubmitParams(require)
       }
     },
+
+    // 设置默认值
+    setDefaultValue () {
+      const keys = Object.keys(this.fieldObj)
+      for (const field of keys) {
+        // console.info('field:', field)
+        const fieldProperty = this.fieldObj[field]?.form
+        const { apiName } = fieldProperty?.defaultValue || {}
+        // console.log(field, '数据源:', apiName)
+
+        let datas = this.fullData
+        if (apiName) {
+          // 存在自定义挑选数据源
+          datas = this.formDataCollect.get(apiName) || {}
+        }
+        const value = formatDefValFunc.call(this, datas, this.formFieds, fieldProperty)
+        this.$set(this.fullData, field, value)
+      }
+    },
     // 初始化接口请求后操作
     afterImmediateResolve (res, api) {
       if (!res) return false
@@ -77,10 +96,11 @@ export default {
         this.$nextTick(() => {
           this.onClearValidate()
         })
-        this.setDefaultValue()
       }
       // 请求成功或失败都存储到formDataCollect中
-      this.formDataCollect.set(`${api.method}_${api.url}`, res) // 测试
+      this.formDataCollect.set(api.name, res) // 测试
+      // 设置默认值
+      this.setDefaultValue()
       return res
     },
     // 串联处理
@@ -130,18 +150,12 @@ export default {
     formatMultiRequire ({ requires = [], rules = {} } = {}) {
       // promise 一旦创建立即执行
       const _requires = cloneDeep(requires)
-      if (rules?.executiveMode === 'inParallel') {
-        // 并联：所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。
-        this.doInParallel(_requires)
-        // const promiseEvts = _requires.map(req => this.$require(this.formatRequire(req)))
-        // console.log('promiseEvts:', promiseEvts)
-        // Promise.all(promiseEvts)
-        //   .finally((results) => {
-        //     console.log(results)
-        //   })
-      } else {
+      if (rules?.executiveMode === 'inSeries') {
         // 串联：从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作
         this.doSeries(_requires)
+      } else {
+        // 并联：所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。
+        this.doInParallel(_requires)
       }
     }
   }

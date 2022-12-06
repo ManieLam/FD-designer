@@ -31,12 +31,18 @@ export const defValOptTree = presetOptions.reduce((r, c) => {
   return r
 }, {})
 
+/** 格式化初始值
+ * valueType: 默认值取值类型 - 同名填值/关联数据
+ * presetType: 关联数据预设值
+ * customFunc: 自定义方法字符串
+ *  */
 export function formatDefValFunc (value = {}, fields = [], field = {}) {
   const { valueType, presetType, customFunc } = field?.defaultValue || {}
   if (!presetType || valueType === 'isDefault') return value[field?.name]
   if (presetType) {
     const target = defValOptTree[presetType]
     if (presetType === 'customFunc') {
+      // 同表单数据自定义
       let res = null
       useEval.call(this, customFunc, (func) => { res = func.call(this, value, fields, field) })
       // console.info('res:', res)
