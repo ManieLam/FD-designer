@@ -1,5 +1,6 @@
 /* 默认数值配置 */
 import { getURLQuery } from '@/utils/format'
+import { MultiApi } from '@/model/resource'
 
 // 默认表单属性
 export const formAttrs = {
@@ -27,11 +28,8 @@ export const formButtons = {
     type: 'primary',
     validate: true,
     sort: 2,
-    func: () => {
-      this.$refs.form.validate((valid) => {
-        console.info('验证结果', valid)
-      })
-    }
+    func: () => {},
+    funcApi: new MultiApi()
   }
 }
 

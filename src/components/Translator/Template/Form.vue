@@ -114,29 +114,10 @@ export default {
          * 并发：promise.all
          * 串行：队列 next
         */
-        // const requireObj = this.formatRequire(actions.immediateRemoteApi)
-        // const requireArr = actions.immediateRemoteApi.map(req => this.$require(this.formatRequire(req)))
-        // Promise.all(requireArr)
-        // console.info(actions.immediateRemoteRule)
         this.formatMultiRequire({
-          requires: actions.immediateRemoteApi,
-          rules: actions.immediateRemoteRule
+          requires: actions.immediateRemoteApi.list,
+          rules: actions.immediateRemoteApi.rule
         })
-        // console.info(func)
-        // .then(res => {
-        //   // console.info('初始化请求发起后:', res)
-        //   this.fullDataTemp = res || {}
-        //   this.fullData = res || {}
-        //   // 受anso-ui，表单在赋值后触发校验
-        //   this.$nextTick(() => {
-        //     this.onClearValidate()
-        //   })
-        //   return res
-        // })
-        // .then(res => {
-        //   this.setDefaultValue()
-        //   // this.formatDefValFunc()
-        // })
       }
     },
     // 内置的按钮重置函数
@@ -207,14 +188,9 @@ export default {
           if (valid && btn.funcApi) {
             // 修改为多数据源操作
             this.formatMultiRequire({
-              requires: btn.funcApi,
-              rules: btn.funcRule
+              requires: btn.funcApi.list,
+              rules: btn.funcApi.rule
             })
-            // const requireObj = this.formatRequire(btn.funcApi)
-            // this.$require(requireObj).then(res => {
-            //   // console.info('on after submit', res)
-            //   this.$emit('onAfterSubmit', res)
-            // })
           }
         })
       } else if (btn.funcApi) {

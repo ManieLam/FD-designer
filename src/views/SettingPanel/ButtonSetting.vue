@@ -7,7 +7,10 @@
       .box-content__collapse
         .button-list-item.d-flex-v-center(v-if="hasSubmit", v-for="(attr, i) in buttonAttrs.submit", :key="i")
           .secondary-text.m-r-8(style="min-width: 100px;") {{attr.label}}
-          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.submit[attr.key]", v-bind="attr")
+          components.list-item-comp(
+            :is="attr.tag"
+            v-model.lazy="buttonData.submit[attr.key]"
+            v-bind="attr")
 
     el-collapse-item.list-item(name="hasReset")
       el-checkbox(slot="title", v-model="hasReset") 重置按钮
@@ -118,6 +121,10 @@ export default {
       } else {
         this.$delete(this.buttonData, name)
       }
+    },
+    chosenSubmitRule (rule) {
+      console.log('获取到规则:', rule)
+      this.$set(this.buttonData.submit, 'funcRule', rule)
     }
   },
   mounted () {

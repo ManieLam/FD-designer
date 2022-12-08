@@ -59,7 +59,7 @@ const getters = {
     const cName = state.canvas.editingName
     if (cName) {
       const cView = state.canvas.collects[cName]
-      const list = cView?.form?.actions?.immediateRemoteApi || []
+      const list = cView?.form?.actions?.immediateRemoteApi?.list || []
       // 记录立即执行的数据集合列表、分步表单的话增加上个表单数据集合
       return list.map(row => {
         return {

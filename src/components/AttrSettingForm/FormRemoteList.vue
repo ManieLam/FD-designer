@@ -38,17 +38,17 @@
     :visible.sync="ruleSettingVisible")
     .dialog-pane(v-if="ruleSettingVisible")
       //- 多规则执行方式：并联/串联
-      el-radio-group(v-model="executiveMode")
+      el-radio-group(v-model="ruleData.executiveMode")
         el-radio-button(label="inParallel") 并联
         el-radio-button(label="inSeries") 串联
         el-radio-button(label="inSetting") 根据规则执行(TODO)
-      .secondary-text.m-t-8.radio-tip-content(v-show="executiveMode === 'inParallel' || executiveMode === 'inSeries'")
+      .secondary-text.m-t-8.radio-tip-content(v-show="ruleData.executiveMode === 'inParallel' || ruleData.executiveMode === 'inSeries'")
         i.el-icon-info.p-r-8
-        i {{ executiveMode === 'inParallel' ? '【默认】并联时，所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。' : '串联时，从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作' }}
+        i {{ ruleData.executiveMode === 'inParallel' ? '【默认】并联时，所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。' : '串联时，从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作' }}
       //- 根据规则执行
       ApiRule.remote-rule-wrap.m-t-8(
-        v-show="executiveMode === 'inSetting'"
-        v-model="executByRule"
+        v-show="ruleData.executiveMode === 'inSetting'"
+        v-model="ruleData.executByRule"
         :apiList="remoteList")
       .bottom-wrap.text-right.m-t-16
         el-button(@click="ruleSettingVisible=false; isSetRule=false") 取消
@@ -67,13 +67,13 @@ export default {
   name: 'FormRemoteList',
   props: {
     value: {
-      type: Array,
-      default: () => ([])
-    },
-    rule: {
       type: Object,
-      default: () => ({})
+      default: () => ({}) // value: { list: [], rule: { executiveMode, executByRule } }
     },
+    // rule: {
+    //   type: Object,
+    //   default: () => ({})
+    // },
     title: {
       type: String,
       default: '数据源配置'
@@ -88,20 +88,19 @@ export default {
     return {
       setAsyncVisible: false, // 配置接口信息是否可见
       ruleSettingVisible: false, // 配置接口规则是否可见
-      isSetRule: this.rule?.executiveMode,
-      apiDataPatch: new ApiData(),
+      isSetRule: this.value?.rule?.executiveMode,
+      apiDataPatch: new ApiData()
       /* 设置规则 */
-      executiveMode: 'inParallel', // 执行规则（串联、并联、自定义）
-      executByRule: '' // 自定义规则字符串
     }
   },
   computed: {
+    // 规则
     remoteList: {
       get () {
-        return this.value
+        return this.value?.list || []
       },
       set (value) {
-        this.$emit('input', value)
+        this.$emit('input', { list: value, rule: this.ruleData })
       }
     },
     // 多数据源情况下, 记录已选数据源key
@@ -110,14 +109,10 @@ export default {
     },
     ruleData: {
       get () {
-        return {
-          executiveMode: this.executiveMode,
-          executByRule: this.executByRule
-        }
+        return this.value.rule || {}
       },
-      set (data) {
-        this.executiveMode = data.executiveMode || 'inParallel'
-        this.executByRule = data.executByRule || ''
+      set (value) {
+        this.$emit('input', { list: this.remoteList, rule: value })
       }
     }
   },
@@ -129,20 +124,11 @@ export default {
       // this.remoteList.push(new ApiData({ url: '/' }))
       this.apiDataPatch = new ApiData({ url: '/' })
       this.$nextTick(() => {
-        // const nIndex = this.remoteList.length - 1
-        // if (nIndex >= 0) {
-        //   this.$refs[`api_${nIndex}`][0].setAsyncVisible = true
-        // }
         this.setAsyncVisible = true
       })
     },
     // 取消新增
     hanldeRefuse (i) {
-      // console.info('弹窗关闭', this.remoteList[i]?.url?.length)
-      // 清除伪数据
-      // if (this.remoteList[i]?.url?.length <= 1) {
-      //   this.$delete(this.remoteList, i)
-      // }
       this.apiDataPatch = new ApiData({ url: '/' })
       this.setAsyncVisible = false
     },
@@ -182,12 +168,6 @@ export default {
         }
       } else {
         // 编辑
-        // const { url: oldUrl, method: oldMethod } = this.apiDataPatch
-        // const isSame = isEqual({ url: newUrl, method: newMethod }, { url: oldUrl, method: oldMethod })
-        // this.$set(this.remoteList, _isEdit - 1, {
-        //   ...newApi,
-        //   name: isSame || api.__isGlobal ? name : new Date().getTime() // 一旦url、method改变，则认为新的接口,保留全局类型接口的name用于重启弹窗出现全局选中标识
-        // })
         this.$set(this.remoteList, _isEdit - 1, newApi)
       }
     },
@@ -195,10 +175,8 @@ export default {
       this.ruleSettingVisible = !this.ruleSettingVisible
     },
     submitRule () {
-      console.info('选中选项')
       this.ruleSettingVisible = false
       this.isSetRule = true
-      this.$emit('chosenRule', this.ruleData)
     },
     setDefault (api) {
       if (api.isDefault) return
@@ -211,7 +189,7 @@ export default {
     }
   },
   mounted () {
-    this.ruleData = this.rule
+    // this.ruleData = this.rule
   }
 }
 </script>

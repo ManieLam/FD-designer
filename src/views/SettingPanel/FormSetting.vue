@@ -49,10 +49,8 @@
                     form-remote-list(
                       v-if="!!actionsData.immediateRemoteApi"
                       v-model="actionsData.immediateRemoteApi"
-                      :rule="actionsData.immediateRemoteRule"
                       key="immediateRemoteApi"
-                      title="配置表单首次加载数据源"
-                      @chosenRule="chosenRemoteRule")
+                      title="配置表单首次加载数据源")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")
               ButtonSetting.row-item(:key="canvasName", :list="buttonList", @change="updateButtons")
@@ -140,7 +138,7 @@ export default {
   computed: {
     immediateRemoteApi: {
       get () {
-        return this.actionsData.immediateRemoteApi || []
+        return this.actionsData.immediateRemoteApi || {}
       },
       set (datas) {
         // this.actionsData.immediateRemoteApi = datas
@@ -178,17 +176,14 @@ export default {
     //     actions: this.actionsData
     //   })
     },
-    getAsyncSeting (data) {
-      this.immediateRemoteApi = data
-    },
+    // getAsyncSeting (data) {
+    //   this.immediateRemoteApi = data
+    // },
     getAttrUpdate (data) {
       console.info('getAttrUpdate:', data)
     },
     getResourceWhen (type) {
       this.$set(this.actionsData, 'immediateRemotePrecondition', this.immediateRemotePrecondition)
-    },
-    chosenRemoteRule (rule = {}) {
-      this.$set(this.actionsData, 'immediateRemoteRule', rule)
     }
   }
 }

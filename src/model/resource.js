@@ -57,10 +57,21 @@ export function ApiBodyParams (config) {
   }
 }
 
-/*  */
+/* 多数据源参数结构 */
+export function MultiApi (config) {
+  return {
+    list: [],
+    rule: {
+      executiveMode: 'inParallel', // 默认并联
+      executByRule: ''
+    },
+    ...config
+  }
+}
 
 export default {
   ApiData,
   ApiBodyParams,
+  MultiApi,
   ApiDataHandles
 }

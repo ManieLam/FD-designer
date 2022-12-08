@@ -124,9 +124,32 @@ export default {
     },
     allCanvasStr () {
       return JSON.stringify(this.allCanvas, null, '\t')
+    // },
+    // // 画布内已选的异步请求链接
+    // hadRemoteResource () {
+    //   return this.getResourceCurSetting()
     }
   },
   methods: {
+    // getResourceCurSetting (setting = null) {
+    //   const allSetting = setting || this.$store.getters.getCurView
+    //   return Object.entries(allSetting).reduce((res, [key, value]) => {
+    //     if (typeof value === 'object') {
+    //       if (has(value, ['url', 'method', 'body', 'header'])) {
+    //         // res.push(new Map([key, value]))
+    //         console.info('找到了:', value)
+    //         res.push(new Map(key, value))
+    //       } else {
+    //         const newRes = this.getResourceCurSetting(value)
+    //         console.log('newRes:', newRes)
+    //         if (newRes.length) {
+    //           res.push(newRes)
+    //         }
+    //       }
+    //     }
+    //     return res
+    //   }, [])
+    // },
     toggleSettingJson () {
       this.$forceUpdate()
       this.$nextTick(() => {
@@ -198,6 +221,7 @@ export default {
     },
     async initResource () {
       await this.$store.commit('resources/init')
+      // await this.$store.commit('resources/initGroup')
     },
     async onPreview () {
       this.previewProps.data = this.allCanvas[this.canvasName]
@@ -238,7 +262,9 @@ export default {
     this.initCanvas()
     this.initResource()
   },
-  mounted () {}
+  mounted () {
+    // console.log(this.hadRemoteResource)
+  }
 }
 </script>
 
@@ -248,7 +274,7 @@ export default {
   justify-content: space-between
   margin-top: 8px
   margin-bottom: 8px
-  height: calc(100vh - 90px)
+  height: calc(100vh - 50px)
   .left-panel,.right-panel,.center-panel
     background: #fff
     padding: 8px
