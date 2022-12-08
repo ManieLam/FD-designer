@@ -117,7 +117,7 @@ export default {
         // const requireObj = this.formatRequire(actions.immediateRemoteApi)
         // const requireArr = actions.immediateRemoteApi.map(req => this.$require(this.formatRequire(req)))
         // Promise.all(requireArr)
-        console.info(actions.immediateRemoteRule)
+        // console.info(actions.immediateRemoteRule)
         this.formatMultiRequire({
           requires: actions.immediateRemoteApi,
           rules: actions.immediateRemoteRule
@@ -205,11 +205,16 @@ export default {
       if (btn.validate) {
         this.$refs.form.$refs.dataform.validate(valid => {
           if (valid && btn.funcApi) {
-            const requireObj = this.formatRequire(btn.funcApi)
-            this.$require(requireObj).then(res => {
-              // console.info('on after submit', res)
-              this.$emit('onAfterSubmit', res)
+            // 修改为多数据源操作
+            this.formatMultiRequire({
+              requires: btn.funcApi,
+              rules: btn.funcRule
             })
+            // const requireObj = this.formatRequire(btn.funcApi)
+            // this.$require(requireObj).then(res => {
+            //   // console.info('on after submit', res)
+            //   this.$emit('onAfterSubmit', res)
+            // })
           }
         })
       } else if (btn.funcApi) {
