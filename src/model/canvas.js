@@ -1,4 +1,5 @@
 import { formButtons } from '@/utils/defaultConfig'
+/* 以"xxxApi"命名的格式, 认为是异步动态接口对象, 在运行时会按照内置规则运行请求  */
 export const CanvasData = function ({ fields = [], formAttrs = {}, formActions = {} }, defaultFormAttrs = {}) {
   return {
     name: '',

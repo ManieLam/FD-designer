@@ -4,7 +4,7 @@
     .d-flex-v-center
       i.el-icon-paperclip.color-primary.m-r-8(title="数据接口")
       .color-warning {{remoteData.method}}
-      .secondary-text.m-l-8(style="text-overflow: ellipsis;overflow: hidden;") {{remoteData.url}}
+      .secondary-text.m-l-8(style="text-overflow: ellipsis;overflow: hidden;", :title="remoteData.url") {{remoteData.url}}
     .color-text-secondary.font-size-small.m-l-8 {{ remoteData.demo || '<无备注>'}}
   slot.right-wrap(name="operation")
     i.el-icon-edit.btn-icon__small(title="编辑", @click="$emit('edit')")

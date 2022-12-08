@@ -1,9 +1,9 @@
 <template lang='pug'>
-.form-remote-list
+.form-remote-list(style="overflow-x: auto;")
   el-button(v-show="!remoteList || !remoteList.length", @click="handleAdd") 配置数据接口
   //- .list-column__default.m-t-4
   .list-column
-    .d-flex-1.m-r-4
+    .d-flex-1
       RemoteInfo.form-remote-item(
         v-for="(api, i) in remoteList"
         v-bind="$attrs"
@@ -25,7 +25,7 @@
       @chosen="chosenResource"
       @refuse="hanldeRefuse")
     //- 列表操作
-    .row-button.m-t-4(v-show="!!remoteList.length")
+    .row-button.m-t-4.p-4(v-show="!!remoteList.length")
       i.el-icon-plus.color-primary.btn-radius-50.hover-change-scale(@click="handleAdd")
       i.el-icon-connection.btn-radius-50.hover-change-scale(:is-active="isSetRule", :title="isSetRule ? '已设置执行规则' : '设置执行规则' ", @click="toggleRules")
       i.el-icon-delete.color-primary.btn-radius-50.hover-change-scale(title="清空已选", @click.prevent.stop="clearAll")
@@ -104,6 +104,7 @@ export default {
         this.$emit('input', value)
       }
     },
+    // 多数据源情况下, 记录已选数据源key
     remoteNames () {
       return this.remoteList.map(api => api.name)
     },

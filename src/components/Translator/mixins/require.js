@@ -1,7 +1,7 @@
 /**
  * 格式化接口请求方法
  * formData: 表单录入数据
- * fullData: 表单录入数据 + 所有数据源数据
+ * collectData: 表单所有数据集合 + 所有数据源数据
  * */
 import { getURLAll, formatDefValFunc } from '@/utils/format.js'
 import { cloneDeep } from 'lodash'
@@ -9,19 +9,19 @@ import { cloneDeep } from 'lodash'
 export default {
   methods: {
     transParamsVal (varType, valKey) {
-      switch (varType) {
+      // console.info('varType:', varType, valKey)
+      switch (varType[0]) {
         case 'const':
           return valKey
         case 'formData':
           return this.formData[valKey]
-        case 'fullData':
-          return this.fullData[valKey]
+        case 'collectData': {
+          const ranges = this.formDataCollect.get(varType[1]) || {}
+          return ranges[valKey]
+        }
         case 'router':
           return getURLAll.call(this, valKey)
         case 'localstorage':
-          // const storageData = localStorage.getItem(value)
-          // console.log(typeof storageData)
-          // return JSON.parse(storageData)
           return localStorage.getItem(valKey)
       }
     },
@@ -33,7 +33,7 @@ export default {
     },
     /**
      * @return body 数据 <Object>
-     * TODO 多数据源转换
+     * 包括 多数据源转换: 根据指定的数据源集合, 赋值参数
      * */
     formatSubmitParams ({ isFullDose, body = [] }) {
       const range = isFullDose ? this.fullData : this.formData
@@ -44,11 +44,14 @@ export default {
     * @return 格式化后的请求地址
     */
     formatPath ({ url = '', pathData = [] }) {
+      // console.info('pathData:', pathData)
       if (url && pathData?.length) {
         const paramsVal = this.formatBodyParams({ body: pathData })
+        // console.info('paramsVal:', paramsVal)
         const newPath = url.split('?')?.[0].replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
           return paramsVal[p2] || ''
         })
+        // console.info('newPath:', newPath)
         return newPath
       } else {
         return url
@@ -105,7 +108,7 @@ export default {
     },
     // 串联处理
     async doSeries (reqs = []) {
-      console.info('evts:', reqs)
+      // console.info('evts:', reqs)
       let preRes = true
       for (let index = 0; index <= reqs.length - 1; index++) {
         const api = reqs[index]
