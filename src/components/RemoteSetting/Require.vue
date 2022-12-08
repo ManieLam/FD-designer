@@ -88,34 +88,46 @@ el-dialog.async-required-dialog(
               el-radio-group(v-model="apiData.method" size="mini")
                 el-radio-button(v-for="method in apiMethods", :key="method", :label="method")
 
-            el-form-item(prop="header")
+            el-form-item.form-item-label_w100(prop="header")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求头部
                 .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
-                  :class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
+                  :class="!hasHeader ? 'el-icon-plus' : 'el-icon-delete'"
+                  :title="!hasHeader ? '添加' : '清空' "
                   @click="toggleCustomList('header')")
               ParamsList(v-show="hasHeader", keyName="header", v-model="apiData.header", :editAble="true", @onClearAll="toggleCustomList('header')")
 
-            el-form-item(prop="pathData")
+            el-form-item.form-item-label_w100(prop="pathData")
+              //- path的请求参数根据url自动转换, 不支持手动添加除非有占位
               .d-flex-row-between.align-items-center(slot="label")
-                .label-left 请求参数（Path）
-                .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(:class="!hasPathData ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'" @click="toggleCustomList('pathData')")
-              ParamsList(v-show="hasPathData", keyName="pathData", v-model="apiData.pathData", :editAble="true", @onClearAll="toggleCustomList('pathData')")
+                .label-left
+                  span 请求参数（Path）
+                  el-tooltip(content="根据地址栏/${xxx}自动生成; 请先在请求地址上补充对应的${xxx}占位", placeholder="top")
+                    i.el-icon-info.m-l-8
+              ParamsList(
+                v-show="hasPathData"
+                keyName="pathData"
+                v-model="apiData.pathData"
+                :operateAble="false"
+                :disableEditFunc="disableEditFunc"
+                @onClearAll="toggleCustomList('pathData')")
 
-            el-form-item(prop="body")
+            el-form-item.form-item-label_w100(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
-                .label-left 请求参数（Query）
-                .label-right
-                  .cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
-                    :class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
+                .label-left
+                  span 请求参数（Query）
+                  el-tooltip(placement="top")
+                    template(slot="content")
+                      div 除字典以外的数据，
+                      div 表单存在默认请求多个数据源时，则以列表形式传递
+                      div 该选项会影响所有该接口，请求参数的数据范围
+                    i.icon.el-icon-info.m-l-8
+                .label-right.d-flex-v-center
+                  el-checkbox.m-l-16.split-after(v-model="apiData.isFullDose") 是否将表单【默认数据集数】全量提交
+                  .cursor-pointer.font-size-medium.hover-change-scale(
+                    :class="!hasBody ? 'el-icon-plus' : 'el-icon-delete'"
+                    :title="!hasBody ? '添加' : '清空' "
                     @click="toggleCustomList('body')")
-                  el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否默认表单全量数据提交
-                    el-tooltip(placement="top")
-                      template(slot="content")
-                        div 除字典以外的数据，
-                        div 表单存在默认请求多个数据源时，则以列表形式传递
-                        div 该选项会影响所有该接口，请求参数的数据范围
-                      i.icon.el-icon-info.m-l-8
               ParamsList(v-show="hasBody", keyName="body", v-model="apiData.body", :editAble="true", @onClearAll="toggleCustomList('body')")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
@@ -145,7 +157,7 @@ el-dialog.async-required-dialog(
             el-button(@click="testLink") 测试链接
             el-button(:disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
           .button-group
-            el-checkbox.p-r-8(v-model="isContinues") 保存后，继续添加下一个
+            el-checkbox.p-r-8.split-after(v-model="isContinues") 保存后，继续添加下一个
             el-button-group
               el-button(@click="$emit('refuse')") 取消
               el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
@@ -198,7 +210,7 @@ export default {
       originGlobalApi: null, // 记录选中的全局接口对象,用于判断是否有修改变动
       apiData: new ApiData(),
       apiMethods: ['GET', 'POST', 'PATCH', 'SET', 'DELETE'],
-      apiStorageList: this.$store.getters.getResources,
+      apiStorageList: this.$store.getters.getResources, // 缓存全局的数据源列表
       dataHandles: ApiDataHandles,
       dataHandleEditors: {},
       rules: {
@@ -242,7 +254,6 @@ export default {
       }
     },
     apiList (list) {
-      console.log('watch is change')
       this.$store.dispatch('resources/updateList', list)
     },
     'apiData.url': debounce(function (path) {
@@ -256,7 +267,6 @@ export default {
         return this.apiStorageList
       },
       set (list) {
-        console.log('set apiList global', list)
         // 当使用array.splice/array.unshift等会影响到array自身的，都不会触发这里
         this.apiStorageList = list
       }
@@ -271,7 +281,9 @@ export default {
       return this.apiData?.body != null
     },
     hasPathData () {
-      return this.apiData?.pathData != null
+      const params = this.apiData?.url?.split('?')?.[0].match(/(\$\{)(\w+)(\})/g)
+      return params && params.length > 0
+      // return this.apiData?.pathData != null
     },
     dialogVisabled: {
       get () {
@@ -292,6 +304,9 @@ export default {
     }
   },
   methods: {
+    disableEditFunc (scope) {
+      return scope.column.property === 'key'
+    },
     /* 筛选api */
     filterApi () {
       if (!this.apiSearchVal) return
@@ -454,7 +469,9 @@ export default {
       if (url) {
         const [part1, part2] = url.split('?')
         if (part1) {
-          this.apiData.pathData = this.getParamByUrl(part1, pathData)
+          // this.apiData.pathData = this.getParamByUrl(part1, pathData)
+          const res = this.getParamByUrl(part1)
+          this.$set(this.apiData, 'pathData', res)
         }
         if (part2) {
           this.apiData.body = this.getParamByUrl(part2, body, /(\w+)=/g)
@@ -542,5 +559,9 @@ export default {
   position: absolute
   left: 10px
   top: 0
+
+.form-item-label_w100
+  ::v-deep .el-form-item__label
+    width: 100%
 
 </style>
