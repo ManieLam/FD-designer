@@ -31,6 +31,18 @@ function findApi (collect) {
   }, {})
 }
 
+/* 格式化接口参数选项 */
+function formatApiOption (list = [], type) {
+  return list.map(row => {
+    return {
+      label: `[${row.method}] ${row.url}`,
+      value: row.name,
+      desc: row.isDefault ? '默认' : '',
+      type
+    }
+  })
+}
+
 const getters = {
   /* 获取画布信息 */
   canvasViews: state => state.canvas.collects,
@@ -54,21 +66,29 @@ const getters = {
       return findApi(state.canvas.collects[curName])
     }
   },
-  /* 获取当前画布数据集 */
+  /** 获取当前画布数据集
+   * @return [{ label, value, children }]
+   * */
   formDataCollect: (state) => {
     const cName = state.canvas.editingName
     if (cName) {
       const cView = state.canvas.collects[cName]
-      const list = cView?.form?.actions?.immediateRemoteApi?.list || []
-      // 记录立即执行的数据集合列表、分步表单的话增加上个表单数据集合
-      return list.map(row => {
-        return {
-          label: `[${row.method}] ${row.url}`,
-          value: row.name,
-          desc: row.isDefault ? '默认' : '',
-          type: 'immediateRemoteApi'
+      // 获取所有涉及funcApi的按钮
+      const buttons = cView?.form?.buttons?.filter(row => !!row.funcApi).reduce((res, row) => { return [...res, ...row.funcApi?.list] }, [])
+      // console.info('buttons:', buttons)
+      return [
+        {
+          label: '初始化数据集',
+          value: 'immediateRemoteApi',
+          // 记录立即执行的数据集合列表、分步表单的话增加上个表单数据集合
+          children: formatApiOption(cView?.form?.actions?.immediateRemoteApi?.list, 'immediateRemoteApi')
+        },
+        {
+          label: '表单按钮配置',
+          value: 'funcApi',
+          children: formatApiOption(buttons, 'funcApi')
         }
-      })
+      ]
     } else {
       return []
     }

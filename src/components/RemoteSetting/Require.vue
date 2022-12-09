@@ -102,8 +102,9 @@ el-dialog.async-required-dialog(
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left
                   span 请求参数（Path）
-                  el-tooltip(content="根据地址栏/${xxx}自动生成; 请先在请求地址上补充对应的${xxx}占位", placeholder="top")
-                    i.el-icon-info.m-l-8
+                  //- el-tooltip(content="根据地址栏/${xxx}自动生成; 请先在请求地址上补充对应的${xxx}占位", placeholder="top")
+                  //-   i.el-icon-info.m-l-8
+                i.label-right.secondary-text 根据地址栏/${xxx}自动生成
               ParamsList(
                 v-show="hasPathData"
                 keyName="pathData"
@@ -448,20 +449,22 @@ export default {
       }
     },
     getParamByUrl (path, originParams, regex = /(\$\{)(\w+)(\})/g) {
-      let pathParams = Array.from(originParams || [])
-      // const regex = /(\$\{)(\w+)(\})/g
+      const pathParams = Array.from(originParams || [])
       const params = path.match(regex)
       if (params && params.length) {
         const keys = params.map(k => k.match(/\w+/)?.[0])
         const objs = keyBy(pathParams, 'key')
         let i = keys.length - 1
         // 自动生成path参数列表
-        while (!objs[keys[i]] && i >= 0) {
-          const val = new ApiBodyParams({ key: keys[i], __key: new Date().getTime() + i })
-          pathParams = [...pathParams, val]
+        let newParam = []
+        while (i >= 0) {
+          // 是否已配置了该参数
+          const isExist = objs[keys[i]]
+          const paramItem = !isExist ? new ApiBodyParams({ key: keys[i], __key: new Date().getTime() + i }) : isExist
+          newParam = [...newParam, paramItem]
           --i
         }
-        return pathParams
+        return newParam
       }
     },
     // 对请求地址格式化，与请求参数(path\query)的联动关系
@@ -470,7 +473,7 @@ export default {
         const [part1, part2] = url.split('?')
         if (part1) {
           // this.apiData.pathData = this.getParamByUrl(part1, pathData)
-          const res = this.getParamByUrl(part1)
+          const res = this.getParamByUrl(part1, pathData) // 去掉pathData则表示每次都新增参数
           this.$set(this.apiData, 'pathData', res)
         }
         if (part2) {

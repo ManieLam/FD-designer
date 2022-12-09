@@ -1,5 +1,5 @@
 <template lang='pug'>
-.form-remote-list(style="overflow-x: auto;")
+.form-remote-list.w-100(style="overflow-x: auto;")
   el-button(v-show="!remoteList || !remoteList.length", @click="handleAdd") 配置数据接口
   //- .list-column__default.m-t-4
   .list-column
@@ -100,6 +100,7 @@ export default {
         return this.value?.list || []
       },
       set (value) {
+        console.info('is set', value)
         this.$emit('input', { list: value, rule: this.ruleData })
       }
     },
