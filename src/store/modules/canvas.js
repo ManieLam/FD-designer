@@ -1,7 +1,7 @@
 /** 记录画布, 同步记录在localstorage
  * 画布包括：字段fields(name,label,form,compTag), 表单form(attrs,actions)
  * */
-import { formAttrs as defaultFormAttrs } from '@/utils/defaultConfig'
+import { formAttrs as defaultFormAttrs } from '@/model/defaultConfig'
 import { CanvasData } from '@/model/canvas' // 定义画布数据
 // import { isEqual, omit } from 'lodash'
 

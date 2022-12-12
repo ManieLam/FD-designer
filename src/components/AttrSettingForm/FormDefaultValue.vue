@@ -54,7 +54,7 @@
  * 关联数据api列表: form.actions.immediateRemoteApi */
 import CodeEditor from '@/components/CodeEditor'
 import { debounce } from 'lodash'
-import { presetOptions } from '@/utils/defaultConfig.js'
+import { presetOptions } from '@/model/defaultConfig'
 // import { formatDefaultValueFunc } from '@/utils/format.js'
 export default {
   name: 'FormDefaultValue',

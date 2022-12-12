@@ -62,7 +62,7 @@
 import AttrSettingForm from '@/components/AttrSettingForm'
 import ButtonSetting from './ButtonSetting'
 import RemoteSettingRequire from '@/components/RemoteSetting/Require'
-import formAttrs from '@/utils/formAttrs.js'
+import formAttrs from '@/model/formAttrs.js'
 import { isEmpty } from 'lodash'
 export default {
   name: 'FormSetting',

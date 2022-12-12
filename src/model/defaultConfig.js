@@ -2,6 +2,20 @@
 import { getURLQuery } from '@/utils/format'
 import { MultiApi } from '@/model/resource'
 
+// 默认字段元素属性（一个字段的属性一般包含默认 + tag对应的属性）
+export const bodyItemAttrs = {
+  name: '', // 对应数据源的key
+  key: '', // 用于表示该字段在文档中的身份id, 一般不变动
+  label: '', // 字段标题
+  compTag: '', // ?使用compTag还是tag
+  tag: '', // 字段使用的组件类型（select/input/table/其他注册供使用的组件name）
+  tip: '', // TODO 辅助文字提示
+  defaultValue: {}, // 默认值配置对象
+  actions: [], // 行为事件操作队列，不同组件对应不同actions
+  visabled: true, // TODO 是否可见(默认true)， 可选择自定义事件
+  disbaled: false // TODO 是否禁用(默认false)， 可选择自定义事件
+}
+
 // 默认表单属性
 export const formAttrs = {
   layout: 'default',

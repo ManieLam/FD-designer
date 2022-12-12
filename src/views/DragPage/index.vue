@@ -28,7 +28,7 @@ draggable.list-group.drag-page-container(
 /** 拖拽的面板页面，多个画布，通过复制这个组件生成 */
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
-import { formItemTags } from '@/utils/componentAttrs.js'
+import { formItemTags } from '@/model/componentAttrs.js'
 // import { mapGetters } from 'vuex'
 export default {
   name: 'DragPage',

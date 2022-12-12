@@ -1,6 +1,6 @@
 /* 存放需要格式转换的方法 */
 import { useEval } from '@/utils/request'
-import { presetOptions } from '@/utils/defaultConfig'
+import { presetOptions } from '@/model/defaultConfig'
 import { keyBy } from 'lodash'
 /** 格式化表单字段验证规则
  *  @param rules 字段规则{isRequired:<Object>, isRegexp:<Array>, isValidator:<String> }

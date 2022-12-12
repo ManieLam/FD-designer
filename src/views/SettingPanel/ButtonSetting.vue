@@ -34,8 +34,8 @@
 
 <script>
 /** 表单按钮配置 */
-import { button as buttonConfig } from '@/utils/componentAttrs.js'
-import { formButtons } from '@/utils/defaultConfig.js'
+import { button as buttonConfig } from '@/model/componentAttrs.js'
+import { formButtons } from '@/model/defaultConfig'
 import { keyBy, isEqual, cloneDeep } from 'lodash'
 export default {
   name: 'ButtonSetting',
