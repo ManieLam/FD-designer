@@ -116,6 +116,7 @@ export default {
           .then(r => {
             this.afterImmediateResolve(r, api)
             preRes = r
+            return r
           }, e => {
             preRes = false
           })
