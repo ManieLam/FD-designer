@@ -64,11 +64,11 @@ export default {
   },
   computed: {
     formConfig () {
-      return this.canvas?.form || {}
+      return this.canvas || {}
     }
   },
   watch: {
-    'canvas.fields': {
+    'formConfig.body': {
       // deep: true,
       immediate: true,
       handler (fields) {

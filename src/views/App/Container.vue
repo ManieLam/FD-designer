@@ -13,20 +13,20 @@
         el-button(@click="toExportProps.visable=true") 导出
         el-button(@click="onClear") 清空
         el-button(@click="onPreview") 预览
-        el-button(type="primary", :disabled="allCanvas[canvasName]|saveable", @click="onSave") 保存
+        el-button(type="primary", :disabled="actCanvas|saveable", @click="onSave") 保存
     DragPage(
       ref="dragPanel"
       :key="actIndex"
       :formItemConfig="formItemConfig"
       :actIndex="actIndex"
       :canvasName="canvasName"
-      :canvas="allCanvas[canvasName]"
+      :canvas="actCanvas"
       @onSelect="onSelectElement")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
       ref="settingPanel"
       :key="actIndex"
-      :canvas="allCanvas[canvasName]"
+      :canvas="actCanvas"
       :actIndex="actIndex"
       :canvasName="canvasName"
       :formItemConfig="formItemConfig"
@@ -104,7 +104,7 @@ export default {
   },
   filters: {
     saveable (actCanvas) {
-      return !(!!actCanvas && actCanvas?.fields?.length)
+      return !(!!actCanvas && actCanvas?.body?.length)
     },
     filterCanvasStr (obj) {
       return JSON.stringify(obj, null, '\t')
@@ -115,12 +115,13 @@ export default {
       return this.$store.state.canvas.editingName || `canvas_${this.actIndex}`
     },
     allCanvas () {
-      return this.$store.state.canvas.collects
-    // },
+      return this.$store.state.canvas.canvas
+    },
     // ---有缓存，出现置后性
-    // actCanvas () {
-    //   // return this.allCanvas[this.canvasName]
-    //   return this.$store.state.canvas.collects[this.canvasName]
+    actCanvas () {
+      // return this.allCanvas[this.canvasName]
+      // TODO 下个版本迭代成多个
+      return this.$store.getters.getCurView
     },
     allCanvasStr () {
       return JSON.stringify(this.allCanvas, null, '\t')
@@ -162,7 +163,7 @@ export default {
       }
     },
     updateFieldStorage ({ fkey, attrs, actions }) {
-      const findex = this.allCanvas[this.canvasName]?.fields?.findIndex(field => field.key === fkey)
+      const findex = this.allCanvas[this.canvasName]?.body?.findIndex(field => field.key === fkey)
       if (findex !== -1) {
         this.$store.commit('canvas/updateField', {
           name: this.canvasName,
@@ -217,7 +218,7 @@ export default {
       await this.$store.commit('canvas/init')
       const editingName = this.$store.state.canvas.editingName
       this.actIndex = editingName ? Number(editingName.split('_')[1]) : 0
-      this.formItemConfig = this.allCanvas[this.canvasName]?.fields?.[0] || {}
+      this.formItemConfig = this.allCanvas[this.canvasName]?.body?.[0] || {}
     },
     async initResource () {
       await this.$store.commit('resources/init')

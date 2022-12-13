@@ -40,10 +40,10 @@ export default {
   },
   computed: {
     formItems () {
-      return this.config?.fields || []
+      return this.config?.body || []
     },
     formFieds () {
-      return this.config?.fields.map(config => {
+      return this.config?.body.map(config => {
         return {
           name: config.name,
           label: config.label,
@@ -58,7 +58,7 @@ export default {
       })
     },
     formAttrs () {
-      const { attrs } = this.config?.form || {}
+      const { attrs } = this.config || {}
       return {
         ...attrs,
         labelWidth: `${attrs.labelWidth}px`,
@@ -74,12 +74,12 @@ export default {
       return !isEqual(this.fullData, this.fullDataTemp)
     },
     actButtons () {
-      const buttons = cloneDeep(this.config?.form.buttons)
+      const buttons = cloneDeep(this.config?.buttons)
       return buttons.map(btn => {
         if (btn.name === 'reset') { btn.func = () => this.onFormReset(btn) }
         if (btn.name === 'cancel') { btn.func = () => this.onFormCancel(btn) }
         if (btn.name === 'submit') { btn.func = () => this.onFormSubmit(btn) }
-        if (this.config?.form?.attrs?.readOnly) {
+        if (this.config?.attrs?.readOnly) {
           btn.disabled = true
         }
         return btn
@@ -107,7 +107,7 @@ export default {
     onDestory () {},
     // 发起异步请求
     requireImmediateRemote () {
-      const { actions } = this.config?.form || {}
+      const { actions } = this.config || {}
       if (actions?.immediateRemoteApi) {
         // TODO 设置规则后，根据规则发起请求
         /**

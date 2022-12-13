@@ -64,7 +64,7 @@ export default {
     buttonData: {
       deep: true,
       handler (data) {
-        console.info('按钮变化', data, this.oldBtnTemp, isEqual(data, this.oldBtnTemp))
+        // console.info('按钮变化', data, this.oldBtnTemp, isEqual(data, this.oldBtnTemp))
         if (!isEqual(data, this.oldBtnTemp)) {
           this.$emit('change', Array.isArray(data) ? data : Object.values(data))
         }
@@ -104,7 +104,6 @@ export default {
         return this.btnObj
       },
       set (data) {
-        console.info('修改button list', data)
         this.btnObj = Array.isArray(data) ? keyBy(data, 'name') : data
       }
     }
@@ -123,11 +122,11 @@ export default {
       }
     },
     chosenSubmitRule (rule) {
-      console.log('获取到规则:', rule)
       this.$set(this.buttonData.submit, 'funcRule', rule)
     }
   },
   mounted () {
+    this.btnObj = keyBy(cloneDeep(this.list), 'name')
     // this.setData(this.list)
   }
 }

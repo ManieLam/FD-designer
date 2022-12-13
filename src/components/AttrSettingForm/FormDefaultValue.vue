@@ -116,7 +116,7 @@ export default {
     /* 数据源列表 */
     resourceList () {
       const cView = this.$store.getters.getCurView
-      const list = cView?.form?.actions?.immediateRemoteApi?.list || []
+      const list = cView?.actions?.immediateRemoteApi?.list || []
       return list.map(row => {
         return {
           label: `[${row.method}] ${row.url}`,

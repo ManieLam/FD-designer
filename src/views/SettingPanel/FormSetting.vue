@@ -1,6 +1,6 @@
 <template lang='pug'>
 .setting-form-wrap
-  .secondary-text.empty-text(v-if="!canvas || !canvas.form") 请先拖拽组件, 再做操作
+  .secondary-text.empty-text(v-if="!canvas") 请先拖拽组件, 再做操作
   .setting-wrap(v-else)
     el-tabs.setting-tab(v-model="activeName", :stretch="true")
       el-tab-pane.tab-component(
@@ -9,8 +9,7 @@
         :name="tab.name"
         :label="tab.label")
         //- 设置表单属性
-        AttrSettingForm(
-          v-show="activeName==='attr'"
+        AttrSettingForm(v-show="activeName==='attr'"
           v-bind="$attrs"
           v-on="$listeners"
           :value="attrsData"
@@ -53,7 +52,7 @@
                       title="配置表单首次加载数据源")
             //- 配置表单按钮操作
             el-collapse-item.setting-block(title="操作按钮", name="button")
-              ButtonSetting.row-item(:key="canvasName", :list="buttonList", @change="updateButtons")
+              ButtonSetting.row-item(v-if="activeName==='action'", :key="canvasName", :list="buttonList", @change="updateButtons")
 
 </template>
 
@@ -89,7 +88,7 @@ export default {
       ],
       activeName: 'attr',
       attrsData: {},
-      attrs: formAttrs,
+      attrs: formAttrs, // 目前只做表单，后续根据template类型选择
       /* 配置字典 */
       relationProps: [
         { label: '字典关键值', prop: 'name' },
@@ -102,24 +101,21 @@ export default {
       // immediateRemotePrecondition: {
       //   route
       // },
-      activeCollapse: ['mounted'],
+      activeCollapse: ['mounted', 'button'],
       buttonList: []
     }
   },
   watch: {
-    canvas (obj) {
-      // console.info('canvas change---', obj)
-    },
-    'canvas.form': {
+    canvas: {
       immediate: true,
       // deep: true,
-      handler (form, oldData) {
-        // console.info('form change--', form)
-        if (form) {
-          this.attrsData = !form?.attrs || isEmpty(form.attrs) ? { ...this.$defVal?.formAttrs } : form?.attrs
-          this.actionsData = !form.actions || isEmpty(form.actions) ? {} : form.actions
-          this.relationList = form?.actions?.relationList || []
-          this.buttonList = form?.buttons || []
+      handler (canvas, oldData) {
+        // const canvas = page?.[0] // 目前先做一个，TODO 修改为多个
+        if (canvas) {
+          this.attrsData = !canvas?.attrs || isEmpty(canvas.attrs) ? { ...this.$defVal?.formAttrs } : canvas?.attrs
+          this.actionsData = !canvas.actions || isEmpty(canvas.actions) ? {} : canvas.actions
+          this.relationList = canvas?.actions?.relationList || []
+          this.buttonList = canvas?.buttons || []
         } else {
           this.actionsData = {}
           this.attrsData = { ...this.$defVal?.formAttrs }
@@ -152,7 +148,6 @@ export default {
       this.activeName = name
     },
     update (attrs) {
-      console.info('修改表单属性：', this.attrsData)
       this.setFormState({ attrs: this.attrsData })
     },
     updateButtons (buttons) {
@@ -165,20 +160,7 @@ export default {
         actions,
         buttons
       })
-    // },
-    // changeRelation (list = []) {
-    //   console.info('更改relation:', list)
-    //   // this.$set(this.actionsData, 'relationList', list)
-    //   // this.actionsData.relationList = list
-    //   // this.setFormState({ actions: this.actionsData })
-    //   this.$store.commit('canvas/updateActions', {
-    //     name: this.canvasName,
-    //     actions: this.actionsData
-    //   })
     },
-    // getAsyncSeting (data) {
-    //   this.immediateRemoteApi = data
-    // },
     getAttrUpdate (data) {
       console.info('getAttrUpdate:', data)
     },

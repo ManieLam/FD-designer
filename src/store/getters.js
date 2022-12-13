@@ -45,25 +45,25 @@ function formatApiOption (list = [], type) {
 
 const getters = {
   /* 获取画布信息 */
-  canvasViews: state => state.canvas.collects,
+  canvasViews: state => state.canvas.canvas,
   /* 获取当前画布配置 */
   getCurView: state => {
     const curName = state.canvas.editingName
     if (curName) {
-      return state.canvas.collects[curName]
+      return state.canvas.canvas[curName]
     } else {
       return {}
     }
   },
   /* 获取指定画布配置 */
-  getCanvasView: (state) => (name) => state.canvas.collects[name] || {},
+  getCanvasView: (state) => (name) => state.canvas.canvas[name] || {},
   /* 记录画布数 */
-  canvasCount: state => Object.keys(state.canvas.collects)?.length,
+  canvasCount: state => Object.keys(state.canvas.canvas)?.length,
   /* 获取当前画布内的所有数据源 TODO */
   getCanvasResources: async (state) => {
     const curName = state.canvas.editingName
     if (curName) {
-      return findApi(state.canvas.collects[curName])
+      return findApi(state.canvas.canvas[curName])
     }
   },
   /** 获取当前画布数据集
@@ -72,16 +72,16 @@ const getters = {
   formDataCollect: (state) => {
     const cName = state.canvas.editingName
     if (cName) {
-      const cView = state.canvas.collects[cName]
+      const cView = state.canvas.canvas[cName]
       // 获取所有涉及funcApi的按钮
-      const buttons = cView?.form?.buttons?.filter(row => !!row.funcApi).reduce((res, row) => { return [...res, ...row.funcApi?.list] }, [])
+      const buttons = cView?.buttons?.filter(row => !!row.funcApi).reduce((res, row) => { return [...res, ...row.funcApi?.list] }, [])
       // console.info('buttons:', buttons)
       return [
         {
           label: '初始化数据集',
           value: 'immediateRemoteApi',
           // 记录立即执行的数据集合列表、分步表单的话增加上个表单数据集合
-          children: formatApiOption(cView?.form?.actions?.immediateRemoteApi?.list, 'immediateRemoteApi')
+          children: formatApiOption(cView?.actions?.immediateRemoteApi?.list, 'immediateRemoteApi')
         },
         {
           label: '表单按钮配置',
