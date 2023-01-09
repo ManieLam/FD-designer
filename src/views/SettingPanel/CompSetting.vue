@@ -1,8 +1,8 @@
 <template lang='pug'>
 .setting-form-wrap
-  .secondary-text.empty-text(v-if="!formItemConfig.key || !attrs.length")
+  .secondary-text.empty-text(v-if="!formItemConfig.key")
     .secondary-text(v-show="!formItemConfig.key")  请先拖拽组件, 再做操作
-    .secondary-text(v-show="formItemConfig.key && !attrs.length")  当前组件不可配置
+    .secondary-text(v-show="formItemConfig.key")  当前组件不可配置
     .secondary-text {{formItemConfig.key}}
   .setting-wrap(v-else)
     el-tabs.setting-tab(v-model="activeName", :stretch="true")
@@ -11,39 +11,38 @@
         :key="tab.name"
         :name="tab.name"
         :label="tab.label")
-        AttrSettingForm(
-          v-show="activeName==='attr'"
-          v-bind="$attrs"
-          v-on="$listeners"
-          :value="attrsData"
-          :attrs="attrs"
-          @update="update"
-          @updateAnAttr="updateAnAttr")
-      //- el-radio-button(label="attr") 属性
-      //- el-radio-button(label="action") 行为
-  //- el-collapse.setting-wrap(v-model="activeNames", v-else)
-  //-   el-collapse-item.collapse-item(title="属性配置", name="attr")
       AttrSettingForm(
+        v-show="activeName === 'attr'"
         v-bind="$attrs"
         v-on="$listeners"
+        :key="`attr_${formItemConfig.key}`"
         :value="attrsData"
         :attrs="attrs"
         @update="update"
         @updateAnAttr="updateAnAttr")
-    el-collapse-item.collapse-item(title="行为配置", name="action")
+      CompActionSetting(
+        v-show="activeName === 'action'"
+        v-bind="$attrs"
+        v-on="$listeners"
+        :key="`action_${formItemConfig.key}`"
+        :value="attrsData"
+        :attrs="actions"
+        @input="updateAction")
 
 </template>
 
 <script>
 /** 组件配置区 */
-import componentAttrs from '@/model/componentAttrs'
 import AttrSettingForm from '@/components/AttrSettingForm'
+import CompActionSetting from './CompActionSetting'
+import componentAttrs from '@/model/componentAttrs'
 import { cloneDeep } from 'lodash'
 export default {
   name: 'CompSetting',
   props: ['formItemConfig', 'canvasName'],
   components: {
-    AttrSettingForm
+    AttrSettingForm,
+    CompActionSetting
   },
   data () {
     return {
@@ -75,6 +74,10 @@ export default {
     attrs () {
       return componentAttrs[this.tag]?.attrs || []
     },
+    actions () {
+      return componentAttrs[this.tag]?.actions || []
+    },
+    /* 纯属性 */
     attrsData: {
       get () {
         return this.tempAttrsData
@@ -86,13 +89,34 @@ export default {
     }
   },
   methods: {
-    update () {
+    update (type) {
+      this.updateFieldStorage(this.attrsData)
       this.$emit('update', 'comp', this.attrsData)
     },
     updateAnAttr ({ name, value }) {
-      // console.info('updateAnAttr:', name, value)
       this.$set(this.attrsData, name, value)
+      this.updateFieldStorage(this.attrsData)
       this.$emit('update', 'comp', this.attrsData)
+    },
+    updateAction (actions) {
+      console.log('更新外部数据:', actions)
+      this.updateAnAttr({ name: 'actions', value: actions })
+    },
+    updateFieldStorage (attrs) {
+      // 由内部更新到store
+      if (!this.formItemConfig) return
+      const curView = this.$store.getters.getCurView
+      const findex = curView.body?.findIndex(field => field.key === this.formItemConfig.key)
+      if (findex !== -1) {
+        this.$store.commit('canvas/updateField', {
+          name: this.canvasName,
+          // fname,
+          findex,
+          attrs
+        })
+        // this.formItemConfig = attrs
+        this.$nextTick(() => this.$forceUpdate())
+      }
     }
   }
 }

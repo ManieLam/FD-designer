@@ -76,3 +76,7 @@ export default [
     }]
   }
 ]
+
+export const actionOptions = [
+  { type: 'changeValue', desc: '数值改变' }
+]

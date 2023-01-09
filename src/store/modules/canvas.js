@@ -70,9 +70,9 @@ const mutations = {
       if (buttons) states.canvas[name].buttons = Array.isArray(buttons) ? buttons.sort((a, b) => a?.sort - b?.sort) : [...buttons]
     }
   },
-  updateField (states, { name, findex = null, attrs = null, actions = null }) {
+  updateField (states, { name, findex = null, attrs = null }) {
     const section = states.canvas[name]
-    if (section && findex !== null && (attrs || actions)) {
+    if (section && findex !== null && attrs) {
       section.body[findex] = attrs
     }
   },

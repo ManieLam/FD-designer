@@ -159,23 +159,7 @@ export default {
     },
     updateConfig (type, attrs) {
       if (type === 'comp') {
-        this.updateFieldStorage({ fkey: attrs.key, attrs })
-      }
-    },
-    updateFieldStorage ({ fkey, attrs, actions }) {
-      const findex = this.allCanvas[this.canvasName]?.body?.findIndex(field => field.key === fkey)
-      if (findex !== -1) {
-        this.$store.commit('canvas/updateField', {
-          name: this.canvasName,
-          // fname,
-          findex,
-          attrs,
-          actions
-        })
         this.formItemConfig = attrs
-        this.$nextTick(() => {
-          this.$forceUpdate()
-        })
       }
     },
     onDragged: debounce(({ from, to }) => {

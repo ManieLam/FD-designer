@@ -9,50 +9,50 @@
         :name="tab.name"
         :label="tab.label")
         //- 设置表单属性
-        AttrSettingForm(v-show="activeName==='attr'"
-          v-bind="$attrs"
-          v-on="$listeners"
-          :value="attrsData"
-          :attrs="attrs"
-          @update="update")
-        //- 设置表单行为
-        .action-setting-wrap.m-t-8(v-show="activeName==='action'")
-          el-collapse(v-model="activeCollapse")
-            //- 表单初始化时
-            el-collapse-item.setting-block(title="表单初始化时", name="mounted")
-              .row-item
-                el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
-                  el-tooltip(class="item", effect="dark", content="- 必须在需要匹配字典的字段属性中配置对应的字典名，位置【属性/选项/动态字典】。", placement="top-start")
-                    i.icon.el-icon-info.m-l-4
-                .row-item__input.box-content__inside
-                  //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi", placeholder="输入字典接口")
-                  form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi")
+      AttrSettingForm(v-show="activeName==='attr'"
+        v-bind="$attrs"
+        v-on="$listeners"
+        :value="attrsData"
+        :attrs="attrs"
+        @update="update")
+      //- 设置表单行为
+      .action-setting-wrap.m-t-8(v-show="activeName==='action'")
+        el-collapse(v-model="activeCollapse")
+          //- 表单初始化时
+          el-collapse-item.setting-block(title="表单初始化时", name="mounted")
+            .row-item
+              el-checkbox(v-model="actionsData.getRelationImmediate") 是否加载字段字典
+                el-tooltip(class="item", effect="dark", content="- 必须在需要匹配字典的字段属性中配置对应的字典名，位置【属性/选项/动态字典】。", placement="top-start")
+                  i.icon.el-icon-info.m-l-4
+              .row-item__input.box-content__inside
+                //- el-input(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi", placeholder="输入字典接口")
+                form-remote(v-if="actionsData.getRelationImmediate", v-model="actionsData.relationApi")
 
-              .row-item.p-t-16
-                el-checkbox(v-model="actionsData.getResourceImmediate") 获取初始化数据
-                  el-tooltip(class="item", effect="dark", placement="top-start")
-                    div(slot="content")
-                      p - 支持多个接口。
-                      p - 默认数据集：存在多个数据集合时，默认第一个请求数据为默认数据集，可修改默认指定。
-                      p - 字段取值：非默认数据集的字段取值，请在字段属性中，指定数据集合。
-                    i.icon.el-icon-info.m-l-4
+            .row-item.p-t-16
+              el-checkbox(v-model="actionsData.getResourceImmediate") 获取初始化数据
+                el-tooltip(class="item", effect="dark", placement="top-start")
+                  div(slot="content")
+                    p - 支持多个接口。
+                    p - 默认数据集：存在多个数据集合时，默认第一个请求数据为默认数据集，可修改默认指定。
+                    p - 字段取值：非默认数据集的字段取值，请在字段属性中，指定数据集合。
+                  i.icon.el-icon-info.m-l-4
 
-                .row-item__remote.box-content__inside(v-if="actionsData.getResourceImmediate")
-                  //- 前置触发条件：路由带参数（跳转进入）
-                  .box-content
-                    el-dropdown(split-button) 前置触发条件(TODO)
-                      el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceWhen(byRoute)") 根据页面路由参数
+              .row-item__remote.box-content__inside(v-if="actionsData.getResourceImmediate")
+                //- 前置触发条件：路由带参数（跳转进入）
+                .box-content
+                  el-dropdown(split-button) 前置触发条件(TODO)
+                    el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceWhen(byRoute)") 根据页面路由参数
 
-                  //- 动态配置数据源
-                  .box-content.m-t-8
-                    form-remote-list(
-                      v-if="!!actionsData.immediateRemoteApi"
-                      v-model="actionsData.immediateRemoteApi"
-                      key="immediateRemoteApi"
-                      title="配置表单首次加载数据源")
-            //- 配置表单按钮操作
-            el-collapse-item.setting-block(title="操作按钮", name="button")
-              ButtonSetting.row-item(v-if="activeName==='action'", :key="canvasName", :list="buttonList", @change="updateButtons")
+                //- 动态配置数据源
+                .box-content.m-t-8
+                  form-remote-list(
+                    v-if="!!actionsData.immediateRemoteApi"
+                    v-model="actionsData.immediateRemoteApi"
+                    key="immediateRemoteApi"
+                    title="配置表单首次加载数据源")
+          //- 配置表单按钮操作
+          el-collapse-item.setting-block(title="操作按钮", name="button")
+            ButtonSetting.row-item(v-if="activeName==='action'", :key="canvasName", :list="buttonList", @change="updateButtons")
 
 </template>
 
@@ -154,6 +154,7 @@ export default {
       this.setFormState({ buttons })
     },
     setFormState ({ attrs = null, actions = null, buttons = null }) {
+      // 由内部更新到store
       this.$store.commit('canvas/updateConfig', {
         name: this.canvasName,
         attrs,

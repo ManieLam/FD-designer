@@ -13,6 +13,7 @@ el-form.setting-list(v-model="data", label-position="top")
       //-   v-if="attrItem.group"
       //-   :class="attrItem.group.__collapse ? 'el-icon-arrow-right' : 'el-icon-arrow-down'"
       //-   @click="toggleGroup(attrItem.group)")
+    //- 单属性配置
     components(
       v-if="attrItem.tag && !attrItem.group"
       :is="attrItem.tag"
@@ -79,6 +80,10 @@ export default {
         this.$emit('input', value)
       }
     }
+    /* 属性配置 { label,key,tag,group } */
+    // attrs () {
+    //   return componentAttrs[this.tag]?.attrs || []
+    // }
   },
   methods: {
     update (value, key) {

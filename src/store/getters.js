@@ -1,35 +1,35 @@
-import { keyBy } from 'lodash'
+// import { keyBy } from 'lodash'
 /* 一次性筛选配置中所有配置的api对象, 不用在每次编辑/删除/编辑的时候维护记录 TODO */
-function findApi (collect) {
-  // value.constructor === 'Array'
-  console.log('collect-------:', collect)
-  let target = null
-  if (collect.constructor === Array) {
-    console.log('数组', collect)
-    target = keyBy(collect, 'name') ? Object.entries(keyBy(collect, 'name')) : []
-  } else if (collect.constructor === Object) {
-    console.log('对象', collect)
-    target = Object.entries(collect)
-  }
-  console.log('target-----:', target)
-  return target.reduce((res, [key, value]) => {
-    console.info('key-----', key)
-    if (typeof value === 'object') {
-      const result = findApi(value)
-      console.log('进入1: ', key, '结果:', result)
-      return { ...res, ...(result || {}) }
-    } else if (typeof key === 'string') {
-      console.info('进入2:', key)
-      const filterAble = /(\w+)api/i.test(key) // 以"xxxApi"命名的格式, 认为是异步动态接口对象
-      if (filterAble) {
-        res[key] = value
-      }
-      return res
-    } else {
-      return res
-    }
-  }, {})
-}
+// function findApi (collect) {
+//   // value.constructor === 'Array'
+//   console.log('collect-------:', collect)
+//   let target = null
+//   if (collect.constructor === Array) {
+//     console.log('数组', collect)
+//     target = keyBy(collect, 'name') ? Object.entries(keyBy(collect, 'name')) : []
+//   } else if (collect.constructor === Object) {
+//     console.log('对象', collect)
+//     target = Object.entries(collect)
+//   }
+//   console.log('target-----:', target)
+//   return target.reduce((res, [key, value]) => {
+//     console.info('key-----', key)
+//     if (typeof value === 'object') {
+//       const result = findApi(value)
+//       console.log('进入1: ', key, '结果:', result)
+//       return { ...res, ...(result || {}) }
+//     } else if (typeof key === 'string') {
+//       console.info('进入2:', key)
+//       const filterAble = /(\w+)api/i.test(key) // 以"xxxApi"命名的格式, 认为是异步动态接口对象
+//       if (filterAble) {
+//         res[key] = value
+//       }
+//       return res
+//     } else {
+//       return res
+//     }
+//   }, {})
+// }
 
 /* 格式化接口参数选项 */
 function formatApiOption (list = [], type) {
@@ -60,12 +60,12 @@ const getters = {
   /* 记录画布数 */
   canvasCount: state => Object.keys(state.canvas.canvas)?.length,
   /* 获取当前画布内的所有数据源 TODO */
-  getCanvasResources: async (state) => {
-    const curName = state.canvas.editingName
-    if (curName) {
-      return findApi(state.canvas.canvas[curName])
-    }
-  },
+  // getCanvasResources: async (state) => {
+  //   const curName = state.canvas.editingName
+  //   if (curName) {
+  //     return findApi(state.canvas.canvas[curName])
+  //   }
+  // },
   /** 获取当前画布数据集
    * @return [{ label, value, children }]
    * */

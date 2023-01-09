@@ -47,6 +47,7 @@ export const formItemTags = {
 
 const switchDefaultOptions = [{ label: '允许', value: true }, { label: '不允许', value: false }]
 
+/* 表单元素组件基本属性选项 */
 const FormtagAttrs = {
   type: { label: '类型', key: 'type', tag: 'AnsoDataformText' },
   name: { label: '字段键名', key: 'name', tag: 'el-input' },
@@ -57,13 +58,20 @@ const FormtagAttrs = {
   disabled: { label: '只读', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '可编辑', value: false }], chains: () => { } }
 }
 
-// const formtagAttrsHandler = {
-//   get: function (obj, props) {
-//     console.info('obj--', obj)
-//     console.log('props--', props)
-//     return typeof props === 'string' && formtagAttrs[props] ? formtagAttrs[props] : obj
-//   }
-// }
+/* 表单元素组件事件结构 */
+export const FormtagActions = function (config = {}) {
+  return {
+    on: 'click', // 触发事件，不同执行者用的事件也不一样，常用click, change, 选择范围取自不同配置的actions
+    target: '', // “被执行方”的name
+    eventName: '', // 事件执行方法（自定义 + 内置TODO）
+    rules: [],
+    ...config
+  }
+}
+
+export const actionHandles = {
+
+}
 
 export const select = {
   attrs: [
@@ -117,14 +125,12 @@ export const select = {
     FormtagAttrs.defaultValue
   ],
   actions: [
-    // {
-    //   label: '自带操作'
-    // },
-    {
-      label: '联动配置',
-      key: 'chains',
-      tag: 'form-chains'
-    }
+    { type: 'change', desc: '选中值发生变化时触发' },
+    { type: 'visible-change', desc: '下拉框出现/隐藏时触发' },
+    { type: 'remove-tag', desc: '多选模式下移除tag时触发' },
+    { type: 'clear', desc: '点击清空按钮时触发' },
+    { type: 'blur', desc: '当 input 失去焦点时触发' },
+    { type: 'focus', desc: '当 input 获得焦点时触发' }
   ]
 }
 
@@ -177,6 +183,13 @@ export const input = {
       key: 'append',
       affixesType: 'append'
     }
+  ],
+  actions: [
+    { type: 'blur', desc: '失去焦点时触发' },
+    { type: 'focus', desc: '获得焦点时触发' },
+    { type: 'change', desc: '输入框失去焦点或用户按下回车时触发' },
+    { type: 'input', desc: '值改变时触发' },
+    { type: 'clear', desc: '清空按钮时触发' }
   ]
 }
 
