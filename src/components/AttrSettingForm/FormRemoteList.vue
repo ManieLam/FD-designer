@@ -152,7 +152,8 @@ export default {
     chosenResource (api) {
       // console.info('获取到新的接口', api)
       if (!api) return
-      const newApi = { ...this.apiDataPatch, ...api }
+      // const newApi = { ...this.apiDataPatch, ...api }
+      const newApi = { ...api }
       const { url: newUrl, method: newMethod, _isEdit } = newApi
       // console.info('isEdit-', _isEdit)
       if (!_isEdit) {

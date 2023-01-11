@@ -10,13 +10,15 @@ export default {
   methods: {
     transParamsVal (varType, valKey) {
       // console.info('varType:', varType, valKey)
-      switch (varType[0]) {
+      const val = Array.isArray(varType) ? varType[0] : varType
+      switch (val) {
         case 'const':
           return valKey
         case 'formData':
           return this.formData[valKey]
         case 'collectData': {
-          const ranges = this.formDataCollect.get(varType[1]) || {}
+          // 最后一位为数据源key
+          const ranges = this.formDataCollect.get(varType[varType.length - 1]) || {}
           return ranges[valKey]
         }
         case 'router':
@@ -36,24 +38,32 @@ export default {
      * 包括 多数据源转换: 根据指定的数据源集合, 赋值参数
      * */
     formatSubmitParams ({ isFullDose, body = [] }) {
+      // 是否全量数据提交
       const range = isFullDose ? this.fullData : this.formData
+      // 转换body参数
       const bodyParams = body && body.length ? this.formatBodyParams({ body }) : {}
+      // console.log('bodyParams:', bodyParams)
       return Object.assign({}, range, bodyParams)
     },
     /**
     * @return 格式化后的请求地址
     */
-    formatPath ({ url = '', pathData = [] }) {
-      // console.info('pathData:', pathData)
+    formatPath ({ url = '', pathData = [], body = [] }) {
       if (url && pathData?.length) {
         const paramsVal = this.formatBodyParams({ body: pathData })
         // console.info('paramsVal:', paramsVal)
         const newPath = url.split('?')?.[0].replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
           return paramsVal[p2] || ''
         })
-        // console.info('newPath:', newPath)
+        // console.info('newPath1:', newPath)
         return newPath
       } else {
+        if (body?.length) {
+          // 如果只有地址+body的参数, 不在这里转换body参数, body参数只在另一个参数转换
+          const newPath = url.split('?')?.[0]
+          // console.info('newPath2:', newPath)
+          return newPath
+        }
         return url
       }
     },
@@ -83,7 +93,7 @@ export default {
           // 存在自定义挑选数据源
           datas = this.formDataCollect.get(apiName) || {}
         }
-        const value = formatDefValFunc.call(this, datas, this.formFieds, fieldProperty)
+        const value = formatDefValFunc.call(this, datas, this.formFields, fieldProperty)
         this.$set(this.fullData, field, value)
       }
     },
@@ -139,7 +149,7 @@ export default {
             )
         })
       ).finally(() => {
-        console.log('最终结束了:', this.formDataCollect)
+        console.log('最终结束了, 所有数据集合:', this.formDataCollect)
         // this.$message.success('所有接口')
       })
     },
