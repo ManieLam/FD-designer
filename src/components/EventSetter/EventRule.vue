@@ -12,7 +12,7 @@ el-table.visabled-event-setting(
       span 条件参数
       span.m-l-4
     template(slot-scope="scope")
-      el-cascader(v-model="scope.row.param", :options="options.paramOptions", clearable, @change="changeInput($event, 'param', scope.$index)")
+      el-cascader(v-model="scope.row.param", :options="options.paramOptions", :props="{emitPath: false}", clearable, @change="changeInput($event, 'param', scope.$index)")
   el-table-column(
     prop="operation"
     label="运算符"
@@ -23,7 +23,17 @@ el-table.visabled-event-setting(
     prop="threshold"
     label="阀值")
     template(slot-scope="scope")
-      el-cascader.w-100(v-model="scope.row.threshold", :options="options.thresholdOptions", clearable, @change="changeInput($event, 'threshold', scope.$index)")
+      .d-flex-v-center
+        el-cascader.w-100(
+          v-model="scope.row.threshold"
+          :options="options.thresholdOptions"
+          :props="{emitPath: false}"
+          clearable
+          @change="changeInput($event, 'threshold', scope.$index, scope)")
+        el-input.m-l-4(
+          v-show="scope.row.thresholdInputAble"
+          v-model="scope.row.thresholdVal"
+          :placeholder="scope.row.threshold|filterThresholdCom('valPlaceholder', thresholdMultiComp)")
   el-table-column(label="操作", fixed="right", width="100")
     template(slot-scope="scope")
       .icon.el-icon-plus.m-r-8.cursor-pointer.hover-change-scale(:key="`add_${scope.$index}`", @click="addRule(scope)")
@@ -78,6 +88,9 @@ export default {
     filterValidate (r, isPreSubmit) {
       if (!isPreSubmit) return false
       return !r.operation || !r.param || !r.threshold
+    },
+    filterThresholdCom (key, pick, collect = {}) {
+      return collect[key] ? collect[key]?.[pick] : ''
     }
   },
   computed: {
@@ -89,12 +102,22 @@ export default {
         console.info('更新rule列表:', list)
         this.$emit('input', list)
       }
+    },
+    // 挑出options.thresholdOptions需要二次输入的类型
+    thresholdMultiComp () {
+      return this.options.thresholdOptions
+        ?.filter(opt => !!opt.valueInput)
+        ?.reduce((res, opt) => {
+          res[opt.value] = opt
+          return res
+        }, {})
     }
   },
   methods: {
-    changeInput: debounce(function (value, keyName, rowIndex) {
-      // v-model="scope.row[keyName]"无法触发list值变化监听
-      console.log('changeInput:', arguments)
+    changeInput: debounce(function (value, keyName, rowIndex, scope) {
+      // 脏: v-model="scope.row[keyName]"无法触发list值变化监听
+      const _thresholdInputAble = keyName === 'threshold' && !!this.thresholdMultiComp[value] // 存在需要二次输入的阀值
+      this.$set(scope.row, 'thresholdInputAble', _thresholdInputAble)
       this.$emit('input', this.ruleData)
     }, 800),
     addRule (row) {

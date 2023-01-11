@@ -37,7 +37,7 @@ export default [
   },
   {
     eventDesc: '发起请求',
-    eventName: 'fetechRequireEvent',
+    eventName: 'fetchRequireEvent',
     actionType: 'common'
   },
   // 自定义

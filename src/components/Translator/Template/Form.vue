@@ -4,7 +4,7 @@
     id="customForm"
     v-model="fullData"
     v-bind="formAttrs"
-    :formFields="formFieds"
+    :formFields="formFields"
     :buttonList="actButtons"
   ></AnsoDataform>
 </template>
@@ -42,7 +42,7 @@ export default {
     formItems () {
       return this.config?.body || []
     },
-    formFieds () {
+    formFields () {
       return this.config?.body.map(config => {
         return {
           name: config.name,
@@ -86,7 +86,7 @@ export default {
       })
     },
     fieldObj () {
-      return keyBy(this.formFieds, 'name')
+      return keyBy(this.formFields, 'name')
     },
     // 表单录入数据
     formData () {
@@ -206,7 +206,7 @@ export default {
   },
   mounted () {
     this.onClearValidate()
-    this.requireImmediateRemote()
+    this.requireimmediateRemote()
   }
 }
 </script>

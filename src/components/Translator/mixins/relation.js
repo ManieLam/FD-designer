@@ -3,7 +3,7 @@ export default {
   methods: {
     /* 获取relation */
     getRelationFields () {
-      return this.formFieds.reduce((res, field) => {
+      return this.formFields.reduce((res, field) => {
         const { optionType } = field?.form || {}
         if (optionType === 'optionRelationKey') {
           res.fByKey.push(field?.form)
