@@ -124,11 +124,13 @@ el-dialog.async-required-dialog(
                       div 该选项会影响所有该接口，请求参数的数据范围
                     i.icon.el-icon-info.m-l-8
                 .label-right.d-flex-v-center
-                  el-checkbox.m-l-16.split-after(v-model="apiData.isFullDose") 是否将表单【默认数据集数】全量提交
                   .cursor-pointer.font-size-medium.hover-change-scale(
                     :class="!hasBody ? 'el-icon-plus' : 'el-icon-delete'"
                     :title="!hasBody ? '添加' : '清空' "
                     @click="toggleCustomList('body')")
+              .row-item
+                el-checkbox.m-l-16(v-model="apiData.isSubmit") 是否提交表单
+                el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否将表单【默认数据集】全量提交
               ParamsList(v-show="hasBody", keyName="body", v-model="apiData.body", :editAble="true", @onClearAll="toggleCustomList('body')")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")

@@ -35,7 +35,8 @@ export function ApiData (config = {}) {
     body: null, // query参数
     pathData: null, // path参数
     dataHandle: [],
-    isFullDose: false,
+    isFullDose: false, // 是否将表单[默认数据集]全量提交
+    isSubmit: false, // 是否提交表单
     beforeRequired: ApiDataHandles.beforeRequired,
     afterRequired: ApiDataHandles.afterRequired,
     error: ApiDataHandles.error,

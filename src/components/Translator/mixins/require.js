@@ -36,12 +36,17 @@ export default {
     /**
      * @return body 数据 <Object>
      * 包括 多数据源转换: 根据指定的数据源集合, 赋值参数
+     * @param isFullDose 是否提交全量默认数据集
+     * @param isSubmit 是否为提交表单数据
      * */
-    formatSubmitParams ({ isFullDose, body = [] }) {
+    formatSubmitParams ({ isFullDose, isSubmit, body = [] }) {
+      // 非提交型接口交互
+      if (!isSubmit) return null
       // 是否全量数据提交
       const range = isFullDose ? this.fullData : this.formData
       // 转换body参数
       const bodyParams = body && body.length ? this.formatBodyParams({ body }) : {}
+      // console.log('range:', range)
       // console.log('bodyParams:', bodyParams)
       return Object.assign({}, range, bodyParams)
     },
