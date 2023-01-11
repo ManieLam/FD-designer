@@ -206,7 +206,7 @@ export default {
   },
   mounted () {
     this.onClearValidate()
-    this.requireimmediateRemote()
+    this.requireImmediateRemote()
   }
 }
 </script>
