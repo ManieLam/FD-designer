@@ -19,7 +19,7 @@ el-dialog.async-required-dialog(
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
     .bottom-wrap.d-flex-row-between
       //- 左
-      .left-wrap.m-r-8.d-flex-column
+      .left-wrap.m-r-8.d-flex-column.d-flex-1
         .left-wrap-tool
           .d-flex-row-between.d-flex-v-center
             .d-flex-1.text 可选数据源
@@ -63,7 +63,7 @@ el-dialog.async-required-dialog(
         //-   :collapseDefault="false"
         //-   title="已选数据源")
       //- 右
-      .right-wrap.d-flex-column
+      .right-wrap.d-flex-column.d-flex-2
         .right-custom-data.d-flex-1.p-r-8
           //- 接口配置
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")

@@ -194,9 +194,16 @@ export default {
           }
         })
       } else if (btn.funcApi) {
-        this.$require(btn.funcApi).then(res => {
-          // console.info('on after submit', res)
-          this.$emit('onAfterSubmit', res)
+        // console.info('提交：', btn.funcApi)
+        // this.$require(btn.funcApi).then(res => {
+        //   // console.info('on after submit', res)
+        //   this.$emit('onAfterSubmit', res)
+        // })
+        this.formatMultiRequire({
+          requires: btn.funcApi.list,
+          rules: btn.funcApi.rule
+        }).then(res => {
+          console.info('提交完成', res)
         })
       }
     }
