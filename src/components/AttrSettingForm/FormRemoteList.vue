@@ -142,9 +142,10 @@ export default {
     handleRemove (api, i) {
       this.$delete(this.remoteList, i)
       this.$nextTick(() => {
-        if (this.remoteList.length && this.remoteList[i]) {
+        if (this.remoteList.length) {
           // 自动将下一个接口置为默认
-          this.$set(this.remoteList[i], 'isDefault', true)
+          const index = this.remoteList.length <= i ? this.remoteList.length - 1 : i
+          this.$set(this.remoteList[index], 'isDefault', true)
         }
       })
     },
