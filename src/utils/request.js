@@ -101,7 +101,7 @@ export function fetch (props) {
           if (props.error?.__isChange) {
             return useEval(props.error.funcInput, (func) => func(rej))
           }
-          reject(false)
+          reject(new Error(false))
           return false
         }
       )
