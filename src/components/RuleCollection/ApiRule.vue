@@ -7,7 +7,10 @@
     .left-wrap.m-r-8.box-content__title.d-flex-1
       .title 变量区
       el-tabs(type="border-card", v-model="paramTabName")
-        el-tab-pane(v-for="tab in paramTabs", v-bind="tab")
+        el-tab-pane(
+          v-for="(tab,i) in paramTabs",
+          :key="`paramTab-${i}`"
+          v-bind="tab")
     .right-wrap.box-content__title.d-flex-1
       .title 函数区
   .bottom-wrap.text-right.m-t-16
