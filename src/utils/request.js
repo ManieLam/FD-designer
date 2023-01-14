@@ -1,6 +1,7 @@
 /* eslint-disable no-eval */
 import axios from 'axios'
 import { Message } from 'element-ui'
+import { cloneDeep } from 'lodash'
 
 export const httpHeader = (props, timeStamp) => {
   return {
@@ -87,11 +88,10 @@ export function fetch (props) {
     return axios(httpOptions(props))
       .then(
         async (response) => {
-          // console.info('is success', response)
           const { __isChange, funcInput, funcDefault } = props.afterRequired || {}
           let res = {}
           await useEval(__isChange ? funcInput : funcDefault, function (func) {
-            res = func(response)
+            res = func(cloneDeep(response))
           })
           resolve(res)
           return res

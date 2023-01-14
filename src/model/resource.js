@@ -1,4 +1,4 @@
-/* 自定义数据请求方法体 */
+/* 自定义数据请求方法体（通用格式） */
 export const ApiDataHandles = {
   beforeRequired: {
     name: 'beforeRequired',

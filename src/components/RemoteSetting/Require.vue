@@ -129,7 +129,7 @@ el-dialog.async-required-dialog(
                     :title="!hasBody ? '添加' : '清空' "
                     @click="toggleCustomList('body')")
               .row-item
-                el-checkbox.m-l-16(v-model="apiData.isSubmit") 是否提交表单
+                //- el-checkbox.m-l-16(v-model="apiData.isSubmit") 是否提交表单
                 el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否将表单【默认数据集】全量提交
               ParamsList(v-show="hasBody", keyName="body", v-model="apiData.body", :editAble="true", @onClearAll="toggleCustomList('body')")
 

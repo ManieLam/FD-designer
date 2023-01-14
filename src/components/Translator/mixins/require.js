@@ -11,6 +11,7 @@ export default {
     transParamsVal (varType, valKey) {
       // console.info('varType:', varType, valKey)
       const val = Array.isArray(varType) ? varType[0] : varType
+      // console.log('val:', val)
       switch (val) {
         case 'const':
           return valKey
@@ -19,6 +20,7 @@ export default {
         case 'collectData': {
           // 最后一位为数据源key
           const ranges = this.formDataCollect.get(varType[varType.length - 1]) || {}
+          // console.info('获取到数据集合：', ranges)
           return ranges[valKey]
         }
         case 'router':
@@ -40,10 +42,9 @@ export default {
      * @param isSubmit 是否为提交表单数据
      * */
     formatSubmitParams ({ isFullDose, isSubmit, body = [] }) {
-      // 非提交型接口交互
-      if (!isSubmit) return null
-      // 是否全量数据提交
-      const range = isFullDose ? this.fullData : this.formData
+      // 是否全量数据提交，isSubmit：提交型接口交互，带表单录入的数据或全量数据
+      // console.info('更新body参数：', arguments)
+      const range = !isSubmit ? {} : isFullDose ? this.fullData : this.formData
       // 转换body参数
       const bodyParams = body && body.length ? this.formatBodyParams({ body }) : {}
       // console.log('range:', range)
@@ -103,20 +104,21 @@ export default {
       }
     },
     // 初始化接口请求后操作
-    afterImmediateResolve (res, api) {
-      if (!res) return false
-      if (api?.isDefault) {
-        // 对默认数据集合赋值
+    doResolve (res, api) {
+      if (!res) return false // 返回空值，不执行后续赋值行为
+      if (api?.isDefault && !api.isSubmit) {
+        // 只有初始化数据需要对默认数据集合赋值， 即只有需要赋值的接口才会做赋值
+        // console.info('res:', res)
         // this.formData = res
         this.fullDataTemp = res || {}
-        this.fullData = res || {}
+        this.fullData = res || {} // 记录默认数据源的数据，参与后续提交取值
         // 受anso-ui，表单在赋值后触发校验
         this.$nextTick(() => {
           this.onClearValidate()
         })
       }
       // 请求成功或失败都存储到formDataCollect中
-      this.formDataCollect.set(api.name, res) // 测试
+      this.formDataCollect.set(api.name, res)
       // 设置默认值
       this.setDefaultValue()
       return res
@@ -127,14 +129,18 @@ export default {
       let preRes = true
       for (let index = 0; index <= reqs.length - 1; index++) {
         const api = reqs[index]
-        await this.$require(this.formatRequire(api))
+        const reqList = this.formatRequire(api)
+        // console.log('reqList:', reqList)
+        await this.$require(reqList)
           .then(r => {
-            this.afterImmediateResolve(r, api)
-            preRes = r
+            // console.log('new r:', r)
+            this.doResolve(r, api)
+            preRes = cloneDeep(r)
             return r
           }, e => {
             preRes = false
           })
+        // console.info('preRes:', preRes)
         if (!preRes) {
           this.$message.error(`出错啦：第${index + 1}个接口异常, 中断执行`)
           break
@@ -148,7 +154,8 @@ export default {
           return this.$require(this.formatRequire(req))
             .then(
               r => {
-                this.afterImmediateResolve(r, req)
+                // console.log('获取到结果:', r)
+                this.doResolve(r, req)
               },
               e => {}
             )

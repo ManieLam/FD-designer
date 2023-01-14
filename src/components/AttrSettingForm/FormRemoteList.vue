@@ -77,7 +77,11 @@ export default {
     title: {
       type: String,
       default: '数据源配置'
-    }
+    },
+    isSubmit: {
+      type: Boolean,
+      default: false
+    } // 是否属于提交类型交互操作, true: 提交型接口交互，带表单录入的数据或全量数据
   },
   components: {
     ApiRule,
@@ -115,6 +119,12 @@ export default {
       set (value) {
         this.$emit('input', { list: this.remoteList, rule: value })
       }
+    },
+    // 私有数据，跟随外部配置，固定不变
+    privateData () {
+      return {
+        isSubmit: this.isSubmit
+      }
     }
   },
   methods: {
@@ -123,14 +133,15 @@ export default {
     },
     handleAdd () {
       // this.remoteList.push(new ApiData({ url: '/' }))
-      this.apiDataPatch = new ApiData({ url: '/' })
+      this.apiDataPatch = new ApiData({ url: '/', isSubmit: this.isSubmit })
+
       this.$nextTick(() => {
         this.setAsyncVisible = true
       })
     },
     // 取消新增
     hanldeRefuse (i) {
-      this.apiDataPatch = new ApiData({ url: '/' })
+      this.apiDataPatch = new ApiData({ url: '/', isSubmit: this.isSubmit })
       this.setAsyncVisible = false
     },
     // 手动编辑
@@ -151,10 +162,10 @@ export default {
     },
     // 确定选中
     chosenResource (api) {
-      // console.info('获取到新的接口', api)
+      console.info('获取到新的接口', api)
       if (!api) return
       // const newApi = { ...this.apiDataPatch, ...api }
-      const newApi = { ...api }
+      const newApi = { ...api, ...this.privateData }
       const { url: newUrl, method: newMethod, _isEdit } = newApi
       // console.info('isEdit-', _isEdit)
       if (!_isEdit) {
