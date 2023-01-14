@@ -1,15 +1,5 @@
-/* class AttrUtils {
-  constructor (attrs = [], actions = []) {
-    this.config = {
-      attrs,
-      actions
-    }
-  }
+/* 所有配置区属性设置 */
 
-  init () {
-    return this.config
-  }
-} */
 /* 表单组件录入的映射, key为实际所用的组件类型，value为AnsoDataform对应的form.tag标签 */
 export const formItemTags = {
   AnsoDataformText: 'text',
@@ -202,7 +192,7 @@ export const button = (function () {
     submitAttrs: [
       ...attrs,
       { label: '提交前校验', key: 'validate', tag: 'el-switch' },
-      { label: '配置数据源', key: 'funcApi', tag: 'form-remote-list', title: '配置数据源' }
+      { label: '配置数据源', key: 'funcApi', tag: 'form-remote-list', title: '配置数据源', isSubmit: true }
     ],
     resetAttrs: [
       ...attrs,
