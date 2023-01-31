@@ -246,18 +246,33 @@ export default {
       console.info(comps)
     },
     createRoute ({ name, configId }) {
-      const matched = this.$router.getRoutes().find(item => item.name === 'Online')
-      console.info('所有路由:', matched)
-
       // 新窗口打开在线预览页面
       // this.$nextTick(() => {
       // ${window.location.protocol}//${window.location.host}
       const { hash, href } = window.location
       const newPath = href.replace(hash, `#/online/${name}/${configId}`)
-      window.open(newPath)
+      const h = this.$createElement
+      this.$msgbox({
+        title: '发布成功',
+        message: h('p', null, [
+          h('span', null, '发布在线预览成功, 地址查看:'),
+          h('i', { style: { color: '#3171F2' } }, newPath)
+        ]),
+        confirmButtonText: '跳转查看'
+        // cancelButtonText: '复制',
+        // showCancelButton: true
+      }).then(action => {
+        window.open(newPath + '?mode=1')
+      // }, reject => {
+      //   console.info('复制:', reject)
+      })
+
       // })
 
-      /* const isExisted = matched.some(item => item.name === name)
+      /*
+      const matched = this.$router.getRoutes().find(item => item.name === 'Online')
+      console.info('所有路由:', matched)
+      const isExisted = matched.some(item => item.name === name)
       if (!isExisted) {
         console.log('不存在:', isExisted)
         // 防止覆盖，在online中生成新的子页面
@@ -288,12 +303,12 @@ export default {
         closeOnPressEscape: false,
         closeOnHashChange: false
       }).then(({ value }) => {
-        console.info('您输入:', value)
-        console.info('对象:', {
-          ...this.previewProps.data,
-          routerName: value
-        })
-        // this.createRoute({ name: value, configId: 2 })
+        // console.info('您输入:', value)
+        // console.info('对象:', {
+        //   ...this.previewProps.data,
+        //   routerName: value
+        // })
+        // this.createRoute({ name: value, configId: 4 })
         // 上传服务端
         this.$normalRequire({
           url: '/fileserver/ui/config/save',
@@ -305,8 +320,8 @@ export default {
             })
           }
         }).then(res => {
-          console.log('配置数据上传服务端后:', res)
-          if (res) {
+          // console.log('配置数据上传服务端后:', res)
+          if (res && res.data) {
             // 创建新页面
             this.createRoute({ name: value, configId: res?.data?.id })
           }
