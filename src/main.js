@@ -15,7 +15,7 @@ import 'anso-ui/lib/anso-ui.css'
 import Widgets from '@/model/widgets'
 import defaultValueSet from '@/model/defaultConfig'
 import gbImport from '@/utils/import'
-import require from '@/utils/request'
+import require, { normalRequire } from '@/utils/request'
 import AnsoUI from 'anso-ui'
 
 import CodeEditorConstruct from '@/components/CodeEditor/CodeEditorConstruct'
@@ -47,6 +47,7 @@ Vue.prototype.$Widget = Widgets
 Vue.prototype.$defValue = defaultValueSet
 Vue.prototype.$gbImport = gbImport
 Vue.prototype.$require = require
+Vue.prototype.$normalRequire = normalRequire
 
 new Vue({
   router,
