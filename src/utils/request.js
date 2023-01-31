@@ -38,16 +38,16 @@ export function formatParams ({ body = {}, beforeRequired } = {}) {
   return body
 }
 
-export const httpOptions = (props) => {
+export const httpOptions = (props, transAble = true) => {
   const timeStamp = new Date().getTime()
-  const params = formatParams(props)
+  const params = transAble ? formatParams(props) : {}
   const data = props.method === 'GET' ? {
-    params: {
+    params: transAble ? {
       ...params,
       timeStamp: timeStamp
-    }
+    } : props.params
   } : {
-    data: params
+    data: transAble ? params : props.data
   }
   return {
     withCredentials: false,
@@ -111,6 +111,26 @@ export function fetch (props) {
           Message.error(error.response.statusText)
         }
         reject(error)
+        return false
+      })
+  })
+}
+
+export function normalRequire (props) {
+  return new Promise((resolve, reject) => {
+    return axios(httpOptions(props, false))
+      .then(
+        resp => {
+          resolve(resp)
+          return resp
+        },
+        rej => {
+          reject(rej)
+          return false
+        }
+      )
+      .catch(err => {
+        reject(err)
         return false
       })
   })

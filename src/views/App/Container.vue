@@ -46,6 +46,9 @@
     :close-on-click-modal="false"
     :visible.sync="previewProps.visable")
     //- FromTemp(v-if="previewProps.visable", :config="previewProps.data")
+    .text-right
+      el-button-group
+        el-button(type="primary" @click="previewOnline") 一键发布，在线预览
     component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false")
     //- form-component(v-if="previewProps.visable", :config="previewProps.data")
   //- 导出.vue或.html
@@ -241,6 +244,74 @@ export default {
         }
       })
       console.info(comps)
+    },
+    createRoute ({ name, configId }) {
+      const matched = this.$router.getRoutes().find(item => item.name === 'Online')
+      console.info('所有路由:', matched)
+
+      // 新窗口打开在线预览页面
+      // this.$nextTick(() => {
+      // ${window.location.protocol}//${window.location.host}
+      const { hash, href } = window.location
+      const newPath = href.replace(hash, `#/online/${name}/${configId}`)
+      window.open(newPath)
+      // })
+
+      /* const isExisted = matched.some(item => item.name === name)
+      if (!isExisted) {
+        console.log('不存在:', isExisted)
+        // 防止覆盖，在online中生成新的子页面
+        this.$router.addRoute({
+          name,
+          path: `/online/${name}`,
+          component: this.componentVM
+        })
+        console.log('新路由列表：', this.$router.getRoutes())
+        // 新窗口打开在线预览页面
+        this.$nextTick(() => {
+          // ${window.location.protocol}//${window.location.host}
+          const { hash, href } = window.location
+          const newPath = href.replace(hash, `#/online/${name}`)
+          window.open(newPath)
+        })
+      } */
+    },
+    // 发布在线预览，数据上传服务端（TODO）
+    previewOnline () {
+      /* :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false" */
+      this.$prompt('请赐予页面名称', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /^[A-Za-z0-9]+$/,
+        inputErrorMessage: '请输入英文或数字',
+        closeOnClickModal: false,
+        closeOnPressEscape: false,
+        closeOnHashChange: false
+      }).then(({ value }) => {
+        console.info('您输入:', value)
+        console.info('对象:', {
+          ...this.previewProps.data,
+          routerName: value
+        })
+        // this.createRoute({ name: value, configId: 2 })
+        // 上传服务端
+        this.$normalRequire({
+          url: '/fileserver/ui/config/save',
+          method: 'post',
+          data: {
+            config: JSON.stringify({
+              ...this.previewProps.data,
+              routerName: value
+            })
+          }
+        }).then(res => {
+          console.log('配置数据上传服务端后:', res)
+          if (res) {
+            // 创建新页面
+            this.createRoute({ name: value, configId: res?.data?.id })
+          }
+        })
+      })
     }
   },
   created () {
@@ -248,6 +319,7 @@ export default {
     this.initResource()
   },
   mounted () {
+    console.info('记录的所有路由：', this.$router.getRoutes())
     // console.log(this.hadRemoteResource)
   }
 }
