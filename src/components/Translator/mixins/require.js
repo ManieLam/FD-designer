@@ -29,8 +29,8 @@ export default {
           return localStorage.getItem(valKey)
       }
     },
-    formatBodyParams ({ body = [] } = {}) {
-      return Array.from(body).reduce((res, item) => {
+    formatVarParams (varlist = []) {
+      return Array.from(varlist).reduce((res, item) => {
         res[item.key] = this.transParamsVal(item.varType, item.value)
         return res
       }, {})
@@ -46,7 +46,7 @@ export default {
       // console.info('更新body参数：', arguments)
       const range = !isSubmit ? {} : isFullDose ? this.fullData : this.formData
       // 转换body参数
-      const bodyParams = body && body.length ? this.formatBodyParams({ body }) : {}
+      const bodyParams = body && body.length ? this.formatVarParams(body) : {}
       // console.log('range:', range)
       // console.log('bodyParams:', bodyParams)
       return Object.assign({}, range, bodyParams)
@@ -56,7 +56,7 @@ export default {
     */
     formatPath ({ url = '', pathData = [], body = [] }) {
       if (url && pathData?.length) {
-        const paramsVal = this.formatBodyParams({ body: pathData })
+        const paramsVal = this.formatVarParams(pathData)
         // console.info('paramsVal:', paramsVal)
         const newPath = url.split('?')?.[0].replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
           return paramsVal[p2] || ''
@@ -73,6 +73,11 @@ export default {
         return url
       }
     },
+    formatHeader ({ header }) {
+      if (header && Array.isArray(header) && header.length) {
+        return this.formatVarParams(header)
+      }
+    },
     /**
      * 单个接口时格式化
      * @return 格式化后的请求地址、请求参数对象
@@ -81,7 +86,8 @@ export default {
       return {
         ...require,
         url: this.formatPath(require),
-        body: this.formatSubmitParams(require)
+        body: this.formatSubmitParams(require),
+        header: this.formatHeader(require)
       }
     },
 

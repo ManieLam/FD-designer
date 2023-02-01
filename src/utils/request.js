@@ -5,7 +5,7 @@ import { cloneDeep } from 'lodash'
 
 export const httpHeader = (props, timeStamp) => {
   return {
-    ...props.headers,
+    ...props.header
     // 'Anso-Sign': signFormat({
     //   ...sign,
     //   ...props.params,
@@ -13,7 +13,7 @@ export const httpHeader = (props, timeStamp) => {
     //   'Anso-TimeStamp': timeStamp
     // }),
     // 'Anso-TimeStamp': timeStamp,
-    'x-csrf-token': 'test'
+    // 'x-csrf-token': 'test'
   }
 }
 
