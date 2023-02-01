@@ -10,23 +10,25 @@
         //- el-button() 切换画布
         el-button(@click="toggleSettingJson") 查看配置文件
       el-button-group.tool-wrap__right
-        el-button(@click="toExportProps.visable=true") 导出
-        el-button(@click="onClear") 清空
-        el-button(@click="onPreview") 预览
-        el-button(type="primary", :disabled="actCanvas|saveable", @click="onSave") 保存
+        //- computed中设立saveable无法监听到store的变化
+        el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="toExportProps.visable=true") 导出
+        el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onClear") 清空
+        el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onPreview") 预览
+        el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onSave") 保存
+        el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="previewOnline") 发布
     DragPage(
       ref="dragPanel"
       :key="actIndex"
       :formItemConfig="formItemConfig"
       :actIndex="actIndex"
       :canvasName="canvasName"
-      :canvas="actCanvas"
+      :canvas="canvasName|getActCanvas(allCanvas)"
       @onSelect="onSelectElement")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
       ref="settingPanel"
       :key="actIndex"
-      :canvas="actCanvas"
+      :canvas="canvasName|getActCanvas(allCanvas)"
       :actIndex="actIndex"
       :canvasName="canvasName"
       :formItemConfig="formItemConfig"
@@ -106,6 +108,9 @@ export default {
     }
   },
   filters: {
+    getActCanvas (name, all) {
+      return all[name] || {}
+    },
     saveable (actCanvas) {
       return !(!!actCanvas && actCanvas?.body?.length)
     },
@@ -120,12 +125,13 @@ export default {
     allCanvas () {
       return this.$store.state.canvas.canvas
     },
-    // ---有缓存，出现置后性
-    actCanvas () {
-      // return this.allCanvas[this.canvasName]
-      // TODO 下个版本迭代成多个
-      return this.$store.getters.getCurView
-    },
+    // actCanvas () {
+    //   return this.allCanvas[this.canvasName] || {} // 无效
+    //   // TODO 下个版本迭代成多个
+    //   // ---有缓存，出现置后性
+    //   // return this.$store.getters.getCurView
+    // // },
+    // },
     allCanvasStr () {
       return JSON.stringify(this.allCanvas, null, '\t')
     // },
@@ -191,9 +197,8 @@ export default {
       this.$refs.settingPanel.clear()
       this.formItemConfig = {}
       this.$store.commit('canvas/clear', this.canvasName)
-      this.onSave()
-      // console.info('清空后:', this.actCanvas)
-      this.$forceUpdate()
+      localStorage.removeItem('Canvas-all')
+      localStorage.removeItem('Canvas-editing')
     },
     onSave () {
       // this.$refs.dragPage.save()
@@ -202,7 +207,7 @@ export default {
       this.$message.success('保存成功')
     },
     async initCanvas () {
-      await this.$store.commit('canvas/init')
+      await this.$store.dispatch('canvas/init')
       const editingName = this.$store.state.canvas.editingName
       this.actIndex = editingName ? Number(editingName.split('_')[1]) : 0
       this.formItemConfig = this.allCanvas[this.canvasName]?.body?.[0] || {}

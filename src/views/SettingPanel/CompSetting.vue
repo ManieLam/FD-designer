@@ -106,7 +106,8 @@ export default {
       // 由内部更新到store
       if (!this.formItemConfig) return
       const curView = this.$store.getters.getCurView
-      const findex = curView.body?.findIndex(field => field.key === this.formItemConfig.key)
+      // console.log('此刻:', curView)
+      const findex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
       if (findex !== -1) {
         this.$store.commit('canvas/updateField', {
           name: this.canvasName,

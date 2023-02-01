@@ -12,23 +12,16 @@ const state = () => ({
 })
 
 const mutations = {
-  /* 初始化 */
-  init (states) {
-    // console.info('初始化:', localStorage.getItem('Canvas-all'))
-    const storages = localStorage.getItem('Canvas-all')
-    states.canvas = storages ? JSON.parse(storages) : {}
-    states.editingName = localStorage.getItem('Canvas-editing') || ''
-  },
   /* 切换画布 */
   toggle (states, name) {},
   /* 新增画布 */
-  add (states, { name, element = {}, eIndex = 0 }) {
+  add (states, { name, element, eIndex = 0 }) {
     // console.info('画布vuex新增:', name, element)
     const elements = states.canvas[name]?.body
     if (elements) {
       elements.splice(eIndex, 0, element)
     } else {
-      states.canvas[name] = new CanvasModel({ body: [element] }, defaultFormAttrs)
+      states.canvas[name] = new CanvasModel({ body: element ? [element] : [] }, defaultFormAttrs)
     }
     states.editingName = name
   },
@@ -41,6 +34,8 @@ const mutations = {
   },
   /* 清空 */
   clear (states, name) {
+    // console.log('清空')
+    // states.canvas[name] = null
     delete states.canvas[name]
   },
   /* 更新 */
@@ -84,6 +79,18 @@ const mutations = {
 }
 
 const actions = {
+  /* 初始化 */
+  init ({ state, commit }) {
+    // console.info('states:', states)
+    state.editingName = localStorage.getItem('Canvas-editing') || 'canvas_0'
+    const storages = localStorage.getItem('Canvas-all')
+    if (storages) {
+      state.canvas = JSON.parse(storages)
+    } else {
+      commit('add', { name: state.editingName })
+    }
+    // console.info('初始化:', state.editingName)
+  }
   // updateFormActions ({ state, commit }, { name, actions = null }) {
   //   const section = state.canvas[name]
   //   if (section && actions) {
