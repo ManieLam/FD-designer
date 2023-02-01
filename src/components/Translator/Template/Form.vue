@@ -202,8 +202,6 @@ export default {
         this.formatMultiRequire({
           requires: btn.funcApi.list,
           rules: btn.funcApi.rule
-        }).then(res => {
-          console.info('提交完成', res)
         })
       }
     }

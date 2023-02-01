@@ -149,13 +149,22 @@ export default {
         // console.info('preRes:', preRes)
         if (!preRes) {
           this.$message.error(`出错啦：第${index + 1}个接口异常, 中断执行`)
+          // this.$emit('onMultiRequireEnd', reqRes)
+          window.parent.postMessage({ onSeriesRequireFalse: api })
           break
         }
+        if (index === reqs.length - 1) {
+          // 表示执行结束
+          return true
+        }
       }
+      // setTimeout(() => {
+      //   console.log('执行结束')
+      // })
     },
     // 并联处理
     async doInParallel (reqs = []) {
-      Promise.all(
+      return Promise.all(
         reqs.map(req => {
           return this.$require(this.formatRequire(req))
             .then(
@@ -166,10 +175,14 @@ export default {
               e => {}
             )
         })
-      ).finally(() => {
-        console.log('最终结束了, 所有数据集合:', this.formDataCollect)
+      )
+        .then(() => {
+          return true // 表示执行结束, 注意不是执行成功/失败通知
+        })
+        .finally(() => {
+          console.log('最终结束了, 所有数据集合:', this.formDataCollect)
         // this.$message.success('所有接口')
-      })
+        })
     },
     /**
      * 多个数据接口 根据执行规则格式化
@@ -179,16 +192,22 @@ export default {
      * }
      * @return none
     */
-    formatMultiRequire ({ requires = [], rules = {} } = {}) {
+    async formatMultiRequire ({ requires = [], rules = {} } = {}) {
       // promise 一旦创建立即执行
       const _requires = cloneDeep(requires)
+      let reqRes = false
       if (rules?.executiveMode === 'inSeries') {
         // 串联：从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作
-        this.doSeries(_requires)
+        reqRes = await this.doSeries(_requires)
       } else {
         // 并联：所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。
-        this.doInParallel(_requires)
+        reqRes = await this.doInParallel(_requires)
+        // console.log('并联执行结束:', res)
       }
+      console.log('执行结果:', reqRes)
+      // 执行结束通知
+      this.$emit('onMultiRequireEnd', reqRes)
+      window.parent.postMessage({ onMultiRequireEnd: reqRes })
     }
   }
 }

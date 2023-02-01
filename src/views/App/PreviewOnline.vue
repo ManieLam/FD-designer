@@ -30,7 +30,9 @@ export default {
   },
   computed: {},
   methods: {
-    onCloseDialog () {}
+    onCloseDialog () {
+      window.parent.postMessage('onCloseDialog', '*')
+    }
   },
   mounted () {
     console.log('route:', this.$route)
