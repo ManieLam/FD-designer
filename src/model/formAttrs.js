@@ -27,8 +27,7 @@ export default [
       label: '默认'
     }, {
       value: 'grid',
-      label: '网格',
-      disabled: true
+      label: '网格'
     }]
   },
   {

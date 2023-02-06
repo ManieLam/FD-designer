@@ -367,10 +367,11 @@ export default {
     flex: 15%
     min-width: 300px
   .center-panel
-    flex: 4 0 auto
+    flex: 4 1 auto
     height: 100%
     display: flex
     flex-direction: column
+    overflow: auto
     // .tool-panel
     //   background: #ff
 

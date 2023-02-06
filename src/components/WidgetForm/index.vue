@@ -6,7 +6,7 @@
     v-else
     ref="form"
     v-bind="formConfig"
-    :class="{'is-active-form': selectItem === 'form'}"
+    :class="[{'is-active-form': selectItem === 'form'}, `form-layout-${formAttrs.layout}`]"
     :rules="rules"
     :model="formData"
     :label-width="`${formAttrs.labelWidth}px`"
@@ -19,19 +19,34 @@
       animation="150"
       @add="handleWidgetAdd"
       @end="handleDragEnd")
-      transition-group(name="fade" tag="div" class="widget-form-list")
-        .widget-form-item-wrap(v-for="(ele, index) in fieldList", :key="ele.key")
+      //- AnsoFormBody(
+      //-   class="widget-form-list"
+      //-   v-bind="formAttrs"
+      //-   v-on="$listeners"
+      //-   :type="formAttrs.layout"
+      //-   :formProps="_props"
+      //-   :formFields="fieldList"
+      //-   :formData="formData")
+      transition-group(
+        name="fade"
+        tag="div"
+        class="widget-form-list"
+        :label-position="formAttrs.labelPosition")
+        .widget-form-item-wrap(
+          v-for="(ele, index) in fieldList"
+          :key="ele.key"
+          :is-border="formAttrs.border !== false"
+          :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
             v-on="$listeners"
             v-model="formData[ele.name]"
-            :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }"
             :keyName="ele.key"
             :name="ele.key"
             :compTag="ele.compTag"
             :index="index"
             :config="ele"
-            @click.native.stop="onClick({ type: 'component', data: ele })")
+            @click.native.stop.prevent="onClick({ type: 'component', data: ele })")
           .tool-wrap
             .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
 
@@ -91,6 +106,10 @@ export default {
     },
     fieldList: {
       get () {
+        /* .map(f => {
+          f.form = omit(f, ['name', 'label', 'compTag'])
+          return f
+        }) */
         return this.fields
       },
       set (list) {
@@ -173,13 +192,17 @@ export default {
     transform: translate3d(-50%, -50%, 0)
 .widget-form-wrap
   padding: 8px
-  border: 1px dashed #f5f5f5
+  border: 1px dashed $--form-divider-border-color
   &:hover
     border: 1px dashed #0A4078
 .widget-form-item-wrap
   padding-bottom: 0
   position: relative
+  border: 1px dashed $--form-divider-border-color // TODO 修改为isBorder
+  // padding: 1px
   &:hover
+    border: 1px dashed #0A4078 !important
+    background: rgb(87, 168, 206, 0.2)
     .tool-wrap
       display: block
       color: #0A4078
@@ -191,16 +214,18 @@ export default {
     display: none
     background: rgba(255,255,255,0.8)
     padding: 2px
-
-.widget-form-item
-  border: 1px solid #f5f5f5
-  padding: 8px
-  &:hover
+    // display: block
+  .is-active
     border: 1px dashed #0A4078
     background: rgb(87, 168, 206, 0.2)
-.is-active
-  border: 1px dashed #0A4078
-  background: rgb(87, 168, 206, 0.2)
+// .widget-form-item
+//   border: 1px solid $--form-divider-border-color // TODO 修改为isBorder
+//   padding: 8px
+//   &:hover
+//     border: 1px dashed #0A4078
+//     background: rgb(87, 168, 206, 0.2)
+
 .is-active-form
   border: 1px dashed #0A4078
+
 </style>
