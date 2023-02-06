@@ -25,7 +25,7 @@
       //-   v-on="$listeners"
       //-   :type="formAttrs.layout"
       //-   :formProps="_props"
-      //-   :formFields="fieldList"
+      //-   :formFields="fieldListFormat"
       //-   :formData="formData")
       transition-group(
         name="fade"
@@ -36,7 +36,8 @@
           v-for="(ele, index) in fieldList"
           :key="ele.key"
           :is-border="formAttrs.border !== false"
-          :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }")
+          :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }"
+          @click.stop.prevent="onClick({ type: 'component', data: ele })")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
             v-on="$listeners"
@@ -45,8 +46,7 @@
             :name="ele.key"
             :compTag="ele.compTag"
             :index="index"
-            :config="ele"
-            @click.native.stop.prevent="onClick({ type: 'component', data: ele })")
+            :config="ele")
           .tool-wrap
             .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
 
@@ -134,6 +134,21 @@ export default {
           return obj
         }
       }, {})
+    },
+    fieldListFormat () {
+      return this.fields.map(config => {
+        return {
+          name: config.name,
+          label: config.label,
+          relation: config.optionRelationKey || null,
+          form: Object.assign(
+            config,
+            {
+              rules: formatFormRules(config.validate) || []
+            }
+          )
+        }
+      })
     }
   },
   // filters: {
