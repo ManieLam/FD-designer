@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vue/babel-helper-vue-jsx-merge-props": "^1.4.0",
-    "anso-ui": "^1.0.47",
+    "anso-ui": "^1.1.0",
     "axios": "^0.27.2",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.9",
