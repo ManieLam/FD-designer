@@ -56,13 +56,15 @@ const mutations = {
     }
   },
   // 更新单画布属性
-  updateConfig (states, config) {
-    const { name, attrs = null, actions = null, buttons = null } = config
+  assignConfig (states, config) {
+    const { name, attrs = null, actions = null, buttons = null, assignObj = null } = config
     const section = states.canvas[name]
     if (section) {
       if (attrs) states.canvas[name].attrs = { ...attrs, ...(attrs || {}) }
       if (actions) states.canvas[name].actions = { ...actions, ...(actions || {}) }
       if (buttons) states.canvas[name].buttons = Array.isArray(buttons) ? buttons.sort((a, b) => a?.sort - b?.sort) : [...buttons]
+      // console.info('保存：', assignObj)
+      if (assignObj) states.canvas[name] = Object.assign(states.canvas[name], assignObj)
     }
   },
   updateField (states, { name, findex = null, attrs = null }) {

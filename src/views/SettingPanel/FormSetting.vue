@@ -155,7 +155,7 @@ export default {
     },
     setFormState ({ attrs = null, actions = null, buttons = null }) {
       // 由内部更新到store
-      this.$store.commit('canvas/updateConfig', {
+      this.$store.commit('canvas/assignConfig', {
         name: this.canvasName,
         attrs,
         actions,
