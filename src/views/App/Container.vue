@@ -13,9 +13,15 @@
         //- computed中设立saveable无法监听到store的变化
         el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="toExportProps.visable=true") 导出
         el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onClear") 清空
-        el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onPreview") 预览
+        //- el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onPreview") 预览
+        el-dropdown(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @command="handlePreview")
+          el-button 预览
+            i.el-icon-arrow-down.el-icon--right
+          el-dropdown-menu(slot="dropdown")
+            el-dropdown-item(command="onPreview") 预览
+            el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
         el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onSave") 保存
-        el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="previewOnline") 发布
+        el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="publishOnline") 发布
     DragPage(
       ref="dragPanel"
       :key="actIndex"
@@ -50,7 +56,7 @@
     //- FromTemp(v-if="previewProps.visable", :config="previewProps.data")
     .text-right
       el-button-group
-        el-button(type="primary" @click="previewOnline") 一键发布，在线预览
+        el-button(type="primary" @click="publishOnline") 一键发布，在线预览
     component(
       v-if="previewProps.visable && componentVM"
       :is="componentVM"
@@ -130,13 +136,13 @@ export default {
     allCanvas () {
       return this.$store.state.canvas.canvas
     },
-    // actCanvas () {
-    //   return this.allCanvas[this.canvasName] || {} // 无效
-    //   // TODO 下个版本迭代成多个
-    //   // ---有缓存，出现置后性
-    //   // return this.$store.getters.getCurView
-    // // },
+    actCanvas () {
+      // return this.allCanvas[this.canvasName] || {} // 无效
+      // TODO 下个版本迭代成多个
+      // ---有缓存，出现置后性
+      return this.$store.getters.getCurView
     // },
+    },
     allCanvasStr () {
       return JSON.stringify(this.allCanvas, null, '\t')
     // },
@@ -221,11 +227,27 @@ export default {
       await this.$store.commit('resources/init')
       // await this.$store.commit('resources/initGroup')
     },
+    handlePreview (command) {
+      // console.info('点击预览:', command)
+      this[command].call()
+    },
+    // 普通预览
     async onPreview () {
       this.previewProps.data = this.allCanvas[this.canvasName]
       this.componentVM = templateRegister[this.previewProps.data?.template]
       this.previewProps.visable = !this.previewProps.visable
       // console.info('previewProps:', this.previewProps)
+    },
+    // 在线预览
+    async handleOnlinePreview () {
+      const curCanvas = this.allCanvas[this.canvasName] || {}
+      const { configId, routerName } = curCanvas
+      if (configId) {
+        const { hash, href } = window.location
+        const newPath = href.replace(hash, `#/online/${routerName}/${configId}`)
+        // 在线预览属于可能频繁打开，带窗口命名跳转
+        window.open(newPath + '?mode=1', routerName)
+      }
     },
     onExport (type) {
     //   if (type === 'json') {
@@ -269,11 +291,11 @@ export default {
         ]),
         confirmButtonText: '跳转查看'
       }).then(action => {
-        window.open(newPath + '?mode=1')
+        window.open(newPath + '?mode=1', name)
       })
     },
     // 发布在线预览，数据上传服务端（TODO）
-    previewOnline () {
+    publishOnline () {
       /* :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false" */
       const curCanvas = this.allCanvas[this.canvasName]
       const hasPublic = curCanvas?.configId
