@@ -124,7 +124,7 @@ export default {
     rules () {
       /* 如果做要同步视图的校验，计算比较多, 这里采用手动点击预览 或 保存后刷新查看结果 */
       return this.fieldList.reduce((obj, field) => {
-        const rules = field.validate
+        const rules = field?.validate
         if (!!rules && (!isEmpty(rules.isRequired) || !isEmpty(rules.isRegexp) || !!rules.isValidator)) {
           return {
             ...obj,

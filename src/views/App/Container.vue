@@ -51,7 +51,12 @@
     .text-right
       el-button-group
         el-button(type="primary" @click="previewOnline") 一键发布，在线预览
-    component(v-if="previewProps.visable && componentVM", :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false")
+    component(
+      v-if="previewProps.visable && componentVM"
+      :is="componentVM"
+      :config="previewProps.data"
+      :isTest="true"
+      @onCloseDialog="previewProps.visable=false")
     //- form-component(v-if="previewProps.visable", :config="previewProps.data")
   //- 导出.vue或.html
   el-dialog(
@@ -200,11 +205,11 @@ export default {
       localStorage.removeItem('Canvas-all')
       localStorage.removeItem('Canvas-editing')
     },
-    onSave () {
+    onSave (alert = true) {
       // this.$refs.dragPage.save()
       localStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
       localStorage.setItem('Canvas-editing', this.canvasName)
-      this.$message.success('保存成功')
+      if (alert) this.$message.success('保存成功')
     },
     async initCanvas () {
       await this.$store.dispatch('canvas/init')
@@ -250,87 +255,96 @@ export default {
       })
       console.info(comps)
     },
-    createRoute ({ name, configId }) {
+    afterPublish ({ name, configId, isUpdate }) {
       // 新窗口打开在线预览页面
-      // this.$nextTick(() => {
-      // ${window.location.protocol}//${window.location.host}
       const { hash, href } = window.location
       const newPath = href.replace(hash, `#/online/${name}/${configId}`)
       const h = this.$createElement
+      const text = isUpdate ? '编辑' : '发布'
       this.$msgbox({
-        title: '发布成功',
+        title: text + '成功',
         message: h('p', null, [
-          h('span', null, '发布在线预览成功, 地址查看:'),
+          h('span', null, text + '在线预览成功, 查看地址:'),
           h('i', { style: { color: '#3171F2' } }, newPath)
         ]),
         confirmButtonText: '跳转查看'
-        // cancelButtonText: '复制',
-        // showCancelButton: true
       }).then(action => {
         window.open(newPath + '?mode=1')
-      // }, reject => {
-      //   console.info('复制:', reject)
       })
-
-      // })
-
-      /*
-      const matched = this.$router.getRoutes().find(item => item.name === 'Online')
-      console.info('所有路由:', matched)
-      const isExisted = matched.some(item => item.name === name)
-      if (!isExisted) {
-        console.log('不存在:', isExisted)
-        // 防止覆盖，在online中生成新的子页面
-        this.$router.addRoute({
-          name,
-          path: `/online/${name}`,
-          component: this.componentVM
-        })
-        console.log('新路由列表：', this.$router.getRoutes())
-        // 新窗口打开在线预览页面
-        this.$nextTick(() => {
-          // ${window.location.protocol}//${window.location.host}
-          const { hash, href } = window.location
-          const newPath = href.replace(hash, `#/online/${name}`)
-          window.open(newPath)
-        })
-      } */
     },
     // 发布在线预览，数据上传服务端（TODO）
     previewOnline () {
       /* :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false" */
-      this.$prompt('请赐予页面名称', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        inputPattern: /^[A-Za-z0-9]+$/,
-        inputErrorMessage: '请输入英文或数字',
-        closeOnClickModal: false,
-        closeOnPressEscape: false,
-        closeOnHashChange: false
-      }).then(({ value }) => {
-        // console.info('您输入:', value)
-        // console.info('对象:', {
-        //   ...this.previewProps.data,
-        //   routerName: value
-        // })
-        // this.createRoute({ name: value, configId: 4 })
-        // 上传服务端
-        this.$normalRequire({
-          url: '/fileserver/ui/config/save',
-          method: 'post',
-          data: {
-            config: JSON.stringify({
-              ...this.previewProps.data,
-              routerName: value
-            })
-          }
-        }).then(res => {
-          // console.log('配置数据上传服务端后:', res)
-          if (res && res.data) {
-            // 创建新页面
-            this.createRoute({ name: value, configId: res?.data?.id })
-          }
+      const curCanvas = this.allCanvas[this.canvasName]
+      const hasPublic = curCanvas?.configId
+      // console.log('是否已经发布:', hasPublic)
+      if (!hasPublic) {
+        this.$prompt('请赐予页面名称', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: /^[A-Za-z0-9]+$/,
+          inputErrorMessage: '请输入英文或数字',
+          closeOnClickModal: false,
+          closeOnPressEscape: false,
+          closeOnHashChange: false
+        }).then(({ value }) => {
+          // console.info('您输入:', value)
+          // console.info('对象:', {
+          //   ...this.previewProps.data,
+          //   routerName: value
+          // })
+          // this.afterPublish({ name: value, configId: 4 })
+          // 上传服务端
+          this.$normalRequire({
+            url: '/fileserver/ui/config/save',
+            method: 'post',
+            data: {
+              config: JSON.stringify({
+                ...this.previewProps.data,
+                routerName: value
+              })
+            }
+          }).then(res => {
+            // console.log('配置数据上传服务端后:', res)
+            if (res && res.data) {
+              // 更新画布信息
+              this.$store.commit('canvas/assignConfig', {
+                name: this.canvasName,
+                assignObj: {
+                  configId: res.data?.id,
+                  routerName: value
+                }
+              })
+              this.$nextTick(() => {
+                this.onSave(false)
+              })
+              // 创建新页面
+              this.afterPublish({ name: value, configId: res?.data?.id })
+            }
+          })
         })
+      } else {
+        this.updateOnline(curCanvas)
+      }
+    },
+    updateOnline (canvas) {
+      const { configId, routerName } = canvas
+      this.$normalRequire({
+        url: `/fileserver/ui/config/edit/${configId}`,
+        method: 'POST',
+        data: {
+          config: JSON.stringify(canvas)
+        }
+      }).then(res => {
+        // console.info('res:', res)
+        if (res.code !== -1) {
+          this.$nextTick(() => {
+            this.onSave(false)
+          })
+          this.afterPublish({ name: routerName, configId, isUpdate: true })
+        } else {
+          this.$message.error(res)
+        }
       })
     }
   },

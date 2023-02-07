@@ -73,8 +73,19 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   response => {
-    // console.log('.....', response)
-    return response.data
+    if (response.status === 200) {
+      // switch (response.data.code) {
+      //   // case 0: return Promise.resolve(response.data)
+      //   case -1: return Promise.resolve(false)
+      //   case 0:
+      //   default:
+      //     return Promise.resolve(response.data.data)
+      // }
+      return Promise.resolve(response.data)
+    } else {
+      return Promise.reject(response)
+    }
+    // return response.data
   },
   error => {
     // console.log('error', error)
