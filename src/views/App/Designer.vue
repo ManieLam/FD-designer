@@ -4,42 +4,49 @@
     .header-icon.font-size-medium
       p Form Designer
     .header-tools
-      el-button-group
-        el-button(
-          v-for="btn in tools"
-          v-bind="btn"
-          :key="btn.name"
-          @click="btn.func") {{btn.label}}
+      el-dropdown(trigger="click", :split-button="true", @command="handleCommand")
+        span.el-dropdown-link 全局配置
+        el-dropdown-menu(slot="dropdown")
+          el-dropdown-item(command="handleWebserver") 环境配置
   AppContainer.app-content
+  WebserverSetter(ref="webserverSetter", v-model="webserverSetting")
 </template>
 
 <script>
 import AppContainer from './Container'
+import WebserverSetter from '@/components/ConfigSetter/WebserverSetter'
 export default {
   name: 'AppDesigner',
   components: {
-    AppContainer
+    AppContainer,
+    WebserverSetter
   },
   data () {
     return {
-      tools: [
-        {
-          label: '全局配置',
-          name: 'globalSetting',
-          func: this.globalSetting
-        // },
-        // {
-        //   label: '导出全部画布',
-        //   name: 'export',
-        //   func: this.export
-        }
-      ]
+      webserverSetting: false // 是否设置环境变量
+      // tools: [
+      //   {
+      //     label: '全局配置',
+      //     name: 'globalSetting',
+      //     func: this.globalSetting
+      //   // },
+      //   // {
+      //   //   label: '导出全部画布',
+      //   //   name: 'export',
+      //   //   func: this.export
+      //   }
+      // ]
     }
   },
   computed: {},
   methods: {
     export () {},
-    globalSetting () {}
+    handleWebserver () {
+      this.webserverSetting = !this.webserverSetting
+    },
+    handleCommand (command) {
+      this[command].call()
+    }
   },
   mounted () {}
 }
