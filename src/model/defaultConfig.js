@@ -71,6 +71,14 @@ export const text = {
     valueType: 'isDefault'
   }
 }
+export const cascader = {
+  valueKey: 'value',
+  parentKey: 'parentId',
+  clearable: true,
+  filterable: true,
+  placeholder: '请选择',
+  expandTrigger: { attrKey: 'props', value: 'click' }
+}
 
 // 默认选项配置
 export const defaultOptions = [{
@@ -188,5 +196,6 @@ export default {
   defaultOptions,
   presetOptions,
   select,
-  input
+  input,
+  cascader
 }

@@ -45,7 +45,8 @@ const FormtagAttrs = {
   validate: { label: '校验', key: 'validate', tag: 'form-validate' },
   placeholder: { label: '占位内容', key: 'placeholder', tag: 'el-input' },
   defaultValue: { label: '默认值', key: 'defaultValue', tag: 'form-defaultValue' },
-  disabled: { label: '只读', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '可编辑', value: false }], chains: () => { } }
+  disabled: { label: '只读', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '可编辑', value: false }], chains: () => { } },
+  clearable: { label: '允许清空', key: 'clearable', tag: 'el-checkbox', labelHidden: true, options: [{ label: '允许', value: true }, { label: '不允许', value: false }] }
 }
 
 /* 表单元素组件事件结构 */
@@ -70,6 +71,7 @@ export const select = {
     FormtagAttrs.label,
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
+    FormtagAttrs.clearable,
     {
       label: '是否多选（TODO）',
       key: 'multiple',
@@ -77,13 +79,13 @@ export const select = {
       labelHidden: true,
       options: [{ label: '多选', value: true }, { label: '单选', value: false }]
     },
-    {
-      label: '是否允许清空选项',
-      key: 'clearable',
-      tag: 'el-checkbox',
-      labelHidden: true,
-      options: switchDefaultOptions
-    },
+    // {
+    //   label: '是否允许清空选项',
+    //   key: 'clearable',
+    //   tag: 'el-checkbox',
+    //   labelHidden: true,
+    //   options: switchDefaultOptions
+    // },
     {
       label: '选项',
       group: [
@@ -183,6 +185,87 @@ export const input = {
   ]
 }
 
+export const cascader = {
+  attrs: [
+    FormtagAttrs.name,
+    FormtagAttrs.label,
+    FormtagAttrs.placeholder,
+    FormtagAttrs.disabled,
+    FormtagAttrs.validate,
+    FormtagAttrs.clearable,
+    {
+      label: '是否多选（TODO）',
+      key: 'multiple',
+      tag: 'el-checkbox',
+      labelHidden: true,
+      options: [{ label: '多选', value: true }, { label: '单选', value: false }]
+    },
+    {
+      label: '选项',
+      group: [
+        {
+          label: '配置',
+          key: 'options',
+          tag: 'form-option',
+          tip: '选项配置的方式只允许一种'
+          // tag: 'el-select'
+        },
+        {
+          label: '是否分组（TODO）',
+          key: 'isGroup',
+          tag: 'el-checkbox',
+          labelHidden: true,
+          options: [{ label: '分组', value: true }, { label: '不分', value: false }],
+          chains: () => { }
+        }
+      ]
+    },
+    {
+      label: '搜索',
+      tag: 'form-search',
+      // tag: 'el-switch',
+      key: 'filterable',
+      options: switchDefaultOptions
+    },
+    {
+      label: '取值关键key',
+      tag: 'el-input',
+      key: 'valueKey'
+    },
+    {
+      label: '取值父级关键key',
+      tag: 'el-input',
+      key: 'parentKey'
+    },
+    {
+      label: '次级菜单的展开方式',
+      key: 'expandTrigger',
+      tag: 'form-attr-passthrough',
+      // tag: 'el-checkbox',
+      passthroughAttr: { tag: 'AnsoDataformSelect', options: [{ label: 'click', value: 'click' }, { label: 'hover', value: 'hover' }], label: '次级菜单的展开方式', attrKey: 'props' }
+    },
+    {
+      label: '仅显示最后一级',
+      key: 'showAllLevels',
+      tag: 'el-checkbox',
+      labelHidden: true,
+      options: [{ label: '是', value: true }, { label: '否', value: false }]
+    },
+    {
+      label: '是否严格的遵守父子节点不互相关联',
+      key: 'checkStrictly',
+      tag: 'form-attr-passthrough',
+      // tag: 'el-checkbox',
+      passthroughAttr: { tag: 'el-checkbox', options: switchDefaultOptions, label: '是否严格的遵守父子节点不互相关联', attrKey: 'props' },
+      labelHidden: true
+    }
+  ],
+  actions: [
+    { type: 'change', desc: '选中值发生变化时触发' },
+    { type: 'clear', desc: '点击清空按钮时触发' }
+  ]
+}
+
 export const button = (function () {
   const attrs = [
     { label: '按钮标签', key: 'label', tag: 'el-input' },
@@ -213,5 +296,6 @@ export default {
   select,
   text,
   input,
+  cascader,
   button
 }
