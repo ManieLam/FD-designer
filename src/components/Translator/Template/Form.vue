@@ -44,6 +44,7 @@ export default {
     },
     formFields () {
       return this.config?.body.map(config => {
+        const hasPassthrough = config._passthroughAttrs && config._passthroughAttrs.length
         return {
           name: config.name,
           label: config.label,
@@ -52,7 +53,8 @@ export default {
             config,
             {
               rules: formatFormRules(config.validate) || []
-            }
+            },
+            hasPassthrough ? this.formatPassthroughAttrs(config._passthroughAttrs, config) : {}
           )
         }
       })
@@ -204,6 +206,15 @@ export default {
           rules: btn.funcApi.rule
         })
       }
+    },
+    // 格式化透传属性: { [attr.attrKey]: {a: [value], b: [value]} }
+    formatPassthroughAttrs (attrList, config) {
+      return attrList.reduce((res, key) => {
+        const curConfig = config[key] || {}
+        const preRes = res[curConfig.attrKey] // 是否存在相同透传关键key
+        res[curConfig?.attrKey] = Object.assign(preRes || {}, { [key]: curConfig.value })
+        return res
+      }, {})
     }
   },
   created () {

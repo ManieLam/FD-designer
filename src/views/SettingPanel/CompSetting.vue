@@ -36,7 +36,7 @@
 import AttrSettingForm from '@/components/AttrSettingForm'
 import CompActionSetting from './CompActionSetting'
 import componentAttrs from '@/model/componentAttrs'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isNil } from 'lodash'
 export default {
   name: 'CompSetting',
   props: ['formItemConfig', 'canvasName'],
@@ -49,9 +49,7 @@ export default {
       tabList: [
         { label: '属性', name: 'attr' },
         { label: '行为', name: 'action' }
-        // { label: '样式', name: 'style' }
       ],
-      // activeNames: ['attr', 'action'],
       activeName: 'attr',
       tempAttrsData: {}
       // attrsData: {}
@@ -65,6 +63,10 @@ export default {
           this.attrsData = cloneDeep(this.formItemConfig)
         }
       }
+    },
+    passthourghAttrs (list) {
+      // console.log('透传属性改变:', list)
+      this.$set(this.attrsData, '_passthroughAttrs', list)
     }
   },
   computed: {
@@ -77,12 +79,17 @@ export default {
     actions () {
       return componentAttrs[this.tag]?.actions || []
     },
+    /* 记录透传属性： 属于透传属性，并且存在修改该属性 */
+    passthourghAttrs () {
+      return this.attrs.filter(attr => attr.passthroughAttr && !isNil(this.attrsData[attr.key])).map(attr => attr.key)
+    },
     /* 纯属性 */
     attrsData: {
       get () {
         return this.tempAttrsData
       },
       set (data) {
+        // console.log('设置compSetting:', data)
         this.tempAttrsData = data
         this.update()
       }

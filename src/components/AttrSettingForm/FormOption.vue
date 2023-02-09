@@ -20,9 +20,11 @@
         td
           el-input(v-model="item.label")
         td
-          i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  @click="remove(item, index)")
-        td
-          i.el-icon-plus.color-primary.btn-radius-50(v-if="index === list.length - 1", @click="add")
+          i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  title="删除选项", @click="remove(item, index)")
+        //- td
+        //-   i.el-icon-plus.color-primary.btn-radius-50(v-if="index === list.length - 1", title="添加子选项", @click="addChild")
+      tr.drag-list
+        i.el-icon-plus.color-primary.btn-radius-50(title="新增一级选项", @click="add")
   .list-async(v-if="optionType === 'optionApi'")
     //- 动态配置数据源
     form-remote(key="option", title="配置选项数据接口", v-model="asyncFunc")
@@ -124,6 +126,7 @@ export default {
     add () {
       this.list.push({ label: '', value: '' })
     },
+    addChild () {},
     remove (ele, index) {
       if (this.list.length) {
         this.$delete(this.list, index)
