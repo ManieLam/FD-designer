@@ -266,6 +266,70 @@ export const cascader = {
   ]
 }
 
+export const switchComp = {
+  attrs: [
+    FormtagAttrs.name,
+    FormtagAttrs.label,
+    FormtagAttrs.disabled,
+    // FormtagAttrs.validate,
+    {
+      label: '尺寸',
+      key: 'size',
+      tag: 'ansoDataformSelect',
+      options: [
+        { label: '大', value: 'lg' },
+        { label: '小', value: 'sm' }
+      ]
+    },
+    {
+      label: '宽度',
+      key: 'width',
+      tag: 'el-input-number',
+      controls: false,
+      tip: '需要保存后刷新查看效果'
+    },
+    // 暂不开启
+    // {
+    //   label: '数值类型',
+    //   key: 'activeType',
+    //   tag: 'ansoDataformSelect',
+    //   options: [
+    //     { label: '数值', value: 'number' },
+    //     { label: '字符串', value: 'string' },
+    //     { label: '布尔', value: 'boolean' }
+    //   ]
+    // },
+    {
+      label: '开关的文字描述及背景色',
+      key: 'options',
+      tag: 'form-list',
+      columnProps: [
+        { label: '文字描述', prop: 'label' },
+        // { label: '数值描述', prop: 'value' },
+        { label: '背景色', prop: 'color', type: 'color' }
+      ],
+      draggable: false,
+      handlAble: false,
+      maxLen: 2
+    },
+    {
+      label: '是否展示提示性语句',
+      key: 'isTooltip',
+      tag: 'el-checkbox',
+      labelHidden: true,
+      options: switchDefaultOptions
+    },
+    {
+      label: '是否将文字描述处于按钮内',
+      key: 'isInline',
+      tag: 'el-checkbox',
+      labelHidden: true,
+      options: switchDefaultOptions
+    }
+  ],
+  actions: []
+}
+
 export const button = (function () {
   const attrs = [
     { label: '按钮标签', key: 'label', tag: 'el-input' },
@@ -297,5 +361,6 @@ export default {
   text,
   input,
   cascader,
+  switch: switchComp,
   button
 }

@@ -383,6 +383,14 @@
     color: $--color-text-regular
     cursor: not-allowed
     // pointer-events: none
+
+// 单独使用i的按钮
+i.btn-icon
+  &[disabled]
+    // cursor: not-allowed
+    background-color: $--button-disabled-background-color
+    color: $--button-disabled-font-color !important
+    pointer-events: none
   
 
 /* 一些内容盒子 */

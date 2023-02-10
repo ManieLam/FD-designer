@@ -47,6 +47,15 @@ export const formButtons = {
   }
 }
 
+// 默认选项配置
+export const defaultOptions = [{
+  label: '选项1',
+  value: 1
+}, {
+  label: '选项2',
+  value: 2
+}]
+
 /* 表单输入元素配置属性值 */
 export const select = {
   // type: '下拉组件',
@@ -56,7 +65,8 @@ export const select = {
     customFunc: '(data, fields, field) => {\n return data[field.name]}',
     valueType: 'isDefault'
   }, // 默认值配置
-  placeholder: '请选择'
+  placeholder: '请选择',
+  options: defaultOptions
 }
 export const input = {
   placeholder: '请输入',
@@ -77,17 +87,34 @@ export const cascader = {
   clearable: true,
   filterable: true,
   placeholder: '请选择',
+  options: defaultOptions,
   expandTrigger: { attrKey: 'props', value: 'click' }
 }
 
-// 默认选项配置
-export const defaultOptions = [{
-  label: '选项1',
-  value: 1
-}, {
-  label: '选项2',
-  value: 2
-}]
+export const switchOption = (activeType) => {
+  const valType = activeType
+  // 获取数值类型转换对应的value类型, 根据anso-ui/ansoDataformSwitch限制的数值
+  let optVal = null
+  switch (valType) {
+    case 'string':
+      optVal = ['1', '0']; break
+    case 'number':
+      optVal = [1, 0]; break
+    case 'boolean':
+    default:
+      optVal = [true, false]; break
+  }
+  return [{ label: '开', value: optVal[0], color: '#409EFF' }, { label: '关', value: optVal[1], color: '#BFBFBF' }]
+}
+
+export const switchConf = {
+  // activeType: 'boolean', // 数值类型，同anso-ui叫法, 暂不开启
+  size: 'lg',
+  width: 40,
+  isTooltip: false,
+  isInline: false,
+  options: switchOption()
+}
 
 // 默认值预设可选项
 export const presetOptions = [
@@ -197,5 +224,7 @@ export default {
   presetOptions,
   select,
   input,
-  cascader
+  cascader,
+  switch: switchConf,
+  switchOption: switchOption
 }
