@@ -135,4 +135,13 @@ export default {
 .drag-list
   i:hover
     transform: scale(1.2)
+  td
+    ::v-deep input[type="color"]
+      margin-top: 6px // 莫名比type="text"多出了6px
+      // border: 0
+      outline: none
+      ::-webkit-color-swatch-wrapper
+        background-color:#ffffff
+      ::-webkit-color-swatch
+        position: relative
 </style>
