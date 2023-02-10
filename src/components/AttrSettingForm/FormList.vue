@@ -10,10 +10,11 @@ table.list-options
     tr.drag-list(v-for="(item, index) in actList", :key="index")
       td(v-for="prop in columnProps", :key="prop.prop")
         slot(v-bind[prop.prop]="item", :name="prop.prop", :index="index", :data="item", :value="item[prop.prop]")
-          el-input(v-model="item[prop.prop]", :placeholder="prop.placeholder")
+          //- el-input(v-model="item[prop.prop]", :placeholder="prop.placeholder")
+          FormInputWithType(v-model="item[prop.prop]", :placeholder="prop.placeholder", v-bind="{...$attrs, ...prop}")
       td
-        i.el-icon-minus.color-primary.btn-radius-50(:disabled="actList.length===1",  @click="remove(item, index)")
-      td(v-if="index === actList.length - 1")
+        i.el-icon-minus.color-primary.btn-radius-50.btn-icon(:disabled="!removeAble",  @click="remove(item, index)")
+      td(v-if="addAble && index === actList.length - 1")
         i.el-icon-plus.color-primary.btn-radius-50(@click="add")
   //- 允许拖拽
   Draggable(v-else, tag="tbody", :list="actList", class="list-group", handle=".handle", animation="150", :disabled="!draggable")
@@ -22,10 +23,11 @@ table.list-options
         i.el-icon-rank.handle
       td(v-for="prop in columnProps")
         slot(v-bind[prop.prop]="item")
-          el-input(v-model="item[prop.prop]", :placeholder="prop.placeholder")
+          //- el-input(v-model="item[prop.prop]", :placeholder="prop.placeholder")
+          FormInputWithType(v-model="item[prop.prop]", :placeholder="prop.placeholder", v-bind="{...$attrs, ...prop}")
       td
-        i.el-icon-minus.color-primary.btn-radius-50(:disabled="actList.length===1",  @click="remove(item, index)")
-      td(v-if="index === actList.length - 1")
+        i.el-icon-minus.color-primary.btn-radius-50.btn-icon(:disabled="!removeAble",  @click="remove(item, index)")
+      td(v-if="addAble && index === actList.length - 1")
         i.el-icon-plus.color-primary.btn-radius-50(@click="add")
 </template>
 
@@ -34,16 +36,14 @@ table.list-options
  * 简单两列输入列表，支持配置拖拽
  * TODO 自定义列数 */
 import Draggable from 'vuedraggable'
+import FormInputWithType from './FormInputWithType.vue'
 import { keyBy } from 'lodash'
 export default {
   name: 'FormList',
   components: {
-    Draggable
+    Draggable,
+    FormInputWithType
   },
-  // model: {
-  //   prop: 'list',
-  //   event: 'input'
-  // },
   props: {
     value: {
       type: Array,
@@ -61,6 +61,15 @@ export default {
           { label: '选项文本', prop: 'label' }
         ]
       }
+    },
+    // 列表最高行数
+    maxLen: {
+      type: Number
+    },
+    // 是否允许操作
+    handlAble: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -78,12 +87,20 @@ export default {
     },
     listPropValue () {
       return Object.keys(keyBy(this.columnProps, 'prop'))
+    },
+    addAble () {
+      return this.handlAble && this.maxLen && this.actList.length < this.maxLen
+    },
+    removeAble () {
+      return this.handlAble && this.actList.length > 1
     }
   },
   watch: {
     value: {
       immediate: true,
+      // deep: true,
       handler (len) {
+        // console.info('form-list value:', len)
         if (!len || !len.length) {
           this.add()
         }
@@ -98,13 +115,18 @@ export default {
       }, {})
     },
     add () {
-      this.actList.push(this.initPropValue())
+      if (this.maxLen && this.actList.length <= this.maxLen) {
+        this.actList.push(this.initPropValue())
+      }
     },
     remove (ele, index) {
       if (this.actList.length) {
         this.$delete(this.actList, index)
       }
     }
+  },
+  mounted () {
+    console.log('form-list数值获取', this.value)
   }
 }
 </script>
