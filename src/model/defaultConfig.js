@@ -116,6 +116,10 @@ export const switchConf = {
   options: switchOption()
 }
 
+export const dateConf = {
+  dateType: 'date' // 默认是日期选择器
+}
+
 // 默认值预设可选项
 export const presetOptions = [
   {
@@ -226,5 +230,6 @@ export default {
   input,
   cascader,
   switch: switchConf,
+  date: dateConf,
   switchOption: switchOption
 }

@@ -45,7 +45,8 @@ const FormtagAttrs = {
   validate: { label: '校验', key: 'validate', tag: 'form-validate' },
   placeholder: { label: '占位内容', key: 'placeholder', tag: 'el-input' },
   defaultValue: { label: '默认值', key: 'defaultValue', tag: 'form-defaultValue' },
-  disabled: { label: '只读', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '可编辑', value: false }], chains: () => { } },
+  disabled: { label: '禁用', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '禁用', value: true }, { label: '非禁用', value: false }], chains: () => { } },
+  readOnly: { label: '只读', key: 'readOnly', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '读写', value: false }], chains: () => { } },
   clearable: { label: '允许清空', key: 'clearable', tag: 'el-checkbox', labelHidden: true, options: [{ label: '允许', value: true }, { label: '不允许', value: false }] }
 }
 
@@ -160,7 +161,6 @@ export const input = {
       labelHidden: true,
       key: 'show-word-limit'
     },
-    FormtagAttrs.defaultValue,
     {
       label: '前缀',
       // tag: 'el-input',
@@ -174,7 +174,8 @@ export const input = {
       tag: 'form-affixes',
       key: 'append',
       affixesType: 'append'
-    }
+    },
+    FormtagAttrs.defaultValue
   ],
   actions: [
     { type: 'blur', desc: '失去焦点时触发' },
@@ -258,7 +259,8 @@ export const cascader = {
       // tag: 'el-checkbox',
       passthroughAttr: { tag: 'el-checkbox', options: switchDefaultOptions, label: '是否严格的遵守父子节点不互相关联', attrKey: 'props' },
       labelHidden: true
-    }
+    },
+    FormtagAttrs.defaultValue
   ],
   actions: [
     { type: 'change', desc: '选中值发生变化时触发' },
@@ -325,7 +327,43 @@ export const switchComp = {
       tag: 'el-checkbox',
       labelHidden: true,
       options: switchDefaultOptions
-    }
+    },
+    FormtagAttrs.defaultValue
+  ],
+  actions: [
+    { type: 'change', desc: '选中值发生变化时触发' },
+    { type: 'clear', desc: '点击清空按钮时触发' }
+  ]
+}
+
+export const dateComp = {
+  attrs: [
+    FormtagAttrs.name,
+    FormtagAttrs.label,
+    FormtagAttrs.placeholder,
+    FormtagAttrs.disabled,
+    FormtagAttrs.readOnly,
+    FormtagAttrs.validate,
+    FormtagAttrs.clearable,
+    {
+      key: 'dateType',
+      label: '显示类型',
+      tag: 'ansoDataformSelect',
+      isGroup: true,
+      // 根据anso-ui可选项写死
+      options: [
+        { label: '日期(默认)', value: 'date', group: '单日期选择' },
+        { label: '年份', value: 'year', group: '单日期选择' },
+        { label: '月份', value: 'month', group: '单日期选择' },
+        { label: '日期时间', value: 'datetime', group: '单日期选择' },
+        { label: '周期', value: 'week', group: '单日期选择' },
+        { label: '多日期', value: 'dates', group: '单日期选择' },
+        { label: '日期范围', value: 'daterange', group: '日期范围选择' },
+        { label: '日期时间范围', value: 'datetimerange', group: '日期范围选择' },
+        { label: '月份范围', value: 'monthrange', group: '日期范围选择' }
+      ]
+    },
+    FormtagAttrs.defaultValue
   ],
   actions: []
 }
@@ -362,5 +400,6 @@ export default {
   input,
   cascader,
   switch: switchComp,
+  date: dateComp,
   button
 }

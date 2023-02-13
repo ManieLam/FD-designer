@@ -18,12 +18,13 @@
         :group="{ name: 'form', pull: 'clone', put: false }"
         :move="checkMove")
         .list-empty.secondary-text(v-if="!widget.components?.length") -- 暂无控件 --
-        .list-group-item(v-for="(item, index) in widget.components", :key="index", :data-name="item.name") {{item.name}}
+        .list-group-item(v-for="(item, index) in widget.components", :key="index", :data-name="item.name", :disabled="item.name|noConfig") {{item.name}}
 </template>
 
 <script>
 /** 控件区 */
 import draggable from 'vuedraggable'
+import componentAttrs, { formItemTags } from '@/model/componentAttrs'
 export default {
   name: 'WidgetPanel',
   components: {
@@ -43,6 +44,12 @@ export default {
         { name: 'Paul', id: 2, key: 2 },
         { name: 'Peter', id: 3, key: 3 }
       ]
+    }
+  },
+  filters: {
+    noConfig (compTag) {
+      const htmlTag = formItemTags[compTag]
+      return !Object.hasOwn(componentAttrs, htmlTag)
     }
   },
   methods: {
@@ -93,4 +100,8 @@ export default {
     border-top: 1px solid #f5f5f5
   &:hover
     background: $--bgcolor-secondary
+  &[disabled]
+    pointer-events: none
+    background: $--button-disabled-background-color
+    color: $--button-disabled-font-color
 </style>
