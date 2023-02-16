@@ -343,8 +343,18 @@ export const dateComp = {
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     FormtagAttrs.readOnly,
-    FormtagAttrs.validate,
     FormtagAttrs.clearable,
+    FormtagAttrs.validate,
+    {
+      key: 'pickerOptions',
+      label: '选择范围配置',
+      tag: 'form-date-pickerOptions'
+    },
+    {
+      key: 'shortcut',
+      label: '快捷键',
+      tag: 'form-date-shortcut'
+    },
     {
       key: 'dateType',
       label: '显示类型',
@@ -362,6 +372,11 @@ export const dateComp = {
         { label: '日期时间范围', value: 'datetimerange', group: '日期范围选择' },
         { label: '月份范围', value: 'monthrange', group: '日期范围选择' }
       ]
+    },
+    {
+      key: 'dateFormat',
+      label: '时间模式配置',
+      tag: 'ansoDataformSelect'
     },
     FormtagAttrs.defaultValue
   ],
