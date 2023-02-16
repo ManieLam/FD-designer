@@ -28,7 +28,6 @@ export default {
   -moz-osx-font-smoothing: grayscale
   // text-align: center
   color: #2c3e50
-  background: #DFDEDD
   .app-header
     color: #2c3e50
     background-image: url('~@/assets/imgs/cool-background.png')

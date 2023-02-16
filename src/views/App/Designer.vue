@@ -52,6 +52,7 @@ export default {
 }
 </script>
 
-<style scoped lang=scss>
-
+<style scoped lang=sass>
+.designer-content
+  background: #DFDEDD
 </style>
