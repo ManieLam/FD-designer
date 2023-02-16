@@ -383,6 +383,62 @@ export const dateComp = {
   actions: []
 }
 
+export const fileComp = {
+  attrs: [
+    FormtagAttrs.name,
+    FormtagAttrs.label,
+    FormtagAttrs.placeholder,
+    FormtagAttrs.disabled,
+    { label: '是否多选', key: 'multiple', tag: 'el-checkbox', labelHidden: true },
+    {
+      label: '显示类型',
+      key: 'uploadType',
+      tag: 'ansoDataformSelect',
+      isGroup: true,
+      // 根据anso-ui可选项写死
+      options: [
+        { label: '图片', value: 'picture' },
+        { label: '按钮', value: 'button' },
+        { label: '拖放区', value: 'drag' }
+      ]
+    },
+    {
+      label: '上传接口',
+      key: 'resource',
+      tag: 'el-input'
+    },
+    {
+      label: '上传所带参数',
+      key: 'resType',
+      tag: 'el-input'
+    },
+    {
+      label: '展示接口',
+      key: 'showResource',
+      tag: 'el-input'
+    },
+    {
+      label: '展示接口的使用類型',
+      key: 'showResourceType',
+      tag: 'el-input'
+    },
+    {
+      label: '文件压缩比例',
+      key: 'compress',
+      tag: 'el-input'
+    },
+    {
+      label: '备注说明',
+      key: 'tip',
+      tag: 'el-input'
+    }
+
+  ],
+  actions: [
+    { type: 'change', desc: '输入框失去焦点或用户按下回车时触发' }
+  ]
+}
+
 export const button = (function () {
   const attrs = [
     { label: '按钮标签', key: 'label', tag: 'el-input' },
@@ -416,5 +472,6 @@ export default {
   cascader,
   switch: switchComp,
   date: dateComp,
+  file: fileComp,
   button
 }
