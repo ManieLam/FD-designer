@@ -41,7 +41,7 @@ const mutations = {
           formActions: data.actions
         }, defaultFormAttrs)
         localStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
-        localStorage.setItem('Canvas-editing', routerName)
+        sessionStorage.setItem('Canvas-editing', routerName)
       }
     } else {
       // 初始新增
@@ -118,7 +118,7 @@ const actions = {
   /* 初始化 */
   init ({ state, commit }, data = {}) {
     // console.info('初始化:', state)
-    state.editingName = localStorage.getItem('Canvas-editing') || 'canvas_0'
+    state.editingName = sessionStorage.getItem('Canvas-editing') || 'canvas_0'
     const storages = localStorage.getItem('Canvas-all')
     if (storages) {
       // 存在缓存

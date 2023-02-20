@@ -208,12 +208,12 @@ export default {
       this.formItemConfig = {}
       this.$store.commit('canvas/clear', this.canvasName)
       localStorage.removeItem('Canvas-all')
-      localStorage.removeItem('Canvas-editing')
+      sessionStorage.removeItem('Canvas-editing')
     },
     onSave (alert = true) {
       // this.$refs.dragPage.save()
       localStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
-      localStorage.setItem('Canvas-editing', this.canvasName)
+      sessionStorage.setItem('Canvas-editing', this.canvasName)
       if (alert) this.$message.success('保存成功')
     },
     async getEditCanvas (rName, id) {
