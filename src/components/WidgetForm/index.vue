@@ -221,6 +221,9 @@ export default {
     .tool-wrap
       display: block
       color: #0A4078
+  &.is-active
+    border: 1px dashed #0A4078
+    background: rgb(87, 168, 206, 0.2)
   .tool-wrap
     position: absolute
     right: 0
@@ -230,9 +233,6 @@ export default {
     background: rgba(255,255,255,0.8)
     padding: 2px
     // display: block
-  .is-active
-    border: 1px dashed #0A4078
-    background: rgb(87, 168, 206, 0.2)
 // .widget-form-item
 //   border: 1px solid $--form-divider-border-color // TODO 修改为isBorder
 //   padding: 8px
