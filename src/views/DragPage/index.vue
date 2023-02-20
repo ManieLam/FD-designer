@@ -128,7 +128,7 @@ export default {
       if (tag) {
         // this.fieldList.splice(newIndex, 0, element)
         // console.info('add fields')
-        this.$store.commit('canvas/add', {
+        this.$store.commit('canvas/addWidget', {
           name: this.canvasName,
           eIndex: newIndex,
           element

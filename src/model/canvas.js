@@ -18,7 +18,8 @@ export const CanvasModel = function ({ body = [], formAttrs = {}, formActions = 
     buttons: Object.values(formButtons).sort((a, b) => a?.sort - b?.sort),
     groups: {},
     resources: {},
-    template
+    template,
+    ...arguments[0]
   }
 }
 

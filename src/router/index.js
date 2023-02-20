@@ -10,14 +10,18 @@ const routes = [
     name: 'Designer',
     component: () => import(/* webpackChunkName: "designer" */ '@/views/App/Designer.vue')
   },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // },
+  {
+    path: '/edit/:name/:id',
+    name: 'DesignerEdit',
+    component: () => import(/* webpackChunkName: "designer" */ '@/views/App/Designer.vue')
+    // redirect: {
+    //   name: 'Designer',
+    //   params: {
+    //     name: 'redirect',
+    //     id: 'redirect'
+    //   }
+    // }
+  },
   {
     path: '/online/:name/:id',
     name: 'Online',

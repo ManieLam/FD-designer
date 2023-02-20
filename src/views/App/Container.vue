@@ -24,18 +24,16 @@
         el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="publishOnline") 发布
     DragPage(
       ref="dragPanel"
-      :key="actIndex"
+      :key="canvasName"
       :formItemConfig="formItemConfig"
-      :actIndex="actIndex"
       :canvasName="canvasName"
       :canvas="canvasName|getActCanvas(allCanvas)"
       @onSelect="onSelectElement")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
       ref="settingPanel"
-      :key="actIndex"
+      :key="canvasName"
       :canvas="canvasName|getActCanvas(allCanvas)"
-      :actIndex="actIndex"
       :canvasName="canvasName"
       :formItemConfig="formItemConfig"
       @update="updateConfig")
@@ -101,7 +99,7 @@ export default {
   },
   data () {
     return {
-      actIndex: 0, // 活动的画布index
+      // actName: 0, // 活动的画布index
       formItemConfig: {},
       settingJsonVisable: false, // 查看json数据
       toggleSettingOpen: true, // 切换配置区
@@ -115,7 +113,8 @@ export default {
         visable: false,
         data: {}
       },
-      componentVM: 'FormTemp'
+      isEditMode: false, // 编辑模式
+      componentVM: 'FormTemp' // 暂且是表单类型，TODO 扩展其他类型
     }
   },
   filters: {
@@ -131,7 +130,7 @@ export default {
   },
   computed: {
     canvasName () {
-      return this.$store.state.canvas.editingName || `canvas_${this.actIndex}`
+      return this.$store.state.canvas.editingName || 'canvas_0'
     },
     allCanvas () {
       return this.$store.state.canvas.canvas
@@ -217,11 +216,34 @@ export default {
       localStorage.setItem('Canvas-editing', this.canvasName)
       if (alert) this.$message.success('保存成功')
     },
+    async getEditCanvas (rName, id) {
+      let resData = {}
+      if (rName && id) {
+        await this.$normalRequire({
+          url: `/fileserver/ui/config/get/${id}`
+        }).then(res => {
+          console.log('res:', res.data)
+          if (res?.data) {
+            resData = JSON.parse(res.data.config)
+          }
+        })
+      }
+      return resData
+    },
     async initCanvas () {
-      await this.$store.dispatch('canvas/init')
-      const editingName = this.$store.state.canvas.editingName
-      this.actIndex = editingName ? Number(editingName.split('_')[1]) : 0
-      this.formItemConfig = this.allCanvas[this.canvasName]?.body?.[0] || {}
+      const { name: routerName, id } = this.$route.params || {}
+      console.info('路由参数:', routerName, id)
+      if (!routerName) {
+        // 初始化
+        await this.$store.dispatch('canvas/init')
+      } else {
+        // 更新本地化
+        const editData = await this.getEditCanvas(routerName, id)
+        await this.$store.dispatch('canvas/init', { routerName, data: editData })
+      }
+      this.$nextTick(() => {
+        this.formItemConfig = this.allCanvas[this.canvasName]?.body?.[0] || {}
+      })
     },
     async initResource () {
       await this.$store.commit('resources/init')
@@ -310,12 +332,6 @@ export default {
           closeOnPressEscape: false,
           closeOnHashChange: false
         }).then(({ value }) => {
-          // console.info('您输入:', value)
-          // console.info('对象:', {
-          //   ...this.previewProps.data,
-          //   routerName: value
-          // })
-          // this.afterPublish({ name: value, configId: 4 })
           // 上传服务端
           this.$normalRequire({
             url: '/fileserver/ui/config/save',
@@ -373,10 +389,6 @@ export default {
   created () {
     this.initCanvas()
     this.initResource()
-  },
-  mounted () {
-    console.info('记录的所有路由：', this.$router.getRoutes())
-    // console.log(this.hadRemoteResource)
   }
 }
 </script>

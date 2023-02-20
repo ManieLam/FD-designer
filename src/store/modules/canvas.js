@@ -15,7 +15,41 @@ const mutations = {
   /* 切换画布 */
   toggle (states, name) {},
   /* 新增画布 */
-  add (states, { name, element, eIndex = 0 }) {
+  add (states, { name, routerName, data }) {
+    if (routerName) {
+      // 追加本地化，如：预览切换编辑
+      const localCanvas = localStorage.getItem('Canvas-all')
+      const allCanvas = localCanvas ? JSON.parse(localStorage.getItem('Canvas-all')) : {}
+      const existIndex = Object.entries(allCanvas).findIndex(([cKey, cObj]) => {
+        return cKey === routerName || cObj.routerName === routerName
+      })
+      // console.log('eee:', existItem, existItemName)
+      if (existIndex > -1) {
+        // console.log('编辑已存在的页面')
+        // 本地存在该页面编辑
+        const existItemName = Object.keys(allCanvas)[existIndex]
+        console.log('existItemName:', existItemName)
+        states.canvas[existItemName] = data
+        states.editingName = existItemName
+      } else {
+        // console.log('本地追加')
+        // 本地追加
+        states.editingName = routerName
+        states.canvas[routerName] = new CanvasModel({
+          ...data,
+          formAttrs: data.attrs,
+          formActions: data.actions
+        }, defaultFormAttrs)
+        localStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+        localStorage.setItem('Canvas-editing', routerName)
+      }
+    } else {
+      // 初始新增
+      states.canvas[name] = new CanvasModel({ body: [] }, defaultFormAttrs)
+    }
+  },
+  /* 画布中新增组件 */
+  addWidget (states, { name, element, eIndex = 0 }) {
     // console.info('画布vuex新增:', name, element)
     const elements = states.canvas[name]?.body
     if (elements) {
@@ -82,16 +116,23 @@ const mutations = {
 
 const actions = {
   /* 初始化 */
-  init ({ state, commit }) {
-    // console.info('states:', states)
+  init ({ state, commit }, data = {}) {
+    // console.info('初始化:', state)
     state.editingName = localStorage.getItem('Canvas-editing') || 'canvas_0'
     const storages = localStorage.getItem('Canvas-all')
     if (storages) {
+      // 存在缓存
       state.canvas = JSON.parse(storages)
+      if (data.routerName) {
+        // 属于重新需要本地化数据
+        commit('add', { name: state.editingName, ...data })
+      }
     } else {
       commit('add', { name: state.editingName })
     }
     // console.info('初始化:', state.editingName)
+  },
+  toggleCanvas () {
   }
   // updateFormActions ({ state, commit }, { name, actions = null }) {
   //   const section = state.canvas[name]

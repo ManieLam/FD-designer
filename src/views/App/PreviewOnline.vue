@@ -1,8 +1,10 @@
 <template lang='pug'>
 .preview-content
-  .app-header(v-if="showHeader")
+  .app-header(v-if="isPCChannel")
     .header-icon.font-size-medium
       p Form Designer 在线预览
+    .header-tool
+      el-button(type="primary", @click="handleEdit") 切换编辑
   .app-content.bgcolor-fff
     component(
       v-if="onReady"
@@ -13,18 +15,16 @@
 </template>
 
 <script>
-/** 在线预览
- * TODO 增加emit事件, postMessage通知外部
-*/
+/** 在线预览 */
 export default {
   name: 'PreviewOnline',
   data () {
     return {
       onReady: false,
-      showHeader: false,
+      isPCChannel: false,
       routeName: '',
       canvasConfig: {},
-      // 目前只支持表单，先写死
+      // 目前只支持表单，先写死, TODO 配置
       componentVM: 'FormTemp'
     }
   },
@@ -32,13 +32,24 @@ export default {
   methods: {
     onCloseDialog () {
       window.parent.postMessage('onCloseDialog', '*')
+    },
+    checkMobile () {
+      return navigator.userAgent.match(
+        /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
+      )
+    },
+    handleEdit () {
+      const { hash, href } = window.location
+      const { name, id } = this.$route.params || {}
+      // 编辑页面跳转
+      const newPath = href.replace(hash, `#/edit/${name}/${id}`)
+      window.location.href = newPath
     }
   },
   mounted () {
-    console.log('route:', this.$route)
     const { name, id } = this.$route.params || {}
     const { mode } = this.$route.query || {}
-    this.showHeader = mode === '1' // 从配置平台跳转进入
+    this.isPCChannel = !this.checkMobile() && !!mode // 从配置平台跳转进入，非移动端
     this.routeName = name
     // console.info('查找路由名称', this.routeName)
     this.onReady = false
