@@ -20,7 +20,7 @@
             i.el-icon-info.m-l-8.secondary-text
             i.m-l-8 动作说明：
           span.m-l-8 {{eventData.eventTip}}
-      .primary-text 执行目标
+      .primary-text 执行目标（开发中）
       label.secondary-text 目标类型
         el-select.m-l-8(v-model="eventData.targetType", placeholder="请选择", :disabled="!eventData.eventName")
           el-option(v-for="opt in targetTypeOptions", :key="opt.value", v-bind="opt") {{ opt.label }}
@@ -31,7 +31,7 @@
             span.float-right.m-l-4 {{ item.name }}
     section.center-wrap
       label.primary-text
-        span.p-r-8 执行规则
+        span.p-r-8 执行规则（开发中）
         el-button(type="text", @click="clearRule") 清空
         span.color-danger.font-size-base.float-right {{ validMesg || '' }}
       EventRule(ref="eventRule", :attrs="eventData", v-model="eventData.rules")

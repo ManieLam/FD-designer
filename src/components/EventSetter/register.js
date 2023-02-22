@@ -12,6 +12,12 @@
  * - 自定义动作
  * */
 export default [
+  {
+    eventDesc: '通知',
+    eventTip: '通知外部窗口已触发动作',
+    eventName: 'notifyWindowEvent',
+    actionType: 'common'
+  },
   // 显示/隐藏
   {
     eventDesc: '显示/隐藏',

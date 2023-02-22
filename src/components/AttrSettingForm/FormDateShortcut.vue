@@ -2,17 +2,18 @@
 </template>
 
 <script>
-/** 操作规则规则设置 */
 export default {
-  name: 'ActionRule',
+  name: 'FormDateShortcut',
   data () {
-    return {}
+    return {
+    }
   },
   computed: {},
-  methods: {}
+  methods: {},
+  mounted () {}
 }
 </script>
 
-<style lang='sass' scoped>
+<style scoped lang=scss>
 
 </style>

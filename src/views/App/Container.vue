@@ -151,25 +151,6 @@ export default {
     }
   },
   methods: {
-    // getResourceCurSetting (setting = null) {
-    //   const allSetting = setting || this.$store.getters.getCurView
-    //   return Object.entries(allSetting).reduce((res, [key, value]) => {
-    //     if (typeof value === 'object') {
-    //       if (has(value, ['url', 'method', 'body', 'header'])) {
-    //         // res.push(new Map([key, value]))
-    //         console.info('找到了:', value)
-    //         res.push(new Map(key, value))
-    //       } else {
-    //         const newRes = this.getResourceCurSetting(value)
-    //         console.log('newRes:', newRes)
-    //         if (newRes.length) {
-    //           res.push(newRes)
-    //         }
-    //       }
-    //     }
-    //     return res
-    //   }, [])
-    // },
     toggleSettingJson () {
       this.$forceUpdate()
       this.$nextTick(() => {
@@ -185,6 +166,7 @@ export default {
       // console.info('on Dragged', from, to)
     }, 800),
     onSelectElement ({ type, data }) {
+      console.info('选中数据:', data)
       const firTab = type === 'component'
       if (firTab) {
         this.formItemConfig = data

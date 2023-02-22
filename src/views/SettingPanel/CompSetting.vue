@@ -11,6 +11,14 @@
         :key="tab.name"
         :name="tab.name"
         :label="tab.label")
+      ButtonGroupSetting(
+        v-show="activeName === 'button'"
+        v-bind="$attrs"
+        v-on="$listeners"
+        :value="attrsData"
+        :attrs="attrs"
+        :key="`button_${formItemConfig.key}`"
+        @updateButton="updateButton")
       AttrSettingForm(
         v-show="activeName === 'attr'"
         v-bind="$attrs"
@@ -35,6 +43,7 @@
 /** 组件配置区 */
 import AttrSettingForm from '@/components/AttrSettingForm'
 import CompActionSetting from './CompActionSetting'
+import ButtonGroupSetting from './ButtonGroupSetting.vue'
 import componentAttrs from '@/model/componentAttrs'
 import { cloneDeep, isNil } from 'lodash'
 export default {
@@ -42,15 +51,16 @@ export default {
   props: ['formItemConfig', 'canvasName'],
   components: {
     AttrSettingForm,
-    CompActionSetting
+    CompActionSetting,
+    ButtonGroupSetting
   },
   data () {
     return {
-      tabList: [
-        { label: '属性', name: 'attr' },
-        { label: '行为', name: 'action' }
-      ],
-      activeName: 'attr',
+      // tabList: [
+      //   { label: '属性', name: 'attr' },
+      //   { label: '行为', name: 'action' }
+      // ],
+      activeName: '',
       tempAttrsData: {}
       // attrsData: {}
     }
@@ -60,6 +70,8 @@ export default {
       immediate: true,
       handler (fname, oldfname) {
         if (fname !== oldfname) {
+          // this.attrsData = cloneDeep(this.formItemConfig)
+          this.activeName = this.formItemConfig.tag === 'button' ? 'button' : 'attr'
           this.attrsData = cloneDeep(this.formItemConfig)
         }
       }
@@ -93,6 +105,12 @@ export default {
         this.tempAttrsData = data
         this.update()
       }
+    },
+    tabList () {
+      return this.formItemConfig?.tag === 'button' ? [{ label: '按钮组', name: 'button' }] : [
+        { label: '属性', name: 'attr' },
+        { label: '行为', name: 'action' }
+      ]
     }
   },
   methods: {
@@ -108,6 +126,9 @@ export default {
     updateAction (actions) {
       console.log('更新外部数据:', actions)
       this.updateAnAttr({ name: 'actions', value: actions })
+    },
+    updateButton (buttons) {
+      console.log('更新按钮')
     },
     updateFieldStorage (attrs) {
       // 由内部更新到store

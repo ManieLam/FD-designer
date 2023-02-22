@@ -346,13 +346,13 @@ export const dateComp = {
     FormtagAttrs.clearable,
     FormtagAttrs.validate,
     {
-      key: 'pickerOptions',
-      label: '选择范围配置',
-      tag: 'form-date-pickerOptions'
+      key: 'disabledDate',
+      label: '选择范围配置【暂不开放】',
+      tag: 'form-date-disabledDate'
     },
     {
       key: 'shortcut',
-      label: '快捷键',
+      label: '快捷键【暂不开放】',
       tag: 'form-date-shortcut'
     },
     {
@@ -444,6 +444,11 @@ export const button = (function () {
     { label: '按钮标签', key: 'label', tag: 'el-input' },
     { label: '排序', key: 'sort', tag: 'el-input-number' }
   ]
+  const actions = [
+    { type: 'click', desc: '点击' },
+    { type: 'dbClick', desc: '双击' },
+    { type: 'rightClick', desc: '右击' }
+  ]
   return {
     submitAttrs: [
       ...attrs,
@@ -461,7 +466,25 @@ export const button = (function () {
       { label: '返回上一页', key: 'returnBack', tag: 'el-switch' }
       // { label: '取消后返回页面', key: 'routeAfterAction', tag: 'el-input', placeholder: '请输入页面路由【相对地址】' }
     ],
-    attrs
+    attrs: [
+      FormtagAttrs.name,
+      ...attrs,
+      {
+        label: '类型',
+        key: 'type',
+        tag: 'ansoDataformSelect',
+        options: [
+          { label: '主要按钮', value: 'primary' },
+          { label: '成功按钮', value: 'success' },
+          { label: '警告按钮', value: 'warning' },
+          { label: '危险按钮', value: 'danger' },
+          { label: '信息按钮', value: 'info' },
+          { label: '文字类型', value: 'text' }
+        ]
+      },
+      FormtagAttrs.disabled
+    ],
+    actions
   }
 })()
 

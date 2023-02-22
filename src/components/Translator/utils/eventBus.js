@@ -28,11 +28,11 @@ export function transThreshold ({ threshold, thresholdVal, datas, value, field }
   // 获取即将执行的阀值方法
   const theFunc = theTransthreshold?.func || null
   // // 阀值执行参数
-  // const 
+  // const
   if (theFunc) {
-    
+
   }
-},
+}
 
 /** 执行规则判断
  * and和or，目前先执行and, TODO - or

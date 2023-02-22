@@ -8,5 +8,7 @@ export default {
   'form-remote': () => import('./FormRemote.vue'),
   'form-remote-list': () => import('./FormRemoteList.vue'),
   'form-affixes': () => import('./FormAffixes.vue'),
-  'form-attr-passthrough': () => import('./FormAttrPassthrough.vue')
+  'form-attr-passthrough': () => import('./FormAttrPassthrough.vue'),
+  'form-date-disabledDate': () => import('./FormDateDisabledDate.vue'),
+  'form-date-shortcut': () => import('./FormDateShortcut.vue')
 }

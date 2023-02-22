@@ -55,6 +55,8 @@ export default {
               rules: formatFormRules(config.validate) || []
             },
             hasPassthrough ? this.formatPassthroughAttrs(config._passthroughAttrs, config) : {}
+            // 进行该组件私有属性转换
+            // ...this.formatFormItem(config)
           )
         }
       })

@@ -102,7 +102,7 @@ export default {
       if (!tag) return {}
       const htmlTag = this.formItemTags[tag]
       // console.log('格式化字段')
-      return {
+      const defAttr = {
         name: `${tag}_${new Date().getTime()}`,
         key: `${tag}_${new Date().getTime()}`,
         compTag: tag,
@@ -113,6 +113,13 @@ export default {
         // form: {
         // }
       }
+      return htmlTag === 'button' ? {
+        compTag: tag,
+        tag: htmlTag,
+        key: `${tag}_${new Date().getTime()}`,
+        name: `${tag}_${new Date().getTime()}`,
+        buttonList: [{ ...this.$defValue?.[htmlTag] } || {}]
+      } : defAttr
     },
     handleWidgetAdd (evt) {
       // console.info('add:', evt)
@@ -135,7 +142,7 @@ export default {
           // elements: this.fieldList
         })
         // console.info('vuex:', this.$store.state.canvas)
-
+        console.log('element:', element)
         this.$emit('onSelect', { type: 'component', data: element })
         this.$forceUpdate()
       }

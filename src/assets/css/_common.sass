@@ -386,6 +386,9 @@
 
 // 单独使用i的按钮
 i.btn-icon
+  @extend .hover-change-scale
+  @extend .hover-change-color__primary
+  @extend .cursor-pointer
   &[disabled]
     // cursor: not-allowed
     background-color: $--button-disabled-background-color
