@@ -150,7 +150,7 @@ export default {
         if (!preRes) {
           this.$message.error(`出错啦：第${index + 1}个接口异常, 中断执行`)
           // this.$emit('onMultiRequireEnd', reqRes)
-          window.parent.postMessage({ onSeriesRequireFalse: api })
+          window.parent.postMessage({ onSeriesRequireFalse: api }, '*')
           break
         }
         if (index === reqs.length - 1) {
@@ -207,7 +207,7 @@ export default {
       console.log('执行结果:', reqRes)
       // 执行结束通知
       this.$emit('onMultiRequireEnd', reqRes)
-      window.parent.postMessage({ onMultiRequireEnd: reqRes })
+      window.parent.postMessage({ onMultiRequireEnd: reqRes }, '*')
     }
   }
 }
