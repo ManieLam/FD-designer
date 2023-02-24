@@ -20,15 +20,16 @@
             i.el-icon-info.m-l-8.secondary-text
             i.m-l-8 动作说明：
           span.m-l-8 {{eventData.eventTip}}
-      .primary-text 执行目标（开发中）
-      label.secondary-text 目标类型
-        el-select.m-l-8(v-model="eventData.targetType", placeholder="请选择", :disabled="!eventData.eventName")
-          el-option(v-for="opt in targetTypeOptions", :key="opt.value", v-bind="opt") {{ opt.label }}
-      label.secondary-text.m-l-8 目标键名
-        el-select.m-l-8(v-model="eventData.target", :multiple="true", placeholder="请选择", :disabled="!eventData.eventName")
-          el-option(v-for="item in targetOptions", :key="item.key", :value="item.name")
-            span.float-left {{ item.label }}
-            span.float-right.m-l-4 {{ item.name }}
+      component(v-if="eventData.eventType", :is="`${eventData.eventType}Frame`", v-model="eventData", :canvas="canvas")
+      //- .primary-text 执行目标（开发中）
+      //- label.secondary-text 目标类型
+      //-   el-select.m-l-8(v-model="eventData.targetType", placeholder="请选择", :disabled="!eventData.eventName")
+      //-     el-option(v-for="opt in targetTypeOptions", :key="opt.value", v-bind="opt") {{ opt.label }}
+      //- label.secondary-text.m-l-8 目标键名
+      //-   el-select.m-l-8(v-model="eventData.target", :multiple="true", placeholder="请选择", :disabled="!eventData.eventName")
+      //-     el-option(v-for="item in targetOptions", :key="item.key", :value="item.name")
+      //-       span.float-left {{ item.label }}
+      //-       span.float-right.m-l-4 {{ item.name }}
     section.center-wrap
       label.primary-text
         span.p-r-8 执行规则（开发中）
@@ -54,13 +55,23 @@
 <script>
 /** 事件配置器，执行事件的选择 */
 import register from './register'
-import ruleConfig from './ruleConfig'
+// import ruleConfig from './ruleConfig'
 import EventRule from './EventRule.vue'
 import { pick } from 'lodash'
+
+const ChangeAttrFrame = () => import('./Frame/ChangeAttrFrame')
+const ApiRequireFrame = () => import('./Frame/ApiRequireFrame')
+const CustomFrame = () => import('./Frame/CustomFrame')
+const MessageFrame = () => import('./Frame/MessageFrame')
+
 export default {
   name: 'EventSetter',
   components: {
-    EventRule
+    EventRule,
+    ChangeAttrFrame,
+    ApiRequireFrame,
+    CustomFrame,
+    MessageFrame
   },
   props: {
     /* 执行的事件方法{ target, event } */
@@ -84,9 +95,7 @@ export default {
       // },
       validMesg: '',
       curAction: this.value || {}, // 选中的
-      eventOptions: register, // 内置可操作的执行事件
-      targetTypeOptions: ruleConfig.targetTypeOptions
-
+      eventOptions: register // 内置可操作的执行事件
     }
   },
   watch: {
@@ -108,12 +117,6 @@ export default {
     },
     unEditable () {
       return !this.eventData.eventName
-    },
-    canvasBodyList () {
-      return this.canvas?.body.filter(e => e.key !== this.field.key)
-    },
-    targetOptions () {
-      return this.eventData.targetType === 'field' ? this.canvasBodyList : []
     }
   },
   methods: {
