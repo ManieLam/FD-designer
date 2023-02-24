@@ -52,14 +52,14 @@
                     title="配置表单首次加载数据源")
           //- 配置表单按钮操作
           el-collapse-item.setting-block(title="操作按钮", name="button")
-            ButtonSetting.row-item(v-if="activeName==='action'", :key="canvasName", :list="buttonList", @change="updateButtons")
+            FormButtonSetting.row-item(v-if="activeName==='action'", :key="canvasName", :list="buttonList", @change="updateButtons")
 
 </template>
 
 <script>
 /** 表单配置区 */
 import AttrSettingForm from '@/components/AttrSettingForm'
-import ButtonSetting from './ButtonSetting'
+import FormButtonSetting from './FormButtonSetting'
 import RemoteSettingRequire from '@/components/RemoteSetting/Require'
 import formAttrs from '@/model/formAttrs.js'
 import { isEmpty } from 'lodash'
@@ -76,7 +76,7 @@ export default {
   },
   components: {
     AttrSettingForm,
-    ButtonSetting,
+    FormButtonSetting,
     RemoteSettingRequire
   },
   data () {

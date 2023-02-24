@@ -28,6 +28,11 @@ const routes = [
     meta: { title: '在线预览' },
     // component: { render: (e) => e('router-view') }
     component: () => import(/* webpackChunkName: "online" */ '@/views/App/PreviewOnline.vue')
+  },
+  {
+    path: '/testPostmessage',
+    name: 'TestPostmessage',
+    component: () => import(/* webpackChunkName: "test" */ '@/views/Test/TestPostmessage.vue')
   }
 ]
 

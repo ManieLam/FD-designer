@@ -17,8 +17,9 @@
         v-on="$listeners"
         :value="attrsData"
         :attrs="attrs"
+        :actions="actions"
         :key="`button_${formItemConfig.key}`"
-        @updateButton="updateButton")
+        @input="updateButton")
       AttrSettingForm(
         v-show="activeName === 'attr'"
         v-bind="$attrs"

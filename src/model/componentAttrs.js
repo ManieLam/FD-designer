@@ -45,7 +45,7 @@ const FormtagAttrs = {
   validate: { label: '校验', key: 'validate', tag: 'form-validate' },
   placeholder: { label: '占位内容', key: 'placeholder', tag: 'el-input' },
   defaultValue: { label: '默认值', key: 'defaultValue', tag: 'form-defaultValue' },
-  disabled: { label: '禁用', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '禁用', value: true }, { label: '非禁用', value: false }], chains: () => { } },
+  disabled: { label: '禁用', key: 'disabled', tag: 'el-checkbox', labelHidden: true, options: [{ label: '禁用', value: true }, { label: '非禁用', value: false }], chains: () => { } }, // TODO 扩展禁用条件规则
   readOnly: { label: '只读', key: 'readOnly', tag: 'el-checkbox', labelHidden: true, options: [{ label: '只读', value: true }, { label: '读写', value: false }], chains: () => { } },
   clearable: { label: '允许清空', key: 'clearable', tag: 'el-checkbox', labelHidden: true, options: [{ label: '允许', value: true }, { label: '不允许', value: false }] }
 }
@@ -441,13 +441,12 @@ export const fileComp = {
 
 export const button = (function () {
   const attrs = [
-    { label: '按钮标签', key: 'label', tag: 'el-input' },
-    { label: '排序', key: 'sort', tag: 'el-input-number' }
+    { label: '按钮标签', key: 'label', tag: 'el-input' }
+    // { label: '排序', key: 'sort', tag: 'el-input-number' } // 暂不开放
   ]
   const actions = [
     { type: 'click', desc: '点击' },
-    { type: 'dbClick', desc: '双击' },
-    { type: 'rightClick', desc: '右击' }
+    { type: 'dblclick', desc: '双击' }
   ]
   return {
     submitAttrs: [
@@ -482,7 +481,24 @@ export const button = (function () {
           { label: '文字类型', value: 'text' }
         ]
       },
+      {
+        label: '图标',
+        key: 'icon',
+        tag: 'el-input'
+      },
       FormtagAttrs.disabled
+      /* // tooltip: { content } */
+      // {
+      //   label: 'tooltip提示',
+      //   name: 'tooltip',
+      //   tag: 'tooltip是对象需要独立开发的组件'
+      // },
+      /* // badge: { value, max, is-dot, hidden, type } */
+      // {
+      //   label: '徽标',
+      //   name: 'badge',
+      //   tag: 'badge是对象 需要独立开发组件 配置'
+      // }
     ],
     actions
   }

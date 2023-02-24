@@ -11,15 +11,17 @@
 <script>
 import { isEqual, cloneDeep, keyBy, pick } from 'lodash'
 import { formatFormRules } from '@/utils/format.js'
+import { validPostMesgToParent } from '../utils/tools'
 // import button from '../mixins/button'
 import relationMixin from '../mixins/relation'
 import requireMixin from '../mixins/require'
+import componentFormat from '../mixins/componentFormat'
 
 import { MessageBox } from 'element-ui'
 // import { useEval } from '@/utils/request.js'
 export default {
   name: 'FormTemp',
-  mixins: [relationMixin, requireMixin],
+  mixins: [relationMixin, requireMixin, componentFormat],
   props: {
     config: {
       type: Object,
@@ -35,6 +37,7 @@ export default {
       formDataCollect: new Map(), // [key('methods_url'), data:<Object>]
       fullDataTemp: {},
       fullData: {},
+      formFields: [],
       relations: {}
     }
   },
@@ -42,25 +45,7 @@ export default {
     formItems () {
       return this.config?.body || []
     },
-    formFields () {
-      return this.config?.body.map(config => {
-        const hasPassthrough = config._passthroughAttrs && config._passthroughAttrs.length
-        return {
-          name: config.name,
-          label: config.label,
-          relation: config.optionRelationKey || null,
-          form: Object.assign(
-            config,
-            {
-              rules: formatFormRules(config.validate) || []
-            },
-            hasPassthrough ? this.formatPassthroughAttrs(config._passthroughAttrs, config) : {}
-            // 进行该组件私有属性转换
-            // ...this.formatFormItem(config)
-          )
-        }
-      })
-    },
+    // formFields (),
     formAttrs () {
       const { attrs } = this.config || {}
       return {
@@ -95,6 +80,9 @@ export default {
     // 表单录入数据
     formData () {
       return pick(this.fullData, Object.keys(this.fieldObj))
+    // },
+    // fieldActions () {
+    //   return this.config?.body.
     }
   },
   methods: {
@@ -217,14 +205,46 @@ export default {
         res[curConfig?.attrKey] = Object.assign(preRes || {}, { [key]: curConfig.value })
         return res
       }, {})
+    },
+    formatFields () {
+      return this.config?.body.map(config => {
+        const hasPassthrough = config._passthroughAttrs && config._passthroughAttrs.length
+        const privateAttrs = this.formatFormItem(config) || {}
+        return {
+          name: config.name,
+          label: config.label,
+          relation: config.optionRelationKey || null,
+          form: Object.assign(
+            config,
+            {
+              rules: formatFormRules(config.validate) || []
+            },
+            hasPassthrough ? this.formatPassthroughAttrs(config._passthroughAttrs, config) : {},
+            // 进行该组件私有属性转换
+            privateAttrs instanceof Object ? privateAttrs : {}
+          )
+        }
+      })
+    },
+    initPostMesgFromParent () {
+      window.addEventListener('message', ({ data, origin }) => {
+        // 只接受允许范围通道消息， TODO 允许指定域数据
+        // 剔除非允许的通道消息
+        const validChannels = Object.keys(data).filter(name => validPostMesgToParent.includes(name))
+        if (validChannels.length) {
+          console.info('获取到其他窗口信息', data, origin)
+        }
+      }, false)
     }
   },
   created () {
     this.getRelation()
   },
   mounted () {
+    this.formFields = this.formatFields()
     this.onClearValidate()
     this.requireImmediateRemote()
+    this.initPostMesgFromParent()
   }
 }
 </script>

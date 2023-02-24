@@ -223,11 +223,12 @@ export const presetOptions = [
 
 /* 按钮组中的子按钮元素 默认值设置 */
 export function buttonConf (config = {}) {
-  console.log('默认值:', config)
+  // console.log('默认值:', config)
   return {
     sort: 0,
     name: `btn_${Math.floor(Math.random() * 10)}`,
     label: '按钮',
+    actions: [],
     ...config
   }
 }
