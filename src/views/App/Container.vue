@@ -148,6 +148,10 @@ export default {
     // // 画布内已选的异步请求链接
     // hadRemoteResource () {
     //   return this.getResourceCurSetting()
+    },
+    isEdit () {
+      const { name, id } = this.$route.params
+      return name && id
     }
   },
   methods: {
@@ -189,8 +193,11 @@ export default {
       this.$refs.settingPanel.clear()
       this.formItemConfig = {}
       this.$store.commit('canvas/clear', this.canvasName)
-      localStorage.removeItem('Canvas-all')
-      sessionStorage.removeItem('Canvas-editing')
+      if (!this.isEdit) {
+        // 非编辑状态才清除本地缓存
+        localStorage.removeItem('Canvas-all')
+        sessionStorage.removeItem('Canvas-editing')
+      }
     },
     onSave (alert = true) {
       // this.$refs.dragPage.save()
@@ -204,9 +211,11 @@ export default {
         await this.$normalRequire({
           url: `/fileserver/ui/config/get/${id}`
         }).then(res => {
-          console.log('res:', res.data)
           if (res?.data) {
-            resData = JSON.parse(res.data.config)
+            resData = {
+              ...JSON.parse(res.data.config),
+              configId: res.data.id
+            }
           }
         })
       }
@@ -214,13 +223,15 @@ export default {
     },
     async initCanvas () {
       const { name: routerName, id } = this.$route.params || {}
-      console.info('路由参数:', routerName, id)
+      // console.info('路由参数:', routerName, id)
       if (!routerName) {
         // 初始化
         await this.$store.dispatch('canvas/init')
       } else {
         // 更新本地化
         const editData = await this.getEditCanvas(routerName, id)
+        // console.log('编辑在线预览数据:', editData)
+
         await this.$store.dispatch('canvas/init', { routerName, data: editData })
       }
       this.$nextTick(() => {
@@ -358,10 +369,11 @@ export default {
       }).then(res => {
         // console.info('res:', res)
         if (res.code !== -1) {
-          this.$nextTick(() => {
-            this.onSave(false)
-          })
+          // this.$nextTick(() => {
+          //   this.onSave(false)
+          // })
           this.afterPublish({ name: routerName, configId, isUpdate: true })
+          this.$message.success('发布成功')
         } else {
           this.$message.error(res)
         }

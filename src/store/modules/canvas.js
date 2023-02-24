@@ -28,20 +28,16 @@ const mutations = {
         // console.log('编辑已存在的页面')
         // 本地存在该页面编辑
         const existItemName = Object.keys(allCanvas)[existIndex]
-        console.log('existItemName:', existItemName)
+        // console.log('existItemName:', existItemName)
         states.canvas[existItemName] = data
         states.editingName = existItemName
       } else {
         // console.log('本地追加')
         // 本地追加
         states.editingName = routerName
-        states.canvas[routerName] = new CanvasModel({
-          ...data,
-          formAttrs: data.attrs,
-          formActions: data.actions
-        }, defaultFormAttrs)
-        localStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
-        sessionStorage.setItem('Canvas-editing', routerName)
+        states.canvas[routerName] = new CanvasModel(data, defaultFormAttrs)
+        // localStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+        // sessionStorage.setItem('Canvas-editing', routerName)
       }
     } else {
       // 初始新增
@@ -66,11 +62,12 @@ const mutations = {
       elements.splice(eIndex, 1)
     }
   },
-  /* 清空 */
+  /* 清空, 不是清除 */
   clear (states, name) {
     // console.log('清空')
-    // states.canvas[name] = null
-    delete states.canvas[name]
+    const { configId, routerName } = states.canvas[name]
+    // 如果存在routerName和configId则保留，这是是否已发布的标志
+    states.canvas[name] = new CanvasModel({ configId, routerName }, defaultFormAttrs)
   },
   /* 更新 */
   update (states, { name, element = {}, eIndex, elements }) {
@@ -118,17 +115,20 @@ const actions = {
   /* 初始化 */
   init ({ state, commit }, data = {}) {
     // console.info('初始化:', state)
-    state.editingName = sessionStorage.getItem('Canvas-editing') || 'canvas_0'
     const storages = localStorage.getItem('Canvas-all')
-    if (storages) {
-      // 存在缓存
-      state.canvas = JSON.parse(storages)
-      if (data.routerName) {
-        // 属于重新需要本地化数据
-        commit('add', { name: state.editingName, ...data })
-      }
+    if (data.routerName) {
+      // 属于重新需要本地化数据
+      // console.info('属于重新需要本地化数据')
+      commit('add', { name: state.editingName, ...data })
     } else {
-      commit('add', { name: state.editingName })
+      if (storages) {
+        // 存在缓存
+        state.canvas = JSON.parse(storages)
+        state.editingName = sessionStorage.getItem('Canvas-editing')
+      } else {
+        state.editingName = sessionStorage.getItem('Canvas-editing') || 'canvas_0'
+        commit('add', { name: state.editingName })
+      }
     }
     // console.info('初始化:', state.editingName)
   },
