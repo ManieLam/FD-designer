@@ -20,7 +20,7 @@
           el-dropdown-menu(slot="dropdown")
             el-dropdown-item(command="onPreview") 预览
             el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
-        el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onSave") 保存
+        el-button(type="primary", :disabled="isEdit || canvasName|getActCanvas(allCanvas)|saveable", @click="onSave") 暂存
         el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="publishOnline") 发布
     DragPage(
       ref="dragPanel"
@@ -201,9 +201,12 @@ export default {
     },
     onSave (alert = true) {
       // this.$refs.dragPage.save()
-      localStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
-      sessionStorage.setItem('Canvas-editing', this.canvasName)
-      if (alert) this.$message.success('保存成功')
+      if (!this.isEdit) {
+        // 非编辑状态保存数据
+        localStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
+        sessionStorage.setItem('Canvas-editing', this.canvasName)
+        if (alert) this.$message.success('保存成功')
+      }
     },
     async getEditCanvas (rName, id) {
       let resData = {}

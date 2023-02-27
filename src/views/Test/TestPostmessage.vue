@@ -13,24 +13,28 @@ export default {
       iframeDom: null
     }
   },
-  computed: {},
+  computed: {
+    // 记录frame中的数据
+    frameData () {
+      return this.$refs.theFrame?.fullData || {}
+    }
+  },
   methods: {
-    getIframe () {
-      this.iframeDom = document.getElementById('iframe')
-      // 需要等到iframe中的子页面加载完成后才发送消息，否则子页面接收不到消息
-    },
     getChildMessage () {
       window.addEventListener('message', e => {
         // 对消息来源暂不做过滤
         // 示例信息通道为aabb
+        // console.info('测试获取到消息:', e.data)
         if (Object.hasOwn(e.data, 'aabb')) {
-          console.log(e.data, Object.hasOwn(e.data, 'aabb')) // 子页面发送的消息
           // console.log('iframeDom:', this.iframeDom)
           if (this.iframeDom) {
-            console.log('向子窗口传递{aa: 11, bb: 22}')
-            // 获取到iframe的window对象
-            this.iframeDom.contentWindow.postMessage({ changeData: { aa: 11, bb: 22 } }, '*')
+            // 向iframe传递数据，数据通道名称“changeData”。
+            this.iframeDom.contentWindow.postMessage({ changeData: { name: 11, bb: 22 } }, '*')
           }
+        }
+        if (Object.hasOwn(e.data, 'onMultiRequireEnd')) {
+          // 模拟【初次获取当前登录人信息作为默认值填入】，在初始化数据后追加赋值，使用“changeData”通道覆盖原默认数据集, “assignData” 则是追加
+          this.iframeDom.contentWindow.postMessage({ assignData: { loginUser: '张三' } }, '*')
         }
       }, false)
     }
@@ -38,7 +42,11 @@ export default {
   mounted () {
     // this.getIframe()
     this.$nextTick(() => {
+      // 等加载完再赋值
       this.iframeDom = document.getElementById('theFrame')
+      // 模拟【初次获取当前登录人信息作为默认值填入】，如果设置了初始化异步请求数据，则会受初始化赋值影响，此次填入失败，建议在初始化请求完数据再赋值
+      // console.info('模拟')
+      this.iframeDom.contentWindow.postMessage({ changeData: { loginUser: '张三' } }, '*')
     })
     this.getChildMessage()
   }

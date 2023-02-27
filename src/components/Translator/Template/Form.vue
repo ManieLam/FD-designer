@@ -11,7 +11,7 @@
 <script>
 import { isEqual, cloneDeep, keyBy, pick } from 'lodash'
 import { formatFormRules } from '@/utils/format.js'
-import { validPostMesgToParent } from '../utils/tools'
+import { channelEvent, validPostMesgToParent } from '../utils/eventBus'
 // import button from '../mixins/button'
 import relationMixin from '../mixins/relation'
 import requireMixin from '../mixins/require'
@@ -34,9 +34,9 @@ export default {
   },
   data () {
     return {
-      formDataCollect: new Map(), // [key('methods_url'), data:<Object>]
+      formDataCollect: new Map(), // 存放所有数据集合 [key('methods_url'), data:<Object>]
       fullDataTemp: {},
-      fullData: {},
+      fullData: {}, // 当前选用的数据集
       formFields: [],
       relations: {}
     }
@@ -231,9 +231,14 @@ export default {
         // 只接受允许范围通道消息， TODO 允许指定域数据
         // 剔除非允许的通道消息
         const validChannels = Object.keys(data).filter(name => validPostMesgToParent.includes(name))
-        if (validChannels.length) {
-          console.info('获取到其他窗口信息', data, origin)
-        }
+        validChannels.forEach(channel => {
+          const cfunc = channelEvent[channel]
+          // console.info('cfunc:', cfunc)
+          if (cfunc && typeof cfunc === 'function') {
+            // console.info('通道事件:', channel)
+            cfunc.call(this, data[channel])
+          }
+        })
       }, false)
     }
   },

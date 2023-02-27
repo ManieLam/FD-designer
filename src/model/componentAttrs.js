@@ -466,7 +466,10 @@ export const button = (function () {
       // { label: '取消后返回页面', key: 'routeAfterAction', tag: 'el-input', placeholder: '请输入页面路由【相对地址】' }
     ],
     attrs: [
-      FormtagAttrs.name,
+      {
+        ...FormtagAttrs.name,
+        disabled: true // 按钮的键名与事件绑定有关系, 不可修改
+      },
       ...attrs,
       {
         label: '类型',

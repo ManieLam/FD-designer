@@ -1,5 +1,8 @@
+/* 所有录入组件私有属性的格式化转换 */
+
 // import dayjs from 'dayjs'
 // import { presetOptions } from '@/model/defaultConfig'
+
 import { upperFirst } from 'lodash'
 
 // const getCurTime = (flag) => {
@@ -53,7 +56,9 @@ export default {
       // }
       // return function (time) {}
     },
-    /* 转换按钮属性/行为 */
+    /** 转换按钮属性/行为
+     * @param buttonList 按钮属性列表
+     */
     formatButtonAttrs ({ buttonList }) {
       // console.log('转换Button:', buttonList)
       const ref = this.$refs.form
@@ -61,22 +66,18 @@ export default {
         const btnEls = ref?.$el.getElementsByTagName('button')
         // console.log('isArray:', btnEls)
         // .test(/^ansoBtns/)
+        // 找到所有带ansoBtns开头的按钮dom元素，赋予事件监听
         const tBtnEls = Array.from(btnEls).filter(btn => /^ansoBtns/.test(btn?.getAttribute('id')))
         // console.log('find:', tBtnEls)
-        tBtnEls.forEach(btn => {
-          const btnName = btn?.getAttribute('id').match(/(btn_\d)/ig)?.[0]
+        tBtnEls.forEach(el => {
+          // console.info('按钮:', el)
+          const btnName = el?.getAttribute('id').match(/(btn_\d)/ig)?.[0] // 获取按钮名称 btn_<随机100内数字>, 不可修改
           const btnConf = buttonList.find(item => item.name === btnName)
           // console.log('btnConf:', btnConf)
-          if (btnConf?.actions) {
-            // btnConf?.actions?.forEach(a => {
-            //   btn.addEventListener(a.on, () => this.handleEvent(btnConf))
-            // })
-            // console.log('action---:', btnConf.actions)
-            for (const a of btnConf.actions) {
-              btn.addEventListener(a.on, this.handleEvent.bind(this, a))
-              // console.info(btn)
-              // btn.addEventListener(a.on, (e) => this.handleEvent(btnConf, e))
-            }
+          // 每个按钮存在多个行为
+          for (const a of (btnConf?.actions || [])) {
+            el.addEventListener(a.on, this.handleEvent.bind(this, a))
+            // btn.addEventListener(a.on, (e) => this.handleEvent(btnConf, e))
           }
         })
         this.$forceUpdate()
@@ -87,7 +88,6 @@ export default {
     },
     handleEvent: function (action) {
       // console.log('点击到了:', action)
-      // let eventName = ''
       if (action?.eventName === 'notifyWindowEvent') {
         console.info('触发通知')
         window.parent.postMessage({ [action.channelName]: action.on }, '*')
