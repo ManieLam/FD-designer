@@ -52,7 +52,7 @@ const getters = {
     if (curName) {
       // console.info('获取当前画布')
       const data = state.canvas.canvas[curName]
-      return data ? Object.assign({}, data) : {}
+      return data ? { ...data } : {}
     } else {
       return {}
     }

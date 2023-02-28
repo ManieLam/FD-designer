@@ -70,7 +70,7 @@ const mutations = {
     states.canvas[name] = new CanvasModel({ configId, routerName }, defaultFormAttrs)
   },
   /* 更新 */
-  update (states, { name, element = {}, eIndex, elements }) {
+  updateBody (states, { name, element = {}, eIndex, elements }) {
     states.canvas[name].body = elements
   },
   /** 更新单画布事件 */
@@ -93,7 +93,12 @@ const mutations = {
     if (section) {
       if (attrs) states.canvas[name].attrs = { ...attrs, ...(attrs || {}) }
       if (actions) states.canvas[name].actions = { ...actions, ...(actions || {}) }
-      if (buttons) states.canvas[name].buttons = Array.isArray(buttons) ? buttons.sort((a, b) => a?.sort - b?.sort) : [...buttons]
+      // console.log('按钮们:', buttons.sort((a, b) => a?.sort - b?.sort))
+      if (buttons) {
+        states.canvas[name].buttons = [] // 防止getter.
+        states.canvas[name].buttons = buttons
+      }
+      // if (buttons) states.canvas[name].buttons = buttons.sort((a, b) => a?.sort - b?.sort)
       // console.info('保存：', assignObj)
       if (assignObj) states.canvas[name] = Object.assign(states.canvas[name], assignObj)
     }

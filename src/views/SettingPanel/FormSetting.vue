@@ -41,7 +41,7 @@
                 //- 前置触发条件：路由带参数（跳转进入）
                 .box-content
                   el-dropdown(split-button) 前置触发条件(TODO)
-                    el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceWhen(byRoute)") 根据页面路由参数
+                    el-dropdown-menu.dropdown-item(name="byRoute", @click="getResourceTransBy(byRoute)") 根据页面路由参数
 
                 //- 动态配置数据源
                 .box-content.m-t-8
@@ -53,7 +53,6 @@
           //- 配置表单按钮操作
           el-collapse-item.setting-block(title="操作按钮", name="button")
             FormButtonSetting.row-item(v-if="activeName==='action'", :key="canvasName", :list="buttonList", @change="updateButtons")
-
 </template>
 
 <script>
@@ -81,13 +80,14 @@ export default {
   },
   data () {
     return {
+
       tabList: [
         { label: '属性', name: 'attr' },
         { label: '行为', name: 'action' }
         // { label: '样式', name: 'style' }
       ],
       activeName: 'attr',
-      attrsData: {},
+      // attrsData: {},
       attrs: formAttrs, // 目前只做表单，后续根据template类型选择
       /* 配置字典 */
       relationProps: [
@@ -95,22 +95,23 @@ export default {
         { label: '字典名', prop: 'label' }
       ], // 字典选项
       actions: [],
-      actionsData: {},
+      // actionsData: {},
       setRemoteVisable: false,
       immediateRemotePrecondition: {},
       // immediateRemotePrecondition: {
       //   route
       // },
-      activeCollapse: ['mounted', 'button'],
-      buttonList: []
+      activeCollapse: ['mounted', 'button']
+      // buttonList: []
     }
   },
   watch: {
     canvas: {
       immediate: true,
-      // deep: true,
+      deep: true,
       handler (canvas, oldData) {
         // const canvas = page?.[0] // 目前先做一个，TODO 修改为多个
+        // console.log('改变canvas表单属性')
         if (canvas) {
           this.attrsData = !canvas?.attrs || isEmpty(canvas.attrs) ? { ...this.$defVal?.formAttrs } : canvas?.attrs
           this.actionsData = !canvas.actions || isEmpty(canvas.actions) ? {} : canvas.actions
@@ -124,12 +125,6 @@ export default {
         }
       }
     }
-    // isRelationAction (flag) {
-    //   if (!flag) this.relationList = []
-    // },
-    // relationList (list) {
-    //   this.changeRelation(list)
-    // }
   },
   computed: {
     immediateRemoteApi: {
@@ -142,6 +137,18 @@ export default {
         this.setFormState({ actions: this.actionsData })
       }
     }
+    // actionsData () {
+    //   return !this.canvas.actions || isEmpty(this.canvas.actions) ? {} : this.canvas.actions
+    // },
+    // attrsData () {
+    //   return !this.canvas?.attrs || isEmpty(this.canvas.attrs) ? { ...this.$defVal?.formAttrs } : this.canvas?.attrs
+    // },
+    // buttonList () {
+    //   return this.canvas?.buttons || []
+    // },
+    // relationList () {
+    //   return this.canvas?.actions?.relationList || []
+    // }
   },
   methods: {
     togggleTab (name) {
@@ -149,23 +156,31 @@ export default {
     },
     update (attrs) {
       this.setFormState({ attrs: this.attrsData })
+      // this.$emit('update', 'attrs', this.attrsData)
     },
     updateButtons (buttons) {
+      this.buttonList = buttons
       this.setFormState({ buttons })
+      // this.$emit('update', 'buttons', buttons)
     },
     setFormState ({ attrs = null, actions = null, buttons = null }) {
       // 由内部更新到store
+      // console.info('formSetting 更新', buttons)
       this.$store.commit('canvas/assignConfig', {
         name: this.canvasName,
         attrs,
         actions,
         buttons
       })
+      this.$nextTick(() => {
+        this.$emit('update') // 防止vuex数据更新延误
+      })
+      // console.info('获取修改后的canvas:', this.$store.state.canvas.canvas[this.canvasName])
     },
     getAttrUpdate (data) {
       console.info('getAttrUpdate:', data)
     },
-    getResourceWhen (type) {
+    getResourceTransBy (type) {
       this.$set(this.actionsData, 'immediateRemotePrecondition', this.immediateRemotePrecondition)
     }
   }

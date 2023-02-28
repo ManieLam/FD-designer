@@ -38,7 +38,7 @@ import { button as buttonConfig } from '@/model/componentAttrs.js'
 import { formButtons } from '@/model/defaultConfig'
 import { keyBy, isEqual, cloneDeep } from 'lodash'
 export default {
-  name: 'ButtonSetting',
+  name: 'FormButtonSetting',
   model: {
     prop: 'list',
     event: 'change'
@@ -65,6 +65,7 @@ export default {
       deep: true,
       handler (data) {
         // console.info('按钮变化', data, this.oldBtnTemp, isEqual(data, this.oldBtnTemp))
+        // this.$emit('change', Array.isArray(data) ? data : Object.values(data))
         if (!isEqual(data, this.oldBtnTemp)) {
           this.$emit('change', Array.isArray(data) ? data : Object.values(data))
         }

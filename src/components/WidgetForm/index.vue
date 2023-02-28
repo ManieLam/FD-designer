@@ -52,9 +52,9 @@
 
     el-form-item.m-t-16.widget-form-item(
       :class="{'is-active': selectItem === 'button'}"
-      @click.native.stop="onClick({ type: 'button', data: buttonList })")
+      @click.native.stop="onClick({ type: 'button', data: formConfig.buttons })")
       el-button(
-        v-for="button in buttonList"
+        v-for="button in formConfig.buttons"
         v-bind="button"
         :key="button.name"
         @click="onButtonClick(button)") {{ button.label }}
@@ -97,19 +97,18 @@ export default {
   data () {
     return {
       selectItem: this.formItemConfig?.key,
+      // buttonList: [],
       formData: {}
     }
   },
   computed: {
     buttonList () {
-      return this.formConfig.buttons || []
+      // console.log('widgetForm 改变button')
+      return this.formConfig?.buttons || []
+      // return this.$store.state.canvas.canvas[this.canvasName]
     },
     fieldList: {
       get () {
-        /* .map(f => {
-          f.form = omit(f, ['name', 'label', 'compTag'])
-          return f
-        }) */
         return this.fields
       },
       set (list) {
@@ -163,7 +162,7 @@ export default {
   // },
   methods: {
     onButtonClick (button) {
-      if (button.func) {
+      if (button.func && typeof button.func === 'function') {
         button.func()
       }
     },

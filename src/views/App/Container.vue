@@ -161,10 +161,16 @@ export default {
         this.settingJsonVisable = !this.settingJsonVisable
       })
     },
-    updateConfig (type, attrs) {
+    updateConfig (type, newData) {
       if (type === 'comp') {
-        this.formItemConfig = attrs
+        this.formItemConfig = newData
+      // } else if (type === 'buttons') {
+      // //   console.log('fitem:', this.formItemConfig)
+      //   this.$set(this.formConfig, 'buttonList', newData)
       }
+      this.$forceUpdate()
+      // console.log('containers 更新', this.allCanvas[this.canvasName])
+      // this.formItemConfig = attrs
     },
     onDragged: debounce(({ from, to }) => {
       // console.info('on Dragged', from, to)
@@ -183,6 +189,7 @@ export default {
         if (!firTab) {
           const tabEL = this.$refs.settingPanel.$refs?.form?.[0]
           if (tabEL) {
+            // 按钮组切换到表单行为设置的tab
             type === 'button' ? tabEL.togggleTab('action') : tabEL.togggleTab('attr')
           }
         }

@@ -19,12 +19,12 @@ draggable.list-group.drag-page-container(
     //- 当前先做一个
     WidgetForm.h-100(
       ref="form"
-      key="widgetForm"
+      :key="canvasName"
       v-on="$listeners"
       v-bind="$attrs"
       :fields="fieldList"
       :added="newField"
-      :formConfig="formConfig"
+      :formConfig="canvas"
       @add="handleWidgetAdd"
       @remove="removeWidget"
       @update="updateCanvas")
@@ -48,11 +48,6 @@ export default {
   },
   // TODO 根据配置属性同步field.form配置
   props: {
-    // formConfig:,
-    formItemConfig: {
-      type: Object,
-      default: () => ({})
-    },
     canvasName: {
       type: String,
       default: ''
@@ -69,19 +64,15 @@ export default {
   data () {
     return {
       keyName: '',
-      // formSetting: {},
+      // formConfig: {},
       fieldList: [],
+      buttonList: [],
       formItemTags,
       newField: {}
     }
   },
-  computed: {
-    formConfig () {
-      return this.canvas || {}
-    }
-  },
   watch: {
-    'formConfig.body': {
+    'canvas.body': {
       // deep: true,
       immediate: true,
       handler (fields) {
@@ -157,7 +148,7 @@ export default {
     updateCanvas (list) {
       // console.log('update--', list)
       // this.fieldList = list
-      this.$store.commit('canvas/update', {
+      this.$store.commit('canvas/updateBody', {
         name: this.canvasName,
         elements: list
       })
