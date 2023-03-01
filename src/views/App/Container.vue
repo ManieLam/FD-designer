@@ -11,29 +11,30 @@
         el-button(@click="toggleSettingJson") 查看配置文件
       el-button-group.tool-wrap__right
         //- computed中设立saveable无法监听到store的变化
-        el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="toExportProps.visable=true") 导出
-        el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onClear") 清空
-        //- el-button(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="onPreview") 预览
-        el-dropdown(:disabled="canvasName|getActCanvas(allCanvas)|saveable", @command="handlePreview")
+        el-button(:disabled="actCanvas|saveable", @click="toExportProps.visable=true") 导出
+        el-button(:disabled="actCanvas|saveable", @click="onClear") 清空
+        //- el-button(:disabled="actCanvas|saveable", @click="onPreview") 预览
+        el-dropdown(:disabled="actCanvas|saveable", @command="handlePreview")
           el-button 预览
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu(slot="dropdown")
             el-dropdown-item(command="onPreview") 预览
             el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
-        el-button(type="primary", :disabled="isEdit || canvasName|getActCanvas(allCanvas)|saveable", @click="onSave") 暂存
-        el-button(type="primary", :disabled="canvasName|getActCanvas(allCanvas)|saveable", @click="publishOnline") 发布
+        el-button(type="primary", :disabled="isEdit || actCanvas|saveable", @click="onSave") 暂存
+        el-button(type="primary", :disabled="actCanvas|saveable", @click="publishOnline") 发布
+    //- :canvas="canvasName|getActCanvas(allCanvas)"
     DragPage(
       ref="dragPanel"
       :key="canvasName"
       :formItemConfig="formItemConfig"
       :canvasName="canvasName"
-      :canvas="canvasName|getActCanvas(allCanvas)"
+      :canvas="actCanvas"
       @onSelect="onSelectElement")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
       ref="settingPanel"
       :key="canvasName"
-      :canvas="canvasName|getActCanvas(allCanvas)"
+      :canvas="actCanvas"
       :canvasName="canvasName"
       :formItemConfig="formItemConfig"
       @update="updateConfig")
@@ -164,12 +165,9 @@ export default {
     updateConfig (type, newData) {
       if (type === 'comp') {
         this.formItemConfig = newData
-      // } else if (type === 'buttons') {
-      // //   console.log('fitem:', this.formItemConfig)
-      //   this.$set(this.formConfig, 'buttonList', newData)
       }
       this.$forceUpdate()
-      // console.log('containers 更新', this.allCanvas[this.canvasName])
+      // console.log('containers 更新', this.actCanvas)
       // this.formItemConfig = attrs
     },
     onDragged: debounce(({ from, to }) => {

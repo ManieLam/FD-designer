@@ -138,7 +138,7 @@ export default {
       // console.log('此刻:', curView)
       const findex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
       if (findex !== -1) {
-        this.$store.commit('canvas/updateField', {
+        this.$store.commit('canvas/updateTheWidget', {
           name: this.canvasName,
           // fname,
           findex,

@@ -66,7 +66,7 @@ export default {
       keyName: '',
       // formConfig: {},
       fieldList: [],
-      buttonList: [],
+      // buttonList: [],
       formItemTags,
       newField: {}
     }
@@ -124,16 +124,12 @@ export default {
         newIndex
       } : {}
       if (tag) {
-        // this.fieldList.splice(newIndex, 0, element)
-        // console.info('add fields')
         this.$store.commit('canvas/addWidget', {
           name: this.canvasName,
           eIndex: newIndex,
           element
           // elements: this.fieldList
         })
-        // console.info('vuex:', this.$store.state.canvas)
-        console.log('element:', element)
         this.$emit('onSelect', { type: 'component', data: element })
         this.$forceUpdate()
       }
@@ -148,7 +144,7 @@ export default {
     updateCanvas (list) {
       // console.log('update--', list)
       // this.fieldList = list
-      this.$store.commit('canvas/updateBody', {
+      this.$store.commit('canvas/updateHoldWidget', {
         name: this.canvasName,
         elements: list
       })

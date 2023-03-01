@@ -102,6 +102,7 @@ export default {
     }
   },
   computed: {
+    // 暂失效
     buttonList () {
       // console.log('widgetForm 改变button')
       return this.formConfig?.buttons || []
@@ -117,6 +118,7 @@ export default {
         })
       }
     },
+    // 暂失效
     formAttrs () {
       return this.formConfig?.attrs || {}
     },

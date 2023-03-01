@@ -70,8 +70,14 @@ const mutations = {
     states.canvas[name] = new CanvasModel({ configId, routerName }, defaultFormAttrs)
   },
   /* 更新 */
-  updateBody (states, { name, element = {}, eIndex, elements }) {
+  updateHoldWidget (states, { name, element = {}, eIndex, elements }) {
     states.canvas[name].body = elements
+  },
+  updateTheWidget (states, { name, findex = null, attrs = null }) {
+    const section = states.canvas[name]
+    if (section && findex !== null && attrs) {
+      section.body[findex] = attrs
+    }
   },
   /** 更新单画布事件 */
   updateActions (states, { name, actions = null, type = 'REWRITE', actionName = '', actionVal }) {
@@ -101,12 +107,6 @@ const mutations = {
       // if (buttons) states.canvas[name].buttons = buttons.sort((a, b) => a?.sort - b?.sort)
       // console.info('保存：', assignObj)
       if (assignObj) states.canvas[name] = Object.assign(states.canvas[name], assignObj)
-    }
-  },
-  updateField (states, { name, findex = null, attrs = null }) {
-    const section = states.canvas[name]
-    if (section && findex !== null && attrs) {
-      section.body[findex] = attrs
     }
   },
   /* 记录画布异步请求资源 */

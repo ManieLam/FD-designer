@@ -13,8 +13,7 @@
         v-bind="$attrs"
         v-on="$listeners"
         :value="attrsData"
-        :attrs="attrs"
-        @update="update")
+        :attrs="attrs")
       //- 设置表单行为
       .action-setting-wrap.m-t-8(v-show="activeName==='action'")
         el-collapse(v-model="activeCollapse")
@@ -155,27 +154,27 @@ export default {
       this.activeName = name
     },
     update (attrs) {
-      this.setFormState({ attrs: this.attrsData })
+      this.$emit('update')
+      // this.setFormState({ attrs: this.attrsData })
       // this.$emit('update', 'attrs', this.attrsData)
     },
     updateButtons (buttons) {
       this.buttonList = buttons
       this.setFormState({ buttons })
+      // this.$emit('updateButtons', buttons)
       // this.$emit('update', 'buttons', buttons)
     },
+    /* 部分配置无法双向修改到，需要更新store/canvas */
     setFormState ({ attrs = null, actions = null, buttons = null }) {
       // 由内部更新到store
-      // console.info('formSetting 更新', buttons)
+      console.info('formSetting 更新', attrs)
       this.$store.commit('canvas/assignConfig', {
         name: this.canvasName,
         attrs,
         actions,
         buttons
       })
-      this.$nextTick(() => {
-        this.$emit('update') // 防止vuex数据更新延误
-      })
-      // console.info('获取修改后的canvas:', this.$store.state.canvas.canvas[this.canvasName])
+      this.$emit('update') // 防止vuex数据更新延误
     },
     getAttrUpdate (data) {
       console.info('getAttrUpdate:', data)

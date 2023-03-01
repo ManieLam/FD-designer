@@ -63,16 +63,16 @@ export default [
         //   tag: 'el-input'
       }
     ]
-  },
-  {
-    label: '保留数据输入（TODO）',
-    key: 'keepAliveData',
-    tag: 'el-checkbox',
-    labelHidden: true,
-    options: [{
-      value: true,
-      label: '开启'
-    }]
+  // },
+  // {
+  //   label: '保留数据输入（TODO）',
+  //   key: 'keepAliveData',
+  //   tag: 'el-checkbox',
+  //   labelHidden: true,
+  //   options: [{
+  //     value: true,
+  //     label: '开启'
+  //   }]
   }
 ]
 
