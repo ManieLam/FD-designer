@@ -73,10 +73,10 @@ const mutations = {
   updateHoldWidget (states, { name, element = {}, eIndex, elements }) {
     states.canvas[name].body = elements
   },
-  updateTheWidget (states, { name, findex = null, attrs = null }) {
+  updateTheWidget (states, { name, eindex = null, attrs = null }) {
     const section = states.canvas[name]
-    if (section && findex !== null && attrs) {
-      section.body[findex] = attrs
+    if (section && eindex !== null && attrs) {
+      section.body[eindex] = attrs
     }
   },
   /** 更新单画布事件 */

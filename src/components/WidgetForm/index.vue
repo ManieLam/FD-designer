@@ -41,14 +41,16 @@
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
             v-on="$listeners"
-            v-model="formData[ele.name]"
+            :key="ele.key"
+            :value="ele"
             :keyName="ele.key"
             :name="ele.key"
             :compTag="ele.compTag"
             :index="index"
-            :config="ele")
-          .tool-wrap
-            .cursor-pointer.el-icon-delete(@click="$emit('remove', ele, index)")
+            :scopedSlots="$scopedSlots"
+            @input="changeItem($event, index)")
+          .tool-wrap(v-if="!(ele.preSlotRender || ele.suffixSlotRender)")
+            .cursor-pointer.el-icon-delete(@click.prevent.stop="$emit('remove', ele, index)")
 
     el-form-item.m-t-16.widget-form-item(
       :class="{'is-active': selectItem === 'button'}"
@@ -114,6 +116,7 @@ export default {
       },
       set (list) {
         this.$nextTick(() => {
+          console.info('isupdate')
           this.$emit('update', list)
         })
       }
@@ -188,7 +191,12 @@ export default {
       }
     },
     setFormitemAttrs () {},
-    setFormAttrs () {}
+    setFormAttrs () {},
+    changeItem (conf, index) {
+      // console.info('改变元素')
+      this.$set(this.fieldList, index, conf)
+      // this.$emit('update', this.fieldList)
+    }
   },
   mounted () {
     // this.formData = this.fieldList.reduce((res, field) => {

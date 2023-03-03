@@ -56,7 +56,7 @@ export default {
     checkMove (evt) {
       const { to } = evt
 
-      const isDragPage = Array.from(to.classList)?.includes('widget-form-list')
+      const isDragPage = Array.from(to.classList)?.some(name => ['widget-form-list', 'form-item-drag'].includes(name))
 
       if (isDragPage) {
         // draggedContext.element 对象总是实际拖拽的对象下一个

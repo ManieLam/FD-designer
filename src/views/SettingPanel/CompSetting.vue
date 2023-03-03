@@ -116,16 +116,16 @@ export default {
   },
   methods: {
     update (type) {
-      this.updateFieldStorage(this.attrsData)
+      // this.updateFieldStorage(this.attrsData)
       this.$emit('update', 'comp', this.attrsData)
     },
     updateAnAttr ({ name, value }) {
       this.$set(this.attrsData, name, value)
-      this.updateFieldStorage(this.attrsData)
+      // this.updateFieldStorage(this.attrsData)
       this.$emit('update', 'comp', this.attrsData)
     },
     updateAction (actions) {
-      console.log('更新外部数据:', actions)
+      // console.log('更新外部数据:', actions)
       this.updateAnAttr({ name: 'actions', value: actions })
     },
     updateButton (buttons) {
@@ -136,12 +136,12 @@ export default {
       if (!this.formItemConfig) return
       const curView = this.$store.getters.getCurView
       // console.log('此刻:', curView)
-      const findex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
-      if (findex !== -1) {
+      const eindex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
+      if (eindex !== -1) {
         this.$store.commit('canvas/updateTheWidget', {
           name: this.canvasName,
           // fname,
-          findex,
+          eindex,
           attrs
         })
         // this.formItemConfig = attrs

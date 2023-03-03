@@ -163,31 +163,67 @@ export default {
       })
     },
     updateConfig (type, newData) {
+      // console.log('更新', type, newData)
       if (type === 'comp') {
         this.formItemConfig = newData
+        this.updateFieldStorage(newData)
+      }
+      if (type === 'assist') {
+        this.formItemConfig = { ...this.formItemConfig, ...newData }
+        this.updateFieldStorage(this.formItemConfig)
       }
       this.$forceUpdate()
       // console.log('containers 更新', this.actCanvas)
       // this.formItemConfig = attrs
     },
+    updateFieldStorage (attrs) {
+      // 由内部更新到store
+      if (!this.formItemConfig) return
+      const curView = this.$store.getters.getCurView
+      // console.log('此刻:', curView)
+      const eindex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
+      if (eindex !== -1) {
+        this.$store.commit('canvas/updateTheWidget', {
+          name: this.canvasName,
+          // fname,
+          eindex,
+          attrs
+        })
+        // this.formItemConfig = attrs
+        this.$nextTick(() => this.$forceUpdate())
+      }
+    },
     onDragged: debounce(({ from, to }) => {
       // console.info('on Dragged', from, to)
     }, 800),
-    onSelectElement ({ type, data }) {
-      console.info('选中数据:', data)
-      const firTab = type === 'component'
-      if (firTab) {
+    // onChangeItem (item) {
+    //   console.log('onChangeItem:', item)
+    // },
+    /** type: form/component/assist
+     * 根据type切换tab */
+    onSelectElement ({ type, data, assist }) {
+      // console.info('选中数据:', type, data)
+      const compTab = type === 'component' || type === 'assist'
+      if (compTab) {
         this.formItemConfig = data
-        this.$nextTick(() => {
-          this.$forceUpdate()
-        })
+        this.$nextTick(() => { this.$forceUpdate() })
       }
-      this.$refs.settingPanel.activeName = firTab ? 'component' : 'form'
+      let actName = ''
+      switch (type) {
+        case 'button':
+        case 'form': actName = 'form'; break
+        default: actName = type; break
+      }
+
+      this.$refs.settingPanel.activeName = actName
+      if (assist) {
+        this.$refs.settingPanel.tabList[2].props = { type: assist }
+      }
       this.$nextTick(() => {
-        if (!firTab) {
+        if (!compTab) {
           const tabEL = this.$refs.settingPanel.$refs?.form?.[0]
           if (tabEL) {
-            // 按钮组切换到表单行为设置的tab
+            // 表单的按钮组切换到表单行为设置的tab
             type === 'button' ? tabEL.togggleTab('action') : tabEL.togggleTab('attr')
           }
         }

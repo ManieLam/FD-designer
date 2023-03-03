@@ -27,7 +27,8 @@ draggable.list-group.drag-page-container(
       :formConfig="canvas"
       @add="handleWidgetAdd"
       @remove="removeWidget"
-      @update="updateCanvas")
+      @update="updateBody"
+      @updateWidget="updateWidgetByTag")
     //- 可能多个表单
     //- el-form.form-designer_default()
 
@@ -38,7 +39,8 @@ draggable.list-group.drag-page-container(
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
 // import WidgetForm from '@/components/WidgetForm/V2'
-import { formItemTags } from '@/model/componentAttrs.js'
+// import { formItemTags } from '@/model/componentAttrs.js'
+import { formatField } from '@/utils/format.js'
 // import { mapGetters } from 'vuex'
 export default {
   name: 'DragPage',
@@ -67,8 +69,9 @@ export default {
       // formConfig: {},
       fieldList: [],
       // buttonList: [],
-      formItemTags,
-      newField: {}
+      // formItemTags,
+      newField: {},
+      formatField
     }
   },
   watch: {
@@ -88,30 +91,6 @@ export default {
     },
     // TODO 改造对接配置的数据源
     checkFieldOption (tag) {},
-    formatField (config) {
-      const { tag } = config
-      if (!tag) return {}
-      const htmlTag = this.formItemTags[tag]
-      // console.log('格式化字段')
-      const defAttr = {
-        name: `${tag}_${new Date().getTime()}`,
-        key: `${tag}_${new Date().getTime()}`,
-        compTag: tag,
-        label: '自定义字段',
-        tag: htmlTag,
-        // options: this.checkEnumerated(htmlTag, config), // 不出默认选项，会不显示组件
-        ...(this.$defValue?.[htmlTag] || {})
-        // form: {
-        // }
-      }
-      return htmlTag === 'button' ? {
-        compTag: tag,
-        tag: htmlTag,
-        key: `${tag}_${new Date().getTime()}`,
-        name: `${tag}_${new Date().getTime()}`,
-        buttonList: [{ ...this.$defValue?.[htmlTag] } || {}]
-      } : defAttr
-    },
     handleWidgetAdd (evt) {
       // console.info('add:', evt)
       // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
@@ -119,6 +98,7 @@ export default {
       // console.info('add-', tag)
       const newIndex = evt.newIndex
       const element = this.formatField({ tag: evt.clone?.dataset?.name })
+      // console.info('element:', element)
       this.newField = tag ? {
         element,
         newIndex
@@ -141,13 +121,27 @@ export default {
         eIndex: index
       })
     },
-    updateCanvas (list) {
+    updateBody (list) {
       // console.log('update--', list)
       // this.fieldList = list
       this.$store.commit('canvas/updateHoldWidget', {
         name: this.canvasName,
         elements: list
       })
+    },
+    // 根据tag重新修改当前主录入组件
+    updateWidgetByTag (tag, index) {
+      console.log('updateWidgetByTag:', tag, index)
+      const element = this.formatField({ tag })
+      this.newField = { element, index }
+      this.$store.commit('canvas/updateTheWidget', {
+        name: this.canvasName,
+        eIndex: index,
+        attrs: element
+        // elements: this.fieldList
+      })
+      this.$emit('onSelect', { type: 'component', data: element })
+      this.$forceUpdate()
     }
   }
 }
