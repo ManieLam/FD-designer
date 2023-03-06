@@ -48,7 +48,8 @@ const getters = {
   canvasViews: state => state.canvas.canvas,
   /* 获取当前画布配置 */
   getCurView: state => {
-    const curName = state.canvas.editingName
+    const curName = state.canvas.editingName || 'canvas_0'
+    console.log('获取当前画布:', curName)
     if (curName) {
       // console.info('获取当前画布')
       const data = state.canvas.canvas[curName]

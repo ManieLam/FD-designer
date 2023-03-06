@@ -1,5 +1,5 @@
 <template lang='pug'>
-.container-wrap
+.container-wrap(v-if="afterLoading")
   .left-panel
     WidgetPanel(@onDragged="onDragged")
   .center-panel
@@ -114,6 +114,7 @@ export default {
         visable: false,
         data: {}
       },
+      afterLoading: false,
       isEditMode: false, // 编辑模式
       componentVM: 'FormTemp' // 暂且是表单类型，TODO 扩展其他类型
     }
@@ -140,7 +141,7 @@ export default {
       // return this.allCanvas[this.canvasName] || {} // 无效
       // TODO 下个版本迭代成多个
       // ---有缓存，出现置后性
-      return this.$store.getters.getCurView
+      return this.afterLoading ? this.$store.getters.getCurView : {}
     // },
     },
     allCanvasStr () {
@@ -425,8 +426,12 @@ export default {
     }
   },
   created () {
+    this.afterLoading = false
     this.initCanvas()
     this.initResource()
+  },
+  mounted () {
+    this.afterLoading = true
   }
 }
 </script>
