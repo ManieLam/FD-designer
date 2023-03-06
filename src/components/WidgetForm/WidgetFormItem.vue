@@ -161,6 +161,7 @@ export default {
                   return <div
                     class="form-item-inside position-relative"
                     key={hindex}
+                    is-slot={this.domLen > 1 && hindex !== 1}
                     onClick={(e) => this.clickItem(e, hdom, hindex)}>
                     {
                       hdom && typeof hdom === 'function'
@@ -209,7 +210,9 @@ export default {
   padding: 2px
   > .form-item_component
     width: 100%
-  & + .form-item-inside
+  &[is-slot=true]
+    width: fit-content !important
+    flex: 0
     // padding-top: 4px
   &:hover
     border: 1px dashed #0A4078 !important
