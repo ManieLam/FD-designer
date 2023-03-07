@@ -25,8 +25,8 @@ export default {
         2: 'suffixSlotRender'
       },
       configs: [],
+      /* domList: [{dom: <string>tag标签, comKey: <string> key}] */
       domList: Array.from({ length: 3 }) // 存放插槽（辅助信息录入）和主录入组件的dom列表
-      // domList: [] // 存放插槽（辅助信息录入）和主录入组件的dom列表
     }
   },
   computed: {
@@ -47,18 +47,15 @@ export default {
       immediate: true,
       handler (conf, oldConf) {
         if (conf.compTag || !isEqual(conf, oldConf)) {
-          // if (!this.domList.length) {
-          //   this.domList.push(conf.compTag)
-          // }
-          this.$set(this.domList, 1, conf.compTag) // 多出个[0]: undefined
+          if (conf.compTag) this.$set(this.domList, 1, { dom: conf.compTag, comKey: conf.key }) // 多出个[0]: undefined
           // this.$set(this.configs, 1, conf)
           Object.entries(this.assistType).reduce((arrRes, [index, assist]) => {
             // 存在某个辅助插槽，按位补组件
-            if (Object.hasOwn(conf, assist)) arrRes[index] = conf[assist]?.compTag
+            arrRes[index] = Object.hasOwn(conf, assist) ? { dom: conf[assist]?.compTag, comKey: conf[assist]?.key } : null
             return arrRes
           }, this.domList)
 
-          // console.log('doms:', doms)
+          // console.log('doms:', this.domList)
         }
       }
     }
@@ -72,7 +69,6 @@ export default {
       if (tag && this.domList.length === 3) {
         // 前后位置暂时各1个, 暂不支持替换主组件
         // console.log('to位置：', newIndex, tag, this.domList.length)
-        this.$set(this.domList, newIndex, tag)
 
         const conf = formatField.call(this, { tag })
         const assistName = this.assistType[newIndex]
@@ -82,13 +78,17 @@ export default {
         this.$nextTick(() => this.clickItem(null, tag, newIndex))
       }
     },
-    removeItem (index) {
-      console.log('删除插槽元素', index)
-      // this.$delete(this.domList, index)
-      this.$set(this.domList, index, null)
-      // 删除对应的辅助插槽组件
-      if (index !== 1) {
-        this.$delete(this.currentConfig, this.assistType[index])
+    /* 通过改变currentConfig，删除对应的domList */
+    removeItem (colIndex, conf) {
+      // console.log('删除插槽元素', colIndex)
+      if (this.domLen > 1 && conf.key !== this.name) {
+        const newIndex = colIndex === 1 ? colIndex + 1 : colIndex // 保证位置只有0，2
+        // 删除对应的辅助插槽组件
+        // console.log('删除的下标：', newIndex)
+        this.$delete(this.currentConfig, this.assistType[newIndex])
+      } else {
+        // 删除主组件
+        this.$emit('remove', this.currentConfig, this.index)
       }
     },
     // 选择
@@ -111,7 +111,7 @@ export default {
     }
   },
   render (h) {
-    const { label, name } = this.currentConfig || {}
+    const { label, name, key } = this.currentConfig || {}
     // 前后缀暂时只支持各1位
     // const domList = [preSlotRender, this.scopedSlots[name] || this.compTag, suffixSlotRender]
     return (
@@ -160,14 +160,16 @@ export default {
             {
               this.domList
                 .filter(e => !!e)
-                .map((hdom, hindex) => {
-                  const assist = this.assistType[hindex]
-                  const config = this.domLen > 1 && assist ? this.currentConfig[assist] : this.currentConfig
+                .map(({ dom: hdom, comKey }, hindex) => {
+                  const isAssist = comKey !== key
+                  const aIndex = isAssist && hindex === 1 ? hindex + 1 : hindex
+                  const config = isAssist ? this.currentConfig[this.assistType[aIndex]] : this.currentConfig
+
                   return <div
-                    key={hindex}
-                    is-slot={this.domLen > 1 && hindex !== 1}
+                    key={comKey}
+                    is-slot={ isAssist }
                     class={[
-                      { 'is-active': this.selectItem === config.key },
+                      { 'is-active': config && this.selectItem === comKey },
                       'form-item-inside',
                       'position-relative'
                     ]}
@@ -192,7 +194,7 @@ export default {
                     }
                     {
                       this.domLen > 1 ? <div class="tool-wrap">
-                        <i class="cursor-pointer el-icon-delete" onClick={() => this.removeItem(hindex, hdom)}></i>
+                        <i class="cursor-pointer el-icon-delete" onClick={() => this.removeItem(hindex, config)}></i>
                       </div> : null
                     }
                   </div>

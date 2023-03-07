@@ -191,15 +191,15 @@ export default {
       this.$set(this.fieldList, index, conf)
     },
     onSelectItem ({ type, data, assist }) {
-      // console.log('onSelectItem:', type, assist)
       if (type === 'assist') {
         // console.log('1----')
-        this.selectItem = data[assist].key
+        // 当选中的辅助被删除，切换为主组件
+        this.selectItem = data[assist]?.key || data.key
       } else if (type === 'component') {
         // console.log('2----')
         this.selectItem = data.key
-        // this.$emit('onSelect', { type, data })
       } else {
+        // 其他类型的type, 需要再次声明透传onSelect，上面两种类型默认透传了
         // console.log('3----')
         this.selectItem = type
         this.$emit('onSelect', { type, data })
