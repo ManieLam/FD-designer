@@ -83,9 +83,13 @@ export default {
       }
     },
     removeItem (index) {
-      // console.log('删除插槽元素', index)
+      console.log('删除插槽元素', index)
       // this.$delete(this.domList, index)
       this.$set(this.domList, index, null)
+      // 删除对应的辅助插槽组件
+      if (index !== 1) {
+        this.$delete(this.currentConfig, this.assistType[index])
+      }
     },
     // 选择
     clickItem (e, tag, index) {
@@ -218,7 +222,8 @@ export default {
     width: 100%
   &[is-slot=true]
     width: fit-content !important
-    flex: 0
+    flex-grow: 0
+    // flex: 0
     // padding-top: 4px
   &.is-active
     border: 1px dashed #0A4078 !important

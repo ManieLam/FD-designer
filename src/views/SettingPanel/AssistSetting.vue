@@ -1,7 +1,7 @@
 <template lang='pug'>
 .assist-setting
   CompSetting(
-    v-if="type"
+    v-if="type && formItemConfig[type]"
     v-bind="$attrs"
     :formItemConfig="currentConfig"
     @update="updateConfig")
