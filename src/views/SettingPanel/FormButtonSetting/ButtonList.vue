@@ -2,35 +2,36 @@
 .button-list.box-content.p-l-8.p-r-8
   el-collapse(v-model="activeName")
     //- el-checkbox(v-model="checked") 是否需要按钮
-    el-collapse-item.list-item(name="hasSubmit")
+    el-collapse-item.list-item(name="submit")
       el-checkbox(slot="title", v-model="hasSubmit") 提交按钮
-      .box-content__collapse
-        .button-list-item.d-flex-v-center(v-if="hasSubmit", v-for="(attr, i) in buttonAttrs.submit", :key="i")
+      .box-content__collapse(key="submit")
+        .button-list-item.d-flex-v-center(v-for="(attr, i) in buttonAttrs.submit", :key="attr.key")
           .secondary-text.m-r-8(style="min-width: 100px;") {{attr.label}}
           components.list-item-comp(
+            v-if="hasSubmit"
             :is="attr.tag"
             v-model.lazy="buttonData.submit[attr.key]"
             v-bind="attr")
 
-    el-collapse-item.list-item(name="hasReset")
+    el-collapse-item.list-item(name="reset")
       el-checkbox(slot="title", v-model="hasReset") 重置按钮
-      .box-content__collapse
-        .button-list-item.d-flex-v-center(v-if="hasReset", v-for="(attr, i) in buttonAttrs.reset", :key="i")
+      .box-content__collapse(key="reset")
+        .button-list-item.d-flex-v-center(v-for="(attr, i) in buttonAttrs.reset", :key="attr.key")
           .secondary-text.m-r-8(style="min-width: 100px;") {{attr.label}}
-          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.reset[attr.key]", v-bind="attr")
+          components.list-item-comp(v-if="hasReset", :is="attr.tag", v-model.lazy="buttonData.reset[attr.key]", v-bind="attr")
 
-    el-collapse-item.list-item(name="hasCancel")
+    el-collapse-item.list-item(name="cancel")
       el-checkbox(slot="title", v-model="hasCancel") 取消按钮
-      .box-content__collapse
-        .button-list-item.d-flex-v-center(v-if="hasCancel", v-for="(attr, i) in buttonAttrs.cancel", :key="i")
+      .box-content__collapse(key="cancel")
+        .button-list-item.d-flex-v-center(v-for="(attr, i) in buttonAttrs.cancel", :key="attr.key")
           .secondary-text.m-r-8(style="min-width: 100px;") {{attr.label}}
-          components.list-item-comp(:is="attr.tag", v-model.lazy="buttonData.cancel[attr.key]", v-bind="attr")
+          components.list-item-comp(v-if="hasCancel", :is="attr.tag", v-model.lazy="buttonData.cancel[attr.key]", v-bind="attr")
 
   //- 考虑步骤性质的表单，提交不一定是异步提交
   .footer-wrap.w-100.text-center.m-t-8
     el-button(icon="el-icon-plus") 自定义操作按钮（TODO）
 
-</template>
+  </template>
 
 <script>
 /** 表单按钮配置 */
@@ -38,7 +39,7 @@ import { button as buttonConfig } from '@/model/componentAttrs.js'
 import { formButtons } from '@/model/defaultConfig'
 import { keyBy, isEqual, cloneDeep } from 'lodash'
 export default {
-  name: 'FormButtonSetting',
+  name: 'FormButtonList',
   model: {
     prop: 'list',
     event: 'change'
@@ -50,14 +51,15 @@ export default {
     }
   },
   data () {
+    const btnObj = keyBy(cloneDeep(this.list), 'name')
     return {
-      activeName: ['hasSubmit', 'hasReset', 'hasCancel'],
+      activeName: Object.keys(btnObj) || ['submit', 'reset', 'cancel'],
       buttonAttrs: {
         submit: buttonConfig.submitAttrs,
         reset: buttonConfig.resetAttrs,
         cancel: buttonConfig.cancelAttrs
       },
-      btnObj: keyBy(cloneDeep(this.list), 'name')
+      btnObj
     }
   },
   watch: {
@@ -133,13 +135,13 @@ export default {
 }
 </script>
 
-<style lang='sass' scoped>
-// .list-item + .list-item
-//   margin-top: 8px
-.button-list-item
-  margin-top: 4px
+  <style lang='sass' scoped>
+  // .list-item + .list-item
+  //   margin-top: 8px
+  .button-list-item
+    margin-top: 4px
 
-// .list-item-comp
-//   flex: 1
+  // .list-item-comp
+  //   flex: 1
 
-</style>
+  </style>

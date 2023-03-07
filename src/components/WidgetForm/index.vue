@@ -55,7 +55,7 @@
             .cursor-pointer.el-icon-delete(@click.prevent.stop="$emit('remove', ele, index)")
 
     el-form-item.m-t-16.widget-form-item.widget-form-button(
-      :class="{'is-active': selectItem === 'button'}"
+      :class="[{'is-active': selectItem === 'button'}, `text-${formAttrs.buttonAlign}`]"
       @click.native.stop="onSelectItem({ type: 'button', data: formConfig.buttons })")
       el-button(
         v-for="button in formConfig.buttons"

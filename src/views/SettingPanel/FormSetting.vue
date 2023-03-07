@@ -51,8 +51,9 @@
                     title="配置表单首次加载数据源")
       //- 设置按钮配置
       FormButtonSetting.row-item(v-if="activeName==='button'"
-        :key="canvasName"
+        :key="`${canvasName}-button-setting`"
         :list="buttonList"
+        :value="attrsData"
         @change="updateButtons")
 </template>
 
@@ -99,11 +100,7 @@ export default {
       // actionsData: {},
       setRemoteVisable: false,
       immediateRemotePrecondition: {},
-      // immediateRemotePrecondition: {
-      //   route
-      // },
       activeCollapse: ['mounted', 'button']
-      // buttonList: []
     }
   },
   watch: {
@@ -138,18 +135,6 @@ export default {
         this.setFormState({ actions: this.actionsData })
       }
     }
-    // actionsData () {
-    //   return !this.canvas.actions || isEmpty(this.canvas.actions) ? {} : this.canvas.actions
-    // },
-    // attrsData () {
-    //   return !this.canvas?.attrs || isEmpty(this.canvas.attrs) ? { ...this.$defVal?.formAttrs } : this.canvas?.attrs
-    // },
-    // buttonList () {
-    //   return this.canvas?.buttons || []
-    // },
-    // relationList () {
-    //   return this.canvas?.actions?.relationList || []
-    // }
   },
   methods: {
     togggleTab (name) {
@@ -161,6 +146,7 @@ export default {
       // this.$emit('update', 'attrs', this.attrsData)
     },
     updateButtons (buttons) {
+      console.log('更新按钮列表')
       this.buttonList = buttons
       this.setFormState({ buttons })
       // this.$emit('updateButtons', buttons)

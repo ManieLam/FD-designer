@@ -22,6 +22,8 @@ export const formAttrs = {
   // labelHidden: false,
   labelWidth: 100,
   labelPosition: 'right',
+  buttonAlign: 'left',
+  buttonFixed: false,
   readOnly: false,
   keepAliveData: true,
   isGroup: false // 是否组合

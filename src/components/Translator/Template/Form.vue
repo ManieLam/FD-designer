@@ -4,6 +4,7 @@
     id="customForm"
     v-model="fullData"
     v-bind="formAttrs"
+    :class="{'form-withFixed': formAttrs.buttonFixed}"
     :formFields="formFields"
     :buttonList="actButtons"
   ></AnsoDataform>
@@ -253,3 +254,10 @@ export default {
   }
 }
 </script>
+<style lang="sass" scoped>
+.form-withFixed
+  transform: translate(0)
+  height: 100vh
+  ::v-deep .form-body_buttonlist > .button-align__fixed
+    width: 100%
+</style>

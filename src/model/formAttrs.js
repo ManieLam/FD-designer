@@ -1,4 +1,28 @@
 /* 表单允许配置的属性 */
+export const formButtonAttr = [
+  {
+    label: '表单按钮组属性',
+    group: [
+      {
+        label: '按钮组水平位置',
+        key: 'buttonAlign',
+        tag: 'AnsoDataformSelect',
+        options: [
+          { label: '左', value: 'left' },
+          { label: '中', value: 'center' },
+          { label: '右', value: 'right' }
+        ]
+      },
+      {
+        label: '是否固定页脚底部',
+        key: 'buttonFixed',
+        tag: 'el-switch'
+      }
+    ]
+  }
+
+]
+
 export default [
   {
     label: '是否只读',
