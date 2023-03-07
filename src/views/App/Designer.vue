@@ -11,7 +11,7 @@
       el-dropdown(trigger="click", :split-button="true", @command="handleNavigtor")
         span.el-dropdown-link 示例查看
         el-dropdown-menu(slot="dropdown")
-          el-dropdown-item(v-for="(expText, expName) in exampleList", :command="expName") {{ expText }}
+          el-dropdown-item(v-for="(expText, expName) in exampleList", :key="expName", :command="expName") {{ expText }}
   AppContainer.app-content
   WebserverSetter(ref="webserverSetter", v-model="webserverSetting")
 </template>

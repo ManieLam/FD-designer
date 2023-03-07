@@ -12,7 +12,7 @@
     :label-width="`${formAttrs.labelWidth}px`"
     :label-position="formAttrs.labelPosition"
     :disabled="formAttrs.readOnly"
-    @click.native="onClick({ type: 'form', data: formAttrs })")
+    @click.native="onSelectItem({ type: 'form', data: formAttrs })")
     Draggable.list-group.drag-page-container(
       :value="fieldList"
       group="form"
@@ -37,7 +37,7 @@
           :key="ele.key"
           :is-border="formAttrs.border !== false"
           :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }"
-          @click.stop.prevent="onClick({ type: 'component', data: ele })")
+          @click.stop.prevent="onSelectItem({ type: 'component', data: ele })")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
             v-on="$listeners"
@@ -47,19 +47,20 @@
             :name="ele.key"
             :compTag="ele.compTag"
             :index="index"
+            :selectItem="selectItem"
             :scopedSlots="$scopedSlots"
-            @input="changeItem($event, index)")
+            @input="changeItem($event, index)"
+            @onSelect="onSelectItem")
           .tool-wrap(v-if="!(ele.preSlotRender || ele.suffixSlotRender)")
             .cursor-pointer.el-icon-delete(@click.prevent.stop="$emit('remove', ele, index)")
 
-    el-form-item.m-t-16.widget-form-item(
+    el-form-item.m-t-16.widget-form-item.widget-form-button(
       :class="{'is-active': selectItem === 'button'}"
-      @click.native.stop="onClick({ type: 'button', data: formConfig.buttons })")
+      @click.native.stop="onSelectItem({ type: 'button', data: formConfig.buttons })")
       el-button(
         v-for="button in formConfig.buttons"
         v-bind="button"
-        :key="button.name"
-        @click="onButtonClick(button)") {{ button.label }}
+        :key="button.name") {{ button.label }}
 
 </template>
 
@@ -166,15 +167,10 @@ export default {
   //   }
   // },
   methods: {
-    onButtonClick (button) {
-      if (button.func && typeof button.func === 'function') {
-        button.func()
-      }
-    },
-    onClick ({ type, data }) {
-      this.selectItem = type === 'component' ? data.key : type
-      this.$emit('onSelect', { type, data })
-    },
+    // onClick ({ type, data }) {
+    //   this.selectItem = type === 'component' ? data.key : type
+    //   this.$emit('onSelect', { type, data })
+    // },
     // 拖拽到表单内部区域时候，需要通知外部转换field格式添加
     handleWidgetAdd (evt) {
       this.$emit('add', evt)
@@ -190,12 +186,24 @@ export default {
         this.fieldList.splice(oldIndex, 1, temp)
       }
     },
-    setFormitemAttrs () {},
-    setFormAttrs () {},
     changeItem (conf, index) {
       // console.info('改变元素')
       this.$set(this.fieldList, index, conf)
-      // this.$emit('update', this.fieldList)
+    },
+    onSelectItem ({ type, data, assist }) {
+      // console.log('onSelectItem:', type, assist)
+      if (type === 'assist') {
+        // console.log('1----')
+        this.selectItem = data[assist].key
+      } else if (type === 'component') {
+        // console.log('2----')
+        this.selectItem = data.key
+        // this.$emit('onSelect', { type, data })
+      } else {
+        // console.log('3----')
+        this.selectItem = type
+        this.$emit('onSelect', { type, data })
+      }
     }
   },
   mounted () {
@@ -207,6 +215,11 @@ export default {
 </script>
 
 <style lang='sass' scoped>
+@mixin virtual-edit
+  border: 1px dashed $--form-divider-border-color
+  &:hover, &.is-active
+    border: 1px dashed #0A4078 !important
+    background: rgb(87, 168, 206, 0.2)
 .widget-form-container
   position: relative
   .empty-wrap
@@ -222,17 +235,10 @@ export default {
 .widget-form-item-wrap
   padding-bottom: 0
   position: relative
-  border: 1px dashed $--form-divider-border-color // TODO 修改为isBorder
-  // padding: 1px
-  &:hover
-    border: 1px dashed #0A4078 !important
-    background: rgb(87, 168, 206, 0.2)
-    .tool-wrap
-      display: block
-      color: #0A4078
-  &.is-active
-    border: 1px dashed #0A4078
-    background: rgb(87, 168, 206, 0.2)
+  &:hover .tool-wrap
+    display: block
+    color: #0a4078
+  @include virtual-edit
   .tool-wrap
     position: absolute
     right: 0
@@ -242,12 +248,10 @@ export default {
     background: rgba(255,255,255,0.8)
     padding: 2px
     // display: block
-// .widget-form-item
-//   border: 1px solid $--form-divider-border-color // TODO 修改为isBorder
-//   padding: 8px
-//   &:hover
-//     border: 1px dashed #0A4078
-//     background: rgb(87, 168, 206, 0.2)
+.widget-form-button
+  padding: 8px
+  margin-top: 4px
+  @include virtual-edit
 
 .is-active-form
   border: 1px dashed #0A4078

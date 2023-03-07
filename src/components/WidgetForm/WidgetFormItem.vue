@@ -12,7 +12,8 @@ export default {
     // 'config',
     'compTag',
     'keyName',
-    'scopedSlots'
+    'scopedSlots',
+    'selectItem'
   ],
   components: {
     Draggable
@@ -89,7 +90,7 @@ export default {
     // 选择
     clickItem (e, tag, index) {
       if (e) e.stopPropagation()
-      // console.log('clickItem', index)
+      console.log('clickItem', tag)
       if (this.domLen > 1) {
         if (index === 1) {
           this.$emit('onSelect', { type: 'component', data: this.currentConfig })
@@ -159,9 +160,13 @@ export default {
                   const assist = this.assistType[hindex]
                   const config = this.domLen > 1 && assist ? this.currentConfig[assist] : this.currentConfig
                   return <div
-                    class="form-item-inside position-relative"
                     key={hindex}
                     is-slot={this.domLen > 1 && hindex !== 1}
+                    class={[
+                      { 'is-active': this.selectItem === config.key },
+                      'form-item-inside',
+                      'position-relative'
+                    ]}
                     onClick={(e) => this.clickItem(e, hdom, hindex)}>
                     {
                       hdom && typeof hdom === 'function'
@@ -192,7 +197,8 @@ export default {
             }
           </transition-group>
         </Draggable>
-      </el-form-item>)
+      </el-form-item>
+    )
   }
 }
 </script>
@@ -214,6 +220,9 @@ export default {
     width: fit-content !important
     flex: 0
     // padding-top: 4px
+  &.is-active
+    border: 1px dashed #0A4078 !important
+    background: rgb(87, 168, 206, 0.2)
   &:hover
     border: 1px dashed #0A4078 !important
     background: rgb(87, 168, 206, 0.2)

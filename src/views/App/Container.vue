@@ -209,6 +209,7 @@ export default {
         this.formItemConfig = data
         this.$nextTick(() => { this.$forceUpdate() })
       }
+      // 设置第一层tab(组件/行为/辅助)
       let actName = ''
       switch (type) {
         case 'button':
@@ -217,15 +218,15 @@ export default {
       }
 
       this.$refs.settingPanel.activeName = actName
-      if (assist) {
-        this.$refs.settingPanel.tabList[2].props = { type: assist }
-      }
+      // 切换tab到辅助区
+      this.$refs.settingPanel.tabList[2].props = assist ? { type: assist } : {}
+      // 切换表单/a按钮配置
       this.$nextTick(() => {
         if (!compTab) {
           const tabEL = this.$refs.settingPanel.$refs?.form?.[0]
           if (tabEL) {
-            // 表单的按钮组切换到表单行为设置的tab
-            type === 'button' ? tabEL.togggleTab('action') : tabEL.togggleTab('attr')
+            // 表单的按钮组切换到表单按钮设置的tab
+            type === 'button' ? tabEL.togggleTab('button') : tabEL.togggleTab('attr')
           }
         }
       })

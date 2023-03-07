@@ -49,9 +49,11 @@
                     v-model="actionsData.immediateRemoteApi"
                     key="immediateRemoteApi"
                     title="配置表单首次加载数据源")
-          //- 配置表单按钮操作
-          el-collapse-item.setting-block(title="操作按钮", name="button")
-            FormButtonSetting.row-item(v-if="activeName==='action'", :key="canvasName", :list="buttonList", @change="updateButtons")
+      //- 设置按钮配置
+      FormButtonSetting.row-item(v-if="activeName==='button'"
+        :key="canvasName"
+        :list="buttonList"
+        @change="updateButtons")
 </template>
 
 <script>
@@ -79,10 +81,10 @@ export default {
   },
   data () {
     return {
-
       tabList: [
         { label: '属性', name: 'attr' },
-        { label: '行为', name: 'action' }
+        { label: '行为', name: 'action' },
+        { label: '按钮', name: 'button' }
         // { label: '样式', name: 'style' }
       ],
       activeName: 'attr',
