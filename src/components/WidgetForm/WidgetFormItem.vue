@@ -63,7 +63,7 @@ export default {
   methods: {
     dragAdd (evt) {
       const tag = evt.clone?.dataset?.name
-      const newIndex = evt.newIndex === 1 ? evt.newIndex + 1 : evt.newIndex // 保证位置只有0，2
+      const newIndex = evt.newIndex === 1 ? evt.newIndex + 1 : evt.newIndex // 保证位置只有0，2; 1永远为主位，当nexIndex位1时，自动补充位2，视为后辅助
       // console.log('拖了 新增', newIndex, this.domList.length)
 
       if (tag && this.domList.length === 3) {
@@ -75,13 +75,13 @@ export default {
         // console.log('转换后的conf:', assistName)
         // this.$set(this.configs, newIndex, conf)
         this.$set(this.currentConfig, assistName, conf)
-        this.$nextTick(() => this.clickItem(null, tag, newIndex))
+        this.$nextTick(() => this.clickItem(null, conf, newIndex))
       }
     },
     /* 通过改变currentConfig，删除对应的domList */
     removeItem (colIndex, conf) {
       // console.log('删除插槽元素', colIndex)
-      if (this.domLen > 1 && conf.key !== this.name) {
+      if (this.checkIsAssist(conf.key)) {
         const newIndex = colIndex === 1 ? colIndex + 1 : colIndex // 保证位置只有0，2
         // 删除对应的辅助插槽组件
         // console.log('删除的下标：', newIndex)
@@ -91,17 +91,16 @@ export default {
         this.$emit('remove', this.currentConfig, this.index)
       }
     },
+    checkIsAssist (eKey) {
+      return eKey !== this.currentConfig?.key
+    },
     // 选择
-    clickItem (e, tag, index) {
+    clickItem (e, conf, index) {
       if (e) e.stopPropagation()
-      console.log('clickItem', tag)
-      if (this.domLen > 1) {
-        if (index === 1) {
-          this.$emit('onSelect', { type: 'component', data: this.currentConfig })
-        } else {
-          // 切换tab， data还是主录入组件的配置数据
-          this.$emit('onSelect', { type: 'assist', data: this.currentConfig, assist: this.assistType[index] })
-        }
+      const isAssist = this.checkIsAssist(conf.key)
+      if (isAssist) {
+        // 切换tab， data还是主录入组件的配置数据
+        this.$emit('onSelect', { type: 'assist', data: this.currentConfig, assistType: this.assistType[index] })
       } else {
         this.$emit('onSelect', { type: 'component', data: this.currentConfig })
       }
@@ -161,7 +160,7 @@ export default {
               this.domList
                 .filter(e => !!e)
                 .map(({ dom: hdom, comKey }, hindex) => {
-                  const isAssist = comKey !== key
+                  const isAssist = this.checkIsAssist(comKey)
                   const aIndex = isAssist && hindex === 1 ? hindex + 1 : hindex
                   const config = isAssist ? this.currentConfig[this.assistType[aIndex]] : this.currentConfig
 
@@ -173,7 +172,7 @@ export default {
                       'form-item-inside',
                       'position-relative'
                     ]}
-                    onClick={(e) => this.clickItem(e, hdom, hindex)}>
+                    onClick={(e) => this.clickItem(e, config, isAssist ? aIndex : hindex)}>
                     {
                       hdom && typeof hdom === 'function'
                         ? hdom(h, { field: config })
