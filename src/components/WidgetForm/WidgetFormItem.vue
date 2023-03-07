@@ -110,7 +110,7 @@ export default {
     }
   },
   render (h) {
-    const { label, name, key } = this.currentConfig || {}
+    const { label, name } = this.currentConfig || {}
     // 前后缀暂时只支持各1位
     // const domList = [preSlotRender, this.scopedSlots[name] || this.compTag, suffixSlotRender]
     return (
