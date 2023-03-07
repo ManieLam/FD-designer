@@ -29,7 +29,7 @@
       :formItemConfig="formItemConfig"
       :canvasName="canvasName"
       :canvas="actCanvas"
-      @onSelect="onSelectElement")
+      @onSelectItem="onSelectElement")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
       ref="settingPanel"
@@ -202,8 +202,8 @@ export default {
     // },
     /** type: form/component/assist
      * 根据type切换tab */
-    onSelectElement ({ type, data, assist }) {
-      // console.info('选中数据:', type, data)
+    onSelectElement ({ type, data, assistType }) {
+      console.info('选中数据:', type, data)
       const compTab = type === 'component' || type === 'assist'
       if (compTab) {
         this.formItemConfig = data
@@ -219,7 +219,7 @@ export default {
 
       this.$refs.settingPanel.activeName = actName
       // 切换tab到辅助区
-      this.$refs.settingPanel.tabList[2].props = assist ? { type: assist } : {}
+      this.$refs.settingPanel.tabList[2].props = assistType ? { type: assistType } : {}
       // 切换表单/a按钮配置
       this.$nextTick(() => {
         if (!compTab) {

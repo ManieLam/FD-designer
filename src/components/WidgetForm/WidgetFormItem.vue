@@ -239,7 +239,6 @@ export default {
       top: 0
       width: 100%
       height: 100%
-      background: rgba(87, 168, 206, 0.2)
     .tool-wrap
       display: inline-block
       color: #0A4078
