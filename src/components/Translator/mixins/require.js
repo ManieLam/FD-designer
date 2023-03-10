@@ -136,7 +136,7 @@ export default {
       for (let index = 0; index <= reqs.length - 1; index++) {
         const api = reqs[index]
         const reqList = this.formatRequire(api)
-        // console.log('reqList:', reqList)
+        const { url, name, method } = reqList
         await this.$require(reqList)
           .then(r => {
             // console.log('new r:', r)
@@ -152,6 +152,8 @@ export default {
           // this.$emit('onMultiRequireEnd', reqRes)
           window.parent.postMessage({ onSeriesRequireFalse: api }, '*')
           break
+        } else {
+          window.parent.postMessage({ onRequireEnd: { api: { url, name, method }, response: preRes } }, '*')
         }
         if (index === reqs.length - 1) {
           // 表示执行结束
@@ -164,19 +166,23 @@ export default {
     },
     // 并联处理
     async doInParallel (reqs = []) {
+      let results = null
       return Promise.all(
         reqs.map(req => {
+          const { url, name, method } = req
           return this.$require(this.formatRequire(req))
             .then(
               r => {
                 // console.log('获取到结果:', r)
                 this.doResolve(r, req)
+                results = { api: { url, name, method }, response: r }
               },
               e => {}
             )
         })
       )
-        .then(() => {
+        .then((r) => {
+          window.parent.postMessage({ onRequireEnd: results }, '*')
           return true // 表示执行结束, 注意不是执行成功/失败通知
         })
         .finally(() => {
