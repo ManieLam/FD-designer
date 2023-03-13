@@ -97,7 +97,7 @@ export default {
         { label: '字典名', prop: 'label' }
       ], // 字典选项
       actions: [],
-      // actionsData: {},
+      actionsData: {},
       setRemoteVisable: false,
       immediateRemotePrecondition: {},
       activeCollapse: ['mounted', 'button']
