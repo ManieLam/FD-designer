@@ -8,7 +8,9 @@
 
   .button-list
     .secondary-text.p-b-8 按钮列表
-    FormButtonList(v-on="$listeners", v-bind="$attrs")
+    FormButtonList(
+      v-bind="$attrs"
+      @change="$emit('change', $event)")
 
     //- 考虑步骤性质的表单，提交不一定是异步提交
     .footer-wrap.w-100.text-center.m-t-8
@@ -16,7 +18,9 @@
 </template>
 
 <script>
-/** 表单按钮配置 */
+/** 表单按钮配置
+ * 是根据ansoDataform指定的关于按钮属性配置: buttonList， buttonAlign，buttonFixed
+ * */
 // import { button as buttonConfig } from '@/model/componentAttrs.js'
 import { formButtonAttr } from '@/model/formAttrs.js'
 // import { formButtons } from '@/model/defaultConfig'

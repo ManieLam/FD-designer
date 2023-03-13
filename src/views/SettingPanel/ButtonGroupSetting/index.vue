@@ -1,44 +1,43 @@
 <template lang='pug'>
-.button-list.box-content.p-l-8.p-r-8
+.button-group-setting.box-content
   el-collapse(v-model="activeName")
-    el-collapse-item(v-for="(btn, i) in currentBtns.buttonList", :name="btn.name", :title="btn.label")
+    el-collapse-item(
+      v-for="(btn, i) in currentBtns"
+      :name="btn.name"
+      :title="btn.label")
       template(slot="title")
-        span.secondary-text {{btn.label}}
-        i.el-icon-delete.m-l-8.btn-icon(@click.prevent.stop="remove(btn)")
-      AttrSettingForm.box-content__inside(
+        slot(name="title", :data="btn")
+          span.secondary-text {{btn.label}}
+          i.el-icon-delete.m-l-8.btn-icon(@click.prevent.stop="remove(btn)")
+      ButtonItemSetting(
         v-bind="btn"
         v-on="$listeners"
         :key="`button_${btn.name}`"
         :value="btn"
         :attrs="attrs"
-        @update="update"
-        @updateAnAttr="updateAnAttr")
-      CompActionSetting.m-t-8.box-content__inside(
-        v-bind="$attrs"
-        v-on="$listeners"
-        :key="`button_action_${btn.name}`"
-        :value="btn"
-        :attrs="actions"
-        @input="updateAction($event, btn, i)")
-  .bottom-tool.w-100.text-center.m-t-8
+        :actions="actions"
+        @updateAction="updateAction($event, btn, i)")
+
+  .bottom-tool.w-100.text-center.m-t-8(v-if="addAble")
     el-button.w-100(size="small", type="primary", @click="add") 增加
 </template>
 
 <script>
-/* 按钮组类型的属性配置 */
-import AttrSettingForm from '@/components/AttrSettingForm'
-import CompActionSetting from './CompActionSetting'
+/* 按钮组类型的属性配置, 接受ansoButtonGroup的props属性 */
+// import AttrSettingForm from '@/components/AttrSettingForm'
+// import CompActionSetting from './CompActionSetting'
+import ButtonItemSetting from './ButtonItemSetting'
 import { buttonConf } from '@/model/defaultConfig'
 export default {
   name: 'ButtonGroupSetting',
   components: {
-    AttrSettingForm,
-    CompActionSetting
+    ButtonItemSetting
   },
   props: {
+    /* 接受ansoButtonGroup的props属性 */
     value: {
-      type: Object,
-      default: () => ({})
+      type: Array,
+      default: () => ([])
     },
     /* 属性配置 { label,key,tag,group } */
     attrs: {
@@ -49,6 +48,10 @@ export default {
     actions: {
       type: Array,
       default: () => ([])
+    },
+    addAble: {
+      type: Boolean,
+      default: true
     }
   },
   data () {
@@ -62,6 +65,7 @@ export default {
         return this.value
       },
       set (value) {
+        console.log('is emit')
         this.$emit('input', value)
       }
     }
@@ -75,15 +79,15 @@ export default {
     },
     updateAction (actions, btn, index) {
       // console.log('更新操作事件:', actions)
-      this.$set(this.currentBtns.buttonList[index], 'actions', actions)
+      this.$set(this.currentBtns[index], 'actions', actions)
     },
     remove (e) {
-      const index = this.currentBtns.buttonList.findIndex(btn => btn.name === e.name)
-      this.$delete(this.currentBtns.buttonList, index)
+      const index = this.currentBtns.findIndex(btn => btn.name === e.name)
+      this.$delete(this.currentBtns, index)
       // console.log('remove:', this.$store.state.canvas.canvas)
     },
     add () {
-      this.currentBtns.buttonList.push({ ...buttonConf({ name: `btn_${Math.floor(Math.random() * 100)}` }) })
+      this.currentBtns.push({ ...buttonConf({ name: `btn_${Math.floor(Math.random() * 100)}` }) })
     }
   },
   mounted () {}

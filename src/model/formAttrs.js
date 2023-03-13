@@ -1,4 +1,4 @@
-/* 表单允许配置的属性 */
+/* 表单按钮组的属性，单个按钮属性请查看@/model/componentAttrs.js中的button属性 */
 export const formButtonAttr = [
   {
     label: '表单按钮组属性',
@@ -23,6 +23,7 @@ export const formButtonAttr = [
 
 ]
 
+/* 表单允许配置的属性 */
 export default [
   {
     label: '是否只读',
@@ -77,7 +78,8 @@ export default [
           { label: '顶部对齐', value: 'top' },
           { label: '居左', value: 'left' },
           { label: '居右', value: 'right' },
-          { label: '居中', value: 'center' }
+          { label: '居中', value: 'center' },
+          { label: '两端对齐(TODO)', value: 'justify' }
         ]
         // },
         // {

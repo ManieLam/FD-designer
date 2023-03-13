@@ -441,7 +441,20 @@ export const fileComp = {
 
 export const button = (function () {
   const attrs = [
-    { label: '按钮标签', key: 'label', tag: 'el-input' }
+    { label: '按钮标签', key: 'label', tag: 'el-input' },
+    {
+      label: '类型',
+      key: 'type',
+      tag: 'ansoDataformSelect',
+      options: [
+        { label: '主要按钮', value: 'primary' },
+        { label: '成功按钮', value: 'success' },
+        { label: '警告按钮', value: 'warning' },
+        { label: '危险按钮', value: 'danger' },
+        { label: '信息按钮', value: 'info' },
+        { label: '文字类型', value: 'text' }
+      ]
+    }
     // { label: '排序', key: 'sort', tag: 'el-input-number' } // 暂不开放
   ]
   const actions = [
@@ -449,41 +462,38 @@ export const button = (function () {
     { type: 'dblclick', desc: '双击' }
   ]
   return {
-    submitAttrs: [
-      ...attrs,
-      { label: '提交前校验', key: 'validate', tag: 'el-switch' },
-      { label: '配置数据源', key: 'funcApi', tag: 'form-remote-list', title: '配置数据源', isSubmit: true }
-    ],
-    resetAttrs: [
-      ...attrs,
-      { label: '重置前二次提醒', key: 'tipBeforeAction', tag: 'el-switch' }
-    ],
-    cancelAttrs: [
-      ...attrs,
-      { label: '取消前二次提醒', key: 'tipBeforeAction', tag: 'el-switch' },
-      { label: '关闭弹窗', key: 'closeDialog', tag: 'el-switch' },
-      { label: '返回上一页', key: 'returnBack', tag: 'el-switch' }
-      // { label: '取消后返回页面', key: 'routeAfterAction', tag: 'el-input', placeholder: '请输入页面路由【相对地址】' }
-    ],
+    submit: {
+      attrs: [
+        ...attrs,
+        { label: '提交前校验', key: 'validate', tag: 'el-switch' },
+        { label: '配置数据源', key: 'funcApi', tag: 'form-remote-list', title: '配置数据源', isSubmit: true }
+      ],
+      actions: []
+    },
+    reset: {
+      attrs: [
+        ...attrs,
+        { label: '重置前二次提醒', key: 'tipBeforeAction', tag: 'el-switch' }
+      ],
+      actions: []
+    },
+    cancel: {
+      attrs: [
+        ...attrs,
+        { label: '取消前二次提醒', key: 'tipBeforeAction', tag: 'el-switch' },
+        { label: '关闭弹窗', key: 'closeDialog', tag: 'el-switch' },
+        { label: '返回上一页', key: 'returnBack', tag: 'el-switch' }
+        // { label: '取消后返回页面', key: 'routeAfterAction', tag: 'el-input', placeholder: '请输入页面路由【相对地址】' }
+      ],
+      actions: []
+    },
+    // 通用按钮属性
     attrs: [
       {
         ...FormtagAttrs.name,
         disabled: true // 按钮的键名与事件绑定有关系, 不可修改
       },
       ...attrs,
-      {
-        label: '类型',
-        key: 'type',
-        tag: 'ansoDataformSelect',
-        options: [
-          { label: '主要按钮', value: 'primary' },
-          { label: '成功按钮', value: 'success' },
-          { label: '警告按钮', value: 'warning' },
-          { label: '危险按钮', value: 'danger' },
-          { label: '信息按钮', value: 'info' },
-          { label: '文字类型', value: 'text' }
-        ]
-      },
       {
         label: '图标',
         key: 'icon',

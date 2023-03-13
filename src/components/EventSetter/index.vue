@@ -2,7 +2,7 @@
 .event-setting-box
   .left.d-flex-1
     section.left-content
-      label.primary-text 执行事件
+      label.primary-text 执行动作
       .left-event-list
         .event-item.hover-change-color__primary.cursor-pointer(
           v-for="event in eventOptions"

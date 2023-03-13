@@ -15,7 +15,7 @@
         v-show="activeName === 'button'"
         v-bind="$attrs"
         v-on="$listeners"
-        :value="attrsData"
+        :value="attrsData.buttonList"
         :attrs="attrs"
         :actions="actions"
         :key="`button_${formItemConfig.key}`"
@@ -44,7 +44,7 @@
 /** 组件配置区 */
 import AttrSettingForm from '@/components/AttrSettingForm'
 import CompActionSetting from './CompActionSetting'
-import ButtonGroupSetting from './ButtonGroupSetting.vue'
+import ButtonGroupSetting from './ButtonGroupSetting/index.vue'
 import componentAttrs from '@/model/componentAttrs'
 import { cloneDeep, isNil } from 'lodash'
 export default {

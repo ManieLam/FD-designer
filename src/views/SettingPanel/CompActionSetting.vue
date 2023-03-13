@@ -18,7 +18,7 @@
   //- 为操作事件绑定方法
   .section-box
     .action-item.list-column__default.m-t-8(v-for="(action, index) in actionData", :key="action.on")
-      .left {{action.on}}
+      .left {{action.on}} - {{action.eventDesc}}
       .right
         i.el-icon-edit-outline.cursor-pointer.color-primary.btn-radius-50(title="指定触发事件", @click="editAction(action, index)")
         i.el-icon-delete.cursor-pointer.color-primary.btn-radius-50(@click="removeAction(index)")
@@ -49,6 +49,11 @@ export default {
       default: () => ({})
     },
     attrs: {
+      type: Array,
+      default: () => ([])
+    },
+    // 禁用方法的列表: [eventName:<String>]
+    preventList: {
       type: Array,
       default: () => ([])
     }
