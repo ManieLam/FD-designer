@@ -21,6 +21,12 @@
     width: 100%
     padding: 0
 
+/* 表单单行录入元素 */
+.widget-form-item-wrap
+  // 允许隐藏label
+  &[label-hidden="true"] .el-form-item__label
+    display: none
+
 /* default类型的表单 */
 .form-layout-default
   .widget-form-item-wrap

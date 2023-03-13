@@ -59,11 +59,12 @@ export default [
     label: '标签',
     key: 'label',
     group: [
-      // {
-      //   label: '是否隐藏文本标签',
-      //   key: 'labelHidden',
-      //   tag: 'el-switch'
-      // },
+      {
+        label: '是否隐藏文本标签',
+        key: 'labelHidden',
+        tag: 'el-switch',
+        'active-text': '隐藏'
+      },
       {
         label: '文本标签宽度',
         key: 'labelWidth',

@@ -5,11 +5,11 @@
   el-form.widget-form-wrap(
     v-else
     ref="form"
-    v-bind="formConfig"
+    v-bind="formConfig.attrs"
     :class="[{'is-active-form': selectItem === 'form'}, `form-layout-${formAttrs.layout}`]"
     :rules="rules"
     :model="formData"
-    :label-width="`${formAttrs.labelWidth}px`"
+    :label-width="labelWidthVal"
     :label-position="formAttrs.labelPosition"
     :disabled="formAttrs.readOnly"
     @click.native="onSelectItem({ type: 'form', data: formAttrs })")
@@ -37,6 +37,7 @@
           :key="ele.key"
           :is-border="formAttrs.border !== false"
           :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }"
+          :label-hidden="ele.labelHidden || formConfig.attrs.labelHidden"
           @click.stop.prevent="onSelectItem({ type: 'component', data: ele })")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"
@@ -154,6 +155,12 @@ export default {
           )
         }
       })
+    },
+    labelWidthVal () {
+      const { labelHidden, labelPosition, labelWidth } = this.formAttrs || {}
+      // TODO 当行内和row类型开发，则开启
+      // return labelHidden || labelPosition === 'top' ? '' : this.inline || this.type === 'row' ? '' : this.labelWidth
+      return labelHidden || labelPosition === 'top' ? '' : `${labelWidth}px`
     }
   },
   // filters: {
