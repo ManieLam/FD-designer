@@ -1,5 +1,8 @@
 <template lang='pug'>
-.test-content
+.test-content.p-16
+  .input
+    label(for="frame-input__src") 输入页面在线预览地址
+    el-input#frame-input__src(style="width: 150px; margin: 8px", v-model="frameSrc", placeholder="输入页面在线预览地址")
   iframe#theFrame(:src="frameSrc", frameborder="1", height="600px")
 </template>
 
@@ -8,7 +11,10 @@ export default {
   name: 'TestPostmessage',
   data () {
     return {
-      frameSrc: '#/online/button/24', // 请不要带?model=1
+      frameSrc: '#/online/cfb/28', // 请不要带?model=1
+      // frameSrc: '#/online/q2/21', // 请不要带?model=1
+      // frameSrc: '#/online/fixed/27', // 请不要带?model=1
+      // frameSrc: '#/online/button/24', // 请不要带?model=1
       // frameSrc: '#/online/25/25', // 请不要带?model=1
       iframeDom: null
     }
