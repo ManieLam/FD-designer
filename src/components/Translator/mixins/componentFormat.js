@@ -92,7 +92,14 @@ export default {
       console.log('点击到了:', action)
       if (action?.eventName === 'notifyWindowEvent') {
         console.info('触发通知')
-        window.parent.postMessage({ [action.channelName]: action.on }, '*')
+        // console.info('formData:', this.fullData, this.formDataCollect)
+        window.parent.postMessage({
+          [action.channelName]: {
+            on: action.on,
+            action,
+            formData: this.fullData
+          }
+        }, '*')
       }
     }
   }

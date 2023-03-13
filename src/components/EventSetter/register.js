@@ -20,7 +20,7 @@
 export default [
   {
     eventDesc: '通知',
-    eventTip: '通知外部窗口已触发动作',
+    eventTip: '通知外部窗口已触发动作, 通知内容为：{ on: 动作<string>, formData: 表单数据<Object>, action: 动作事件配置对象<Object> }',
     eventName: 'notifyWindowEvent',
     eventType: 'message'
   },

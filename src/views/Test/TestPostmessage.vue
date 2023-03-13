@@ -30,9 +30,9 @@ export default {
       window.addEventListener('message', e => {
         // 对消息来源暂不做过滤
         // 示例信息通道为aabb
-        // console.info('测试获取到消息:', e.data)
         if (Object.hasOwn(e.data, 'aabb')) {
           // console.log('iframeDom:', this.iframeDom)
+          // console.info('测试获取到消息:', e.data)
           if (this.iframeDom) {
             // 向iframe传递数据，数据通道名称“changeData”。
             this.iframeDom.contentWindow.postMessage({ changeData: { name: 11, bb: 22 } }, '*')
