@@ -15,15 +15,21 @@ import { upperFirst } from 'lodash'
 export default {
   methods: {
     /* @return 最终将配置的属性内容返回成引用组件接受的对象类型 */
-    formatFormItem ({ tag }) {
+    formatFormItem ({ tag, suffixSlotRender, preSlotRender }) {
+      // console.info('tag是：', tag)
+      // 对字段tag类型的方法处理
       const func = this[`format${upperFirst(tag)}Attrs`]
+      // 对字段辅助配置的格式化
+      const suffixRenderFunc = suffixSlotRender && suffixSlotRender.tag ? this.formatFormItem(suffixSlotRender) : {}
+      const preSlotRenderFunc = preSlotRender && preSlotRender.tag ? this.formatFormItem(preSlotRender) : {}
+      const formatRes = Object.assign({}, suffixRenderFunc, preSlotRenderFunc)
       if (func) {
         const resAttrs = func(...arguments)
-        // console.log('执行后结果:', resAttrs)
+        // console.log('格式化字段后结果:', resAttrs)
         // 请返回对象([属性key]: 属性value)，不返回则阻断
-        return typeof resAttrs === 'object' ? resAttrs : {}
+        return typeof resAttrs === 'object' ? { ...formatRes, ...resAttrs } : formatRes
       } else {
-        return {}
+        return formatRes
       }
     },
     /* TODO 转换日期组件属性 */
@@ -61,21 +67,17 @@ export default {
      */
     formatButtonAttrs ({ buttonList }) {
       // console.log('转换Button:', buttonList)
-      const ref = this.$refs.form
       this.$nextTick(() => {
-        const btnEls = ref?.$el.getElementsByTagName('button')
-        // console.log('isArray:', btnEls)
-        // .test(/^ansoBtns/)
-        // 找到所有带ansoBtns开头的按钮dom元素，赋予事件监听
-        const tBtnEls = Array.from(btnEls).filter(btn => /^ansoBtns/.test(btn?.getAttribute('id')))
-        // console.log('find:', tBtnEls)
-        tBtnEls.forEach(el => {
-          // console.info('按钮:', el)
-          const btnName = el?.getAttribute('id').match(/(btn_\d)/ig)?.[0] // 获取按钮名称 btn_<随机100内数字>, 不可修改
-          const btnConf = buttonList.find(item => item.name === btnName)
-          // console.log('btnConf:', btnConf)
+        buttonList.forEach(conf => {
+          const el = this.customButtons.find(domEl => {
+            // 获取按钮名称 btn_<随机100内数字>, 不可修改
+            return domEl.getAttribute('id').match(/(btn_\d+)/ig)?.[0] === conf.name
+          })
+          // console.log('btnName:', conf.name)
+          // console.log('el:', el)
+          // console.log('btnConf:', conf)
           // 每个按钮存在多个行为
-          for (const a of (btnConf?.actions || [])) {
+          for (const a of (conf?.actions || [])) {
             el.addEventListener(a.on, this.handleEvent.bind(this, a))
             // btn.addEventListener(a.on, (e) => this.handleEvent(btnConf, e))
           }
@@ -87,7 +89,7 @@ export default {
       }
     },
     handleEvent: function (action) {
-      // console.log('点击到了:', action)
+      console.log('点击到了:', action)
       if (action?.eventName === 'notifyWindowEvent') {
         console.info('触发通知')
         window.parent.postMessage({ [action.channelName]: action.on }, '*')

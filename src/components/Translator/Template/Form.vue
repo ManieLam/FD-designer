@@ -69,11 +69,19 @@ export default {
         if (btn.name === 'reset') { btn.func = () => this.onFormReset(btn) }
         if (btn.name === 'cancel') { btn.func = () => this.onFormCancel(btn) }
         if (btn.name === 'submit') { btn.func = () => this.onFormSubmit(btn) }
-        if (this.config?.attrs?.readOnly) {
-          btn.disabled = true
-        }
+        if (this.config?.attrs?.readOnly) { btn.disabled = true }
         return btn
       })
+    },
+    /* 所有自定义按钮 */
+    customButtons () {
+      if (this.$refs.form) {
+        const btnEls = this.$refs.form?.$el.getElementsByTagName('button')
+        console.log('btnEls:', btnEls)
+        return Array.from(btnEls).filter(btn => /^.*(ansoBtns|ansoForm)(?=.*(btn_\d+)).*$/ig.test(btn?.getAttribute('id')))
+      } else {
+        return []
+      }
     },
     fieldObj () {
       return keyBy(this.formFields, 'name')
@@ -227,7 +235,7 @@ export default {
         }
       })
     },
-    initPostMesgFromParent () {
+    initPostMesgWithParent () {
       window.addEventListener('message', ({ data, origin }) => {
         // 只接受允许范围通道消息， TODO 允许指定域数据
         // 剔除非允许的通道消息
@@ -241,6 +249,15 @@ export default {
           }
         })
       }, false)
+    },
+    /* 对按钮类的事件绑定，按钮范围：表单/插槽辅助等 */
+    initCustomButton () {
+      // 非内定的按钮：bindEventListener===true
+      const buttonList = this.actButtons.filter(btn => btn.bindEventListener)
+      // console.info('buttonList:', buttonList)
+      if (buttonList) {
+        this.formatButtonAttrs({ buttonList })
+      }
     }
   },
   created () {
@@ -250,7 +267,11 @@ export default {
     this.formFields = this.formatFields()
     this.onClearValidate()
     this.requireImmediateRemote()
-    this.initPostMesgFromParent()
+    this.initPostMesgWithParent()
+    this.$nextTick(() => {
+      // computed中读取ref具有延迟性，使用$nextTick
+      this.initCustomButton()
+    })
   }
 }
 </script>
