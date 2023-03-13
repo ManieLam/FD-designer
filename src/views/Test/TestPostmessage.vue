@@ -2,7 +2,7 @@
 .test-content.p-16
   .input
     label(for="frame-input__src") 输入页面在线预览地址
-    el-input#frame-input__src(style="width: 150px; margin: 8px", v-model="frameSrc", placeholder="输入页面在线预览地址")
+    el-input#frame-input__src(style="width: 150px", v-model="frameSrc", placeholder="输入页面在线预览地址")
   iframe#theFrame(:src="frameSrc", frameborder="1", height="600px")
 </template>
 
@@ -38,8 +38,9 @@ export default {
             this.iframeDom.contentWindow.postMessage({ changeData: { name: 11, bb: 22 } }, '*')
           }
         }
-        if (Object.hasOwn(e.data, 'onMultiRequireEnd')) {
+        if (Object.hasOwn(e.data, 'onRequireEnd')) {
           // 模拟【初次获取当前登录人信息作为默认值填入】，在初始化数据后追加赋值，使用“changeData”通道覆盖原默认数据集, “assignData” 则是追加
+          console.log('结束了，返回的成功/失败数据:', e.data)
           this.iframeDom.contentWindow.postMessage({ assignData: { loginUser: '张三' } }, '*')
         }
       }, false)

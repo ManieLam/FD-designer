@@ -186,7 +186,7 @@ export default {
               },
               e => {
                 // console.log('请求异常:', e)
-                result = e
+                result = { api: { url, name, method }, response: e }
               }
             )
         })
