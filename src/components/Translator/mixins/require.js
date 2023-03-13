@@ -133,6 +133,7 @@ export default {
     async doSeries (reqs = []) {
       // console.info('evts:', reqs)
       let preRes = true
+      let isError = false
       for (let index = 0; index <= reqs.length - 1; index++) {
         const api = reqs[index]
         const reqList = this.formatRequire(api)
@@ -144,29 +145,35 @@ export default {
             preRes = cloneDeep(r)
             return r
           }, e => {
-            preRes = false
+            // console.log('串联异常：', e)
+            preRes = e
+            isError = true
           })
         // console.info('preRes:', preRes)
-        if (!preRes) {
-          this.$message.error(`出错啦：第${index + 1}个接口异常, 中断执行`)
-          // this.$emit('onMultiRequireEnd', reqRes)
-          window.parent.postMessage({ onSeriesRequireFalse: api }, '*')
+        if (isError) {
+          // 遇到失败则中断
+          this.$message.error(`出错啦：第${index + 1}个接口异常, 中断执行`) // TODO 实验时候开启，生产模式关闭
+          this.$emit('onMultiRequireEnd', preRes)
+          // window.parent.postMessage({ onSeriesRequireFalse: api }, '*') // 废弃
+          window.parent.postMessage({ onRequireEnd: { api: { url, name, method }, response: preRes } }, '*')
           break
         } else {
           window.parent.postMessage({ onRequireEnd: { api: { url, name, method }, response: preRes } }, '*')
         }
         if (index === reqs.length - 1) {
-          // 表示执行结束
+          // 只表示执行结束，不带成功/失败
           return true
         }
       }
-      // setTimeout(() => {
-      //   console.log('执行结束')
-      // })
+      if (isError) {
+        // console.log('执行失败', preRes)
+        // 当列表中途中断，并未完整将整个队列执行完成，即表示执行失败
+        return false
+      }
     },
     // 并联处理
     async doInParallel (reqs = []) {
-      let results = null
+      let result = null
       return Promise.all(
         reqs.map(req => {
           const { url, name, method } = req
@@ -175,14 +182,18 @@ export default {
               r => {
                 // console.log('获取到结果:', r)
                 this.doResolve(r, req)
-                results = { api: { url, name, method }, response: r }
+                result = { api: { url, name, method }, response: r }
               },
-              e => {}
+              e => {
+                // console.log('请求异常:', e)
+                result = e
+              }
             )
         })
       )
         .then((r) => {
-          window.parent.postMessage({ onRequireEnd: results }, '*')
+          // console.log('result:', result)
+          window.parent.postMessage({ onRequireEnd: result }, '*') // 执行结束后，无论失败或成功，都带response通知
           return true // 表示执行结束, 注意不是执行成功/失败通知
         })
         .finally(() => {
@@ -201,16 +212,16 @@ export default {
     async formatMultiRequire ({ requires = [], rules = {} } = {}) {
       // promise 一旦创建立即执行
       const _requires = cloneDeep(requires)
-      let reqRes = false
+      let reqRes = false // 只代表结束，无关成功/失败
       if (rules?.executiveMode === 'inSeries') {
-        // 串联：从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作
+        // 串联：从第一个接口依次执行，当一个接口报错则中断后续操作，进入请求失败操作（中断请求）
         reqRes = await this.doSeries(_requires)
       } else {
         // 并联：所有接口执行完成，再执行下一步操作。若存在请求失败的接口，则会单独执行该失败的操作。
         reqRes = await this.doInParallel(_requires)
         // console.log('并联执行结束:', res)
       }
-      console.log('执行结果:', reqRes)
+      console.log('执行结束:', reqRes)
       // 执行结束通知
       this.$emit('onMultiRequireEnd', reqRes)
       window.parent.postMessage({ onMultiRequireEnd: reqRes }, '*')

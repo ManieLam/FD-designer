@@ -104,16 +104,17 @@ export function fetch (props) {
           await useEval(__isChange ? funcInput : funcDefault, function (func) {
             res = func(cloneDeep(response))
           })
+          // console.info('resolve-----', res)
           resolve(res)
-          return res
+          // return res
         },
         (rej) => {
           // console.info('is reject', rej)
           if (props.error?.__isChange) {
             return useEval(props.error.funcInput, (func) => func(rej))
           }
-          reject(new Error(false))
-          return false
+          reject(rej.response.data)
+          // return rej.response?.data
         }
       )
       .catch((error) => {
@@ -121,8 +122,8 @@ export function fetch (props) {
         if (error.response) {
           Message.error(error.response.statusText)
         }
-        reject(error)
-        return false
+        reject(error.response)
+        // return false
       })
   })
 }
