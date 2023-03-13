@@ -38,7 +38,7 @@ export default {
         name: 'form',
         components: () => import('./FormSetting')
       }, {
-        label: '辅助配置',
+        label: '卡槽配置',
         name: 'assist',
         disabled: this.assistTabDisabled,
         props: {},
