@@ -37,7 +37,7 @@
           :key="ele.key"
           :is-border="formAttrs.border !== false"
           :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }"
-          :label-hidden="ele.labelHidden || formConfig.attrs.labelHidden"
+          :label-hidden="ele.labelHidden"
           @click.stop.prevent="onSelectItem({ type: 'component', data: ele })")
           WidgetFormItem.widget-form-item(
             v-if="ele && ele.compTag"

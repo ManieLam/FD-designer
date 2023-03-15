@@ -154,6 +154,19 @@ export default {
     isEdit () {
       const { name, id } = this.$route.params
       return name && id
+    },
+    formLabelHidden () {
+      return this.actCanvas?.attrs?.labelHidden
+    }
+  },
+  watch: {
+    formLabelHidden: {
+      handler (flag, oldFlag) {
+        // console.info('改变画布标签:', flag, oldFlag)
+        if (flag !== oldFlag) {
+          this.actCanvas.body.forEach(f => this.$set(f, 'labelHidden', flag))
+        }
+      }
     }
   },
   methods: {
@@ -170,9 +183,13 @@ export default {
         this.updateFieldStorage(newData)
       }
       if (type === 'assist') {
+        // 卡槽设计
         this.formItemConfig = { ...this.formItemConfig, ...newData }
         this.updateFieldStorage(this.formItemConfig)
       }
+      // if (type === 'formAttrs') {
+      //   // 表单标签隐藏的属性，影响全局字段
+      // }
       this.$forceUpdate()
       // console.log('containers 更新', this.actCanvas)
       // this.formItemConfig = attrs

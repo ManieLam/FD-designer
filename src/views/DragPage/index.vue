@@ -97,7 +97,7 @@ export default {
       const tag = evt.clone?.dataset?.name
       // console.info('add-', tag)
       const newIndex = evt.newIndex
-      const element = this.formatField({ tag: evt.clone?.dataset?.name })
+      const element = this.formatField({ tag: evt.clone?.dataset?.name, attrConf: { labelHidden: this.canvas?.attrs?.labelHidden } })
       // console.info('element:', element)
       this.newField = tag ? {
         element,

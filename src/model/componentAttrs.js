@@ -42,6 +42,7 @@ const FormtagAttrs = {
   type: { label: '类型', key: 'type', tag: 'AnsoDataformText' },
   name: { label: '字段键名', key: 'name', tag: 'el-input' },
   label: { label: '文本标签', key: 'label', tag: 'el-input' },
+  labelHidden: { label: '文本隐藏', key: 'labelHidden', tag: 'el-switch', 'active-text': '隐藏' },
   validate: { label: '校验', key: 'validate', tag: 'form-validate' },
   placeholder: { label: '占位内容', key: 'placeholder', tag: 'el-input' },
   defaultValue: { label: '默认值', key: 'defaultValue', tag: 'form-defaultValue' },
@@ -70,6 +71,7 @@ export const select = {
     // FormtagAttrs.type,
     FormtagAttrs.name,
     FormtagAttrs.label,
+    FormtagAttrs.labelHidden,
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     FormtagAttrs.clearable,
@@ -132,6 +134,7 @@ export const text = {
     // FormtagAttrs.type,
     FormtagAttrs.name,
     FormtagAttrs.label,
+    FormtagAttrs.labelHidden,
     FormtagAttrs.defaultValue
   ]
 }
@@ -142,6 +145,7 @@ export const input = {
     // FormtagAttrs.type,
     FormtagAttrs.name,
     FormtagAttrs.label,
+    FormtagAttrs.labelHidden,
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     FormtagAttrs.validate,
@@ -190,6 +194,7 @@ export const cascader = {
   attrs: [
     FormtagAttrs.name,
     FormtagAttrs.label,
+    FormtagAttrs.labelHidden,
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     FormtagAttrs.validate,
@@ -272,6 +277,7 @@ export const switchComp = {
   attrs: [
     FormtagAttrs.name,
     FormtagAttrs.label,
+    FormtagAttrs.labelHidden,
     FormtagAttrs.disabled,
     // FormtagAttrs.validate,
     {
@@ -340,6 +346,7 @@ export const dateComp = {
   attrs: [
     FormtagAttrs.name,
     FormtagAttrs.label,
+    FormtagAttrs.labelHidden,
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     FormtagAttrs.readOnly,
@@ -387,6 +394,7 @@ export const fileComp = {
   attrs: [
     FormtagAttrs.name,
     FormtagAttrs.label,
+    FormtagAttrs.labelHidden,
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     { label: '是否多选', key: 'multiple', tag: 'el-checkbox', labelHidden: true },
@@ -481,7 +489,7 @@ export const button = (function () {
       attrs: [
         ...attrs,
         { label: '取消前二次提醒', key: 'tipBeforeAction', tag: 'el-switch' },
-        { label: '关闭弹窗', key: 'closeDialog', tag: 'el-switch' },
+        // { label: '关闭弹窗', key: 'closeDialog', tag: 'el-switch' },
         { label: '返回上一页', key: 'returnBack', tag: 'el-switch' }
         // { label: '取消后返回页面', key: 'routeAfterAction', tag: 'el-input', placeholder: '请输入页面路由【相对地址】' }
       ],
