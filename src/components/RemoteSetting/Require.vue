@@ -44,7 +44,7 @@ el-dialog.async-required-dialog(
             v-for="(list, title) in apiGroup"
             v-bind="$attrs"
             :key="title"
-            :apiData="apiData"
+            :selectedApi="apiData"
             :title="decodeURI(title)"
             :list="list"
             :full="apiGroup"
@@ -120,8 +120,8 @@ el-dialog.async-required-dialog(
                   el-tooltip(placement="top")
                     template(slot="content")
                       div 除字典以外的数据，
-                      div 表单存在默认请求多个数据源时，则以列表形式传递
-                      div 该选项会影响所有该接口，请求参数的数据范围
+                      div “是否将表单数据提交”, 当勾选该选项时，则提交默认数据集和修改的数据，
+                      div 【提交】按钮默认开启 “是否将表单数据提交”, 如不需要则可手动取消勾选
                     i.icon.el-icon-info.m-l-8
                 .label-right.d-flex-v-center
                   .cursor-pointer.font-size-medium.hover-change-scale(
@@ -130,7 +130,7 @@ el-dialog.async-required-dialog(
                     @click="toggleCustomList('body')")
               .row-item
                 //- el-checkbox.m-l-16(v-model="apiData.isSubmit") 是否提交表单
-                el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否将表单【默认数据集】全量提交
+                el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否将表单数据提交（多数据源时，仅提交默认数据集）
               ParamsList(v-show="hasBody", keyName="body", v-model="apiData.body", :editAble="true", @onClearAll="toggleCustomList('body')")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
@@ -186,6 +186,11 @@ export default {
     },
     // 是否多选
     isMulti: {
+      type: Boolean,
+      default: false
+    },
+    // 是否提交按钮
+    isSubmit: {
       type: Boolean,
       default: false
     }
@@ -304,6 +309,9 @@ export default {
     // // 表单内已选数据源
     // formApiList () {
     //   const
+    },
+    isEdit () {
+      return this.chosenData?.__isEdit
     }
   },
   methods: {
@@ -346,8 +354,10 @@ export default {
       this.apiData = new ApiData()
     },
     editApi (api, index) {
+      console.log('editApi:', api)
       this.originGlobalApi = api
-      this.apiData = new ApiData(api)
+      // 当为【提交】按钮配置，则设置为true
+      this.apiData = new ApiData({ ...api, isFullDose: this.isSubmit })
     },
     removeApi (api) {
       const index = this.apiList.findIndex(row => row.name === api.name)
@@ -416,6 +426,7 @@ export default {
           newData.name = unChanged ? this.apiData.name : new Date().getTime()
           // console.log('是否改名:', unChanged ? '是' : '否', newData.name)
           newData.__isGlobal = unChanged
+          newData.__isEdit = this.isEdit
           this.$emit('chosen', newData, this.isContinues)
           if (!this.isContinues) {
             this.dialogVisabled = false

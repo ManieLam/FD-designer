@@ -20,6 +20,7 @@
       v-model="setAsyncVisible"
       :title="title"
       :isMulti="true"
+      :isSubmit="isSubmit"
       :chosenData="apiDataPatch"
       :isSelected="remoteNames"
       @chosen="chosenResource"
@@ -133,7 +134,7 @@ export default {
     },
     handleAdd () {
       // this.remoteList.push(new ApiData({ url: '/' }))
-      this.apiDataPatch = new ApiData({ url: '/', isSubmit: this.isSubmit })
+      this.apiDataPatch = new ApiData({ url: '/', isFullDose: this.isSubmit })
 
       this.$nextTick(() => {
         this.setAsyncVisible = true
@@ -141,12 +142,12 @@ export default {
     },
     // 取消新增
     hanldeRefuse (i) {
-      this.apiDataPatch = new ApiData({ url: '/', isSubmit: this.isSubmit })
+      this.apiDataPatch = new ApiData({ url: '/', isFullDose: this.isSubmit })
       this.setAsyncVisible = false
     },
     // 手动编辑
     handleEdit (api, i) {
-      this.apiDataPatch = { ...api, _isEdit: i + 1 }
+      this.apiDataPatch = { ...api, __isEdit: i + 1 }
       this.setAsyncVisible = true
     },
     // 手动移除
@@ -162,27 +163,27 @@ export default {
     },
     // 确定选中
     chosenResource (api) {
-      console.info('获取到新的接口', api)
+      // console.info('获取到新的接口', api)
       if (!api) return
       // const newApi = { ...this.apiDataPatch, ...api }
-      const newApi = { ...api, ...this.privateData }
-      const { url: newUrl, method: newMethod, _isEdit } = newApi
-      // console.info('isEdit-', _isEdit)
-      if (!_isEdit) {
+      // const newApi = api
+      const { url: newUrl, method: newMethod, __isEdit } = api
+      // console.info('isEdit-', __isEdit)
+      if (!__isEdit) {
         // 新增
-        this.apiDataPatch = newApi
+        this.apiDataPatch = api
         // 保持唯一性
         const hasExist = this.remoteList.some(({ url, method }) => isEqual({ url, method }, { url: newUrl, method: newMethod }))
         if (!hasExist) {
           const len = this.remoteList.length
           // 根据列表长度判断, 首位为默认数据集, 默认追尾添加到列表中
-          this.$set(this.remoteList, len, { ...newApi, isDefault: len === 0 })
+          this.$set(this.remoteList, len, { ...api, isDefault: len === 0 })
         } else {
           // this.$message.warning('重复选择同一个接口')
         }
       } else {
         // 编辑
-        this.$set(this.remoteList, _isEdit - 1, newApi)
+        this.$set(this.remoteList, __isEdit - 1, api)
       }
     },
     toggleRules () {

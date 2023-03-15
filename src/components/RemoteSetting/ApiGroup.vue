@@ -35,12 +35,12 @@
       v-for="(apiItem) in resourceList"
       :key="apiItem.name"
       :data-name="apiItem.name"
-      :is-active="apiData && apiItem.name === apiData.name"
+      :is-active="selectedApi && apiItem.name === selectedApi.name"
       @click.stop="$emit('editApi', apiItem)")
       .left
         .d-flex-v-center
-          //- 选中的标识 (apiData && apiItem.name === apiData.name) ||
-          i.el-icon-check.color-primary.m-r-8(v-show="multiSelectAble ? isSelected.includes(apiItem.name) : apiData && apiItem.name === apiData.name")
+          //- 选中的标识 (selectedApi && apiItem.name === selectedApi.name) ||
+          i.el-icon-check.color-primary.m-r-8(v-show="multiSelectAble ? isSelected.includes(apiItem.name) : selectedApi && apiItem.name === selectedApi.name")
           .color-warning {{apiItem.method}}
           .secondary-text.m-l-8.d-flex-1 {{apiItem.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ apiItem.demo || ''}}
@@ -65,7 +65,7 @@ export default {
       default: () => ([])
     },
     /* 当前选中的数据源 */
-    apiData: {
+    selectedApi: {
       type: Object,
       default: () => ({})
     },
