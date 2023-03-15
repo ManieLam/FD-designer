@@ -25,7 +25,8 @@ import SmartDrawer from '@/components/SmartDrawer.vue'
 Vue.config.productionTip = false
 
 Vue.use(Element, {
-  size: 'small'
+  size: 'small',
+  zIndex: 1000
 })
 Vue.use(AnsoUI)
 // console.info(FDTranslator)
