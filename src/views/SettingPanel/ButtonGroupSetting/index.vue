@@ -3,6 +3,7 @@
   el-collapse(v-model="activeName")
     el-collapse-item(
       v-for="(btn, i) in currentBtns"
+      :key="btn.name"
       :name="btn.name"
       :title="btn.label")
       template(slot="title")

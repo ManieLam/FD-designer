@@ -28,6 +28,7 @@
         el-dropdown-item(
           v-for="opt in buttonTypeOptions"
           v-bind="opt"
+          :key="opt.value"
           :command="opt.value"
           :disabled="hasChosen.includes(opt.value)"
         ) {{opt.label}}
