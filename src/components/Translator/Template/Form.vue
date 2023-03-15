@@ -10,7 +10,7 @@
   ></AnsoDataform>
 </template>
 <script>
-import { isEqual, cloneDeep, keyBy, pick } from 'lodash'
+import { isEqual, cloneDeep, keyBy, pick, isEmpty } from 'lodash'
 import { formatFormRules } from '@/utils/format.js'
 import { channelEvent, validPostMesgToParent } from '../utils/eventBus'
 // import button from '../mixins/button'
@@ -18,8 +18,9 @@ import relationMixin from '../mixins/relation'
 import requireMixin from '../mixins/require'
 import componentFormat from '../mixins/componentFormat'
 
-import { MessageBox } from 'element-ui'
+// import { MessageBox } from 'element-ui'
 // import { useEval } from '@/utils/request.js'
+// MessageBox.zIndex = 2000
 export default {
   name: 'FormTemp',
   mixins: [relationMixin, requireMixin, componentFormat],
@@ -77,7 +78,6 @@ export default {
     customButtons () {
       if (this.$refs.form) {
         const btnEls = this.$refs.form?.$el.getElementsByTagName('button')
-        console.log('btnEls:', btnEls)
         return Array.from(btnEls).filter(btn => /^.*(ansoBtns|ansoForm)(?=.*(btn_\d+)).*$/ig.test(btn?.getAttribute('id')))
       } else {
         return []
@@ -123,22 +123,32 @@ export default {
     },
     // 内置的按钮重置函数
     doReset () {
-      this.$refs.form.resetForm()
+      const { immediateRemoteApi } = this.config?.actions || {}
+      if (immediateRemoteApi && !isEmpty(immediateRemoteApi?.list)) {
+        this.requireImmediateRemote()
+      } else {
+        // 清空
+        this.$refs.form.resetForm()
+      }
     },
     onFormReset (btn) {
       //  && this.hasChangeData
       if (btn.tipBeforeAction) {
-        MessageBox.confirm(
+        // MessageBox.confirm
+        this.$confirm(
           '检测到未保存的内容，是否确定当前操作？',
           `${btn.label}提醒`,
           {
             distinguishCancelAndClose: true,
             confirmButtonText: '确定',
-            cancelButtonText: '取消'
+            cancelButtonText: '取消',
+            customClass: ['cancelMessageBox']
+            // style: { zIndex: 9999 }
           })
           .then(confirm => {
             if (confirm) {
               this.doReset()
+              window.parent.postMessage('onResetForm')
             }
           })
       } else {
@@ -156,6 +166,7 @@ export default {
           }
         } else if (btn.closeDialog) {
           this.$emit('onCloseDialog')
+          window.parent.postMessage('onCancelForm')
         }
       } catch (err) {
         console.warn('取消功能异常:', err)
@@ -164,26 +175,30 @@ export default {
     // 内置的按钮取消函数
     onFormCancel (btn) {
       if (btn.tipBeforeAction) {
-        MessageBox.confirm(
+        // MessageBox.confirm
+        this.$confirm(
           '检测到未保存的内容，是否确定当前操作？',
           `${btn.label}提醒`,
           {
             distinguishCancelAndClose: true,
             confirmButtonText: '确定',
-            cancelButtonText: '取消'
+            cancelButtonText: '取消',
+            customClass: 'checkCancelBox'
           })
           .then(confirm => {
             if (confirm) {
-              console.info('confirm:', btn)
+              console.info('confirm:', confirm, btn)
               this.doCancel(btn)
             }
           })
       } else {
         this.doCancel(btn)
+        window.parent.postMessage('onResetForm')
       }
     },
     // 内置的按钮提交事件
     onFormSubmit (btn) {
+      window.parent.postMessage('onSubmitForm', { data: this.fullData })
       if (btn.validate) {
         this.$refs.form.$refs.dataform.validate(valid => {
           if (valid && btn.funcApi) {
