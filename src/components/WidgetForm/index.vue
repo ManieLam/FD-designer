@@ -101,8 +101,19 @@ export default {
   data () {
     return {
       selectItem: this.formItemConfig?.key,
+      formAttrs: {},
       // buttonList: [],
       formData: {}
+    }
+  },
+  watch: {
+    'formConfig.attrs': {
+      immediate: true,
+      deep: true,
+      handler (attr) {
+        // console.log('表单属性改变')
+        this.formAttrs = attr || {}
+      }
     }
   },
   computed: {
@@ -124,9 +135,9 @@ export default {
       }
     },
     // 暂失效
-    formAttrs () {
-      return this.formConfig?.attrs || {}
-    },
+    // formAttrs () {
+    //   return this.formConfig?.attrs || {}
+    // },
     rules () {
       /* 如果做要同步视图的校验，计算比较多, 这里采用手动点击预览 或 保存后刷新查看结果 */
       return this.fieldList.reduce((obj, field) => {
@@ -160,7 +171,7 @@ export default {
       const { labelHidden, labelPosition, labelWidth } = this.formAttrs || {}
       // TODO 当行内和row类型开发，则开启
       // return labelHidden || labelPosition === 'top' ? '' : this.inline || this.type === 'row' ? '' : this.labelWidth
-      return labelHidden || labelPosition === 'top' ? '' : `${labelWidth}px`
+      return labelHidden || labelPosition === 'top' ? '0px' : `${labelWidth}px`
     }
   },
   // filters: {
