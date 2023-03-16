@@ -13,7 +13,8 @@
         v-bind="$attrs"
         v-on="$listeners"
         :value="attrsData"
-        :attrs="attrs")
+        :attrs="attrs"
+        @update="update")
       //- 设置表单行为
       .action-setting-wrap.m-t-8(v-show="activeName==='action'")
         el-collapse(v-model="activeCollapse")
@@ -141,7 +142,7 @@ export default {
       this.activeName = name
     },
     update (attrs) {
-      this.$emit('update')
+      this.$emit('update', 'formAttrs', attrs)
       // this.setFormState({ attrs: this.attrsData })
       // this.$emit('update', 'attrs', this.attrsData)
     },

@@ -114,6 +114,7 @@ export default {
         visable: false,
         data: {}
       },
+      formLabelHidden: false, // 表单字段是否隐藏
       afterLoading: false,
       isEditMode: false, // 编辑模式
       componentVM: 'FormTemp' // 暂且是表单类型，TODO 扩展其他类型
@@ -154,19 +155,28 @@ export default {
     isEdit () {
       const { name, id } = this.$route.params
       return name && id
-    },
-    formLabelHidden () {
-      return this.actCanvas?.attrs?.labelHidden
+    // },
+    // 获取actCanvas会有延迟，不生效
+    // formLabelHidden () {
+    //   return this.afterLoading ? this.actCanvas?.attrs?.labelHidden : false
     }
   },
   watch: {
     formLabelHidden: {
       handler (flag, oldFlag) {
-        // console.info('改变画布标签:', flag, oldFlag)
+        console.info('改变画布标签:', flag, oldFlag)
         if (flag !== oldFlag) {
           this.actCanvas.body.forEach(f => this.$set(f, 'labelHidden', flag))
         }
       }
+    // },
+    // actCanvas: {
+    //   deep: true,
+    //   immediate: true,
+    //   handler (canvas, oldCanvas) {
+    //     console.log('actCanvas:', canvas)
+    //     this.formLabelHidden = canvas?.attrs?.labelHidden
+    //   }
     }
   },
   methods: {
@@ -187,9 +197,10 @@ export default {
         this.formItemConfig = { ...this.formItemConfig, ...newData }
         this.updateFieldStorage(this.formItemConfig)
       }
-      // if (type === 'formAttrs') {
-      //   // 表单标签隐藏的属性，影响全局字段
-      // }
+      if (type === 'formAttrs') {
+        // 表单标签隐藏的属性，影响全局字段
+        this.formLabelHidden = newData.labelHidden
+      }
       this.$forceUpdate()
       // console.log('containers 更新', this.actCanvas)
       // this.formItemConfig = attrs
@@ -220,7 +231,7 @@ export default {
     /** type: form/component/assist
      * 根据type切换tab */
     onSelectElement ({ type, data, assistType }) {
-      console.info('选中数据:', type, data)
+      // console.info('选中数据:', type, data)
       const compTab = type === 'component' || type === 'assist'
       if (compTab) {
         this.formItemConfig = data
@@ -298,7 +309,9 @@ export default {
         await this.$store.dispatch('canvas/init', { routerName, data: editData })
       }
       this.$nextTick(() => {
-        this.formItemConfig = this.allCanvas[this.canvasName]?.body?.[0] || {}
+        // console.info('当前canvas', this.actCanvas)
+        this.formItemConfig = this.actCanvas?.body?.[0] || {}
+        this.formLabelHidden = this.actCanvas?.attrs?.labelHidden
       })
     },
     async initResource () {
