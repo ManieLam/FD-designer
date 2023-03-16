@@ -8,7 +8,7 @@
       :title="btn.label")
       //- el-checkbox(slot="title", v-model="activeCollapse") {{btn.label}}
       template(slot="title")
-        span.secondary-text {{btn.label}}
+        span.secondary-text(style="color: #606266;") {{btn.label}}
         i.el-icon-delete.m-l-8.btn-icon(@click.prevent.stop="remove(btn, i)")
       ButtonItemSetting.box-content__collapse(
         :key="btn.name"

@@ -7,7 +7,7 @@
     @updateAnAttr="updateAnAttr")
 
   .button-list
-    .secondary-text.p-b-8 按钮列表
+    .secondary-text.p-b-8(style="color:#606266;") 按钮列表
     FormButtonList(
       v-bind="$attrs"
       @change="$emit('change', $event)")
