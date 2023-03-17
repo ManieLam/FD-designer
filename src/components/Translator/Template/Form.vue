@@ -276,12 +276,17 @@ export default {
     }
   },
   created () {
+    // 获取relation
     this.getRelation()
   },
   mounted () {
+    // 格式化字段
     this.formFields = this.formatFields()
+    // 清除验证
     this.onClearValidate()
+    // 获取初次加载数据源
     this.requireImmediateRemote()
+    // 初始化窗口通道
     this.initPostMesgWithParent()
     this.$nextTick(() => {
       // computed中读取ref具有延迟性，使用$nextTick

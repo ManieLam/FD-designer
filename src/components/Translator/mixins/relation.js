@@ -14,25 +14,29 @@ export default {
       }, { fByKey: [], fByRemote: [] })
     },
     getRelation () {
-      const { getRelationImmediate, relationApi: gbResource } = this.config?.form?.actions || {}
+      // console.log('获取relation:', this.config)
+      const { getRelationImmediate, relationApi: gbResource } = this.config?.actions || {}
       if (getRelationImmediate) {
         const { fByKey, fByRemote } = this.getRelationFields()
-
-        if (gbResource && fByKey?.length) {
+        // 去掉存在fByKey才请求的限制，防止歧义，只要有配就请求
+        // console.log('gbResource:', gbResource)
+        const requireFormat = this.formatRequire(gbResource)
+        if (gbResource) {
           // 根据字段配置relation字典key，赋值
-          this.$require(gbResource)
+          this.$require(requireFormat)
             .then(res => {
               if (res) {
-                // console.info(res?.data?.data?.[0]?.data)
                 fByKey.forEach(f => {
                   // f.options = result[f.optionRelationKey]
-                  if (this.isTest) {
-                    // 测试数据
+                  if (process.env.NODE_ENV === 'development') {
+                    // 测试数据, 默认取第一行数据
+                    console.log('开发环境relation取值为第一行数据')
                     // console.info(res?.data?.data?.[0]?.data)
                     // TODO 对数据结构的取值层级优化成可配置的
                     this.$set(f, 'options', res?.data?.[0]?.data)
                   } else {
                     const result = res?.data ? keyBy(res?.data, 'name') : {}
+                    // console.info('result:', result)
                     this.relations = result
                     this.$set(f, 'options', result[f.optionRelationKey])
                   }
