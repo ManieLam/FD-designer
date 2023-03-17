@@ -150,6 +150,12 @@ export const input = {
     FormtagAttrs.disabled,
     FormtagAttrs.validate,
     {
+      label: '输入框类型',
+      key: 'inputType',
+      tag: 'ansoDataformSelect',
+      options: [{ label: '输入框', value: 'text' }, { label: '文本域', value: 'textarea' }]
+    },
+    {
       label: '最大长度限制',
       tag: 'el-input-number',
       key: 'maxlength'
