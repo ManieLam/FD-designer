@@ -39,7 +39,7 @@ import WidgetForm from '@/components/WidgetForm'
 // import WidgetForm from '@/components/WidgetForm/V2'
 // import { formItemTags } from '@/model/componentAttrs.js'
 import { formatField } from '@/utils/format.js'
-// import { mapGetters } from 'vuex'
+import { cloneDeep } from 'lodash'
 export default {
   name: 'DragPage',
   components: {
@@ -107,11 +107,12 @@ export default {
       // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
       const tag = evt.clone?.dataset?.name
       const newIndex = evt.newIndex
+      const fields = cloneDeep(this.fieldList) // 触发外部list更新
       if (tag) {
         const element = this.formatField({ tag: evt.clone?.dataset?.name, attrConf: { labelHidden: this.canvas?.attrs?.labelHidden } })
-        this.fieldList.splice(newIndex, 0, element)
+        fields.splice(newIndex, 0, element)
         // console.log('拖拽新增：', newIndex, this.fieldList)
-        // this.$set(this.fieldList, newIndex, element)
+        this.fieldList = [...fields] // 触发外部list更新
         this.$emit('onSelectItem', { type: 'component', data: element })
         this.$forceUpdate()
       }
