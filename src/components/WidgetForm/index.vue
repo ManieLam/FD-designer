@@ -76,6 +76,10 @@ import Draggable from 'vuedraggable'
 import WidgetFormItem from './WidgetFormItem'
 export default {
   name: 'WidgetForm',
+  model: {
+    prop: 'fields',
+    event: 'update'
+  },
   props: {
     fields: {
       type: Array,

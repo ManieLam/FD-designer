@@ -1,4 +1,5 @@
 <template lang='pug'>
+//- draggable别把value改成v-model,会取错元素填入
 draggable.list-group.drag-page-container(
   :value="fieldList"
   group="form"
@@ -23,12 +24,9 @@ draggable.list-group.drag-page-container(
       v-on="$listeners"
       v-bind="$attrs"
       :fields="fieldList"
-      :added="newField"
       :formConfig="canvas"
       @add="handleWidgetAdd"
-      @remove="removeWidget"
-      @update="updateBody"
-      @updateWidget="updateWidgetByTag")
+      @remove="removeWidget")
     //- 可能多个表单
     //- el-form.form-designer_default()
 
@@ -48,6 +46,10 @@ export default {
     draggable,
     WidgetForm
   },
+  model: {
+    prop: 'list',
+    event: 'change'
+  },
   // TODO 根据配置属性同步field.form配置
   props: {
     canvasName: {
@@ -61,87 +63,63 @@ export default {
     canvas: {
       type: Object,
       default: () => ({})
+    },
+    list: {
+      type: Array,
+      default: () => ([])
     }
   },
   data () {
     return {
       keyName: '',
-      // formConfig: {},
-      fieldList: [],
-      // buttonList: [],
-      // formItemTags,
-      newField: {},
+      computedList: [],
       formatField
     }
   },
+  computed: {
+    fieldList: {
+      get () {
+        return this.computedList
+      },
+      set (list) {
+        // console.log('dragPage 变了:', list)
+        this.computedList = list
+        this.$emit('change', list)
+      }
+    }
+  },
   watch: {
-    'canvas.body': {
-      // deep: true,
+    list: {
+    //     // deep: true,
       immediate: true,
       handler (fields) {
-        // this.fieldList = Array.from(new Set(fields)) || []
-        this.fieldList = fields || []
+        this.computedList = fields
       }
     }
   },
   methods: {
     clear () {
       this.fieldList = []
-      this.newField = {}
     },
     // TODO 改造对接配置的数据源
     checkFieldOption (tag) {},
     handleWidgetAdd (evt) {
-      // console.info('add:', evt)
       // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
       const tag = evt.clone?.dataset?.name
-      // console.info('add-', tag)
       const newIndex = evt.newIndex
-      const element = this.formatField({ tag: evt.clone?.dataset?.name, attrConf: { labelHidden: this.canvas?.attrs?.labelHidden } })
-      // console.info('element:', element)
-      this.newField = tag ? {
-        element,
-        newIndex
-      } : {}
       if (tag) {
-        this.$store.commit('canvas/addWidget', {
-          name: this.canvasName,
-          eIndex: newIndex,
-          element
-          // elements: this.fieldList
-        })
-        this.$emit('onSelect', { type: 'component', data: element })
+        const element = this.formatField({ tag: evt.clone?.dataset?.name, attrConf: { labelHidden: this.canvas?.attrs?.labelHidden } })
+        this.fieldList.splice(newIndex, 0, element)
+        // console.log('拖拽新增：', newIndex, this.fieldList)
+        // this.$set(this.fieldList, newIndex, element)
+        this.$emit('onSelectItem', { type: 'component', data: element })
         this.$forceUpdate()
       }
     },
     removeWidget (ele, index) {
-      // this.$delete(this.fieldList, index)
-      this.$store.commit('canvas/deleteWidget', {
-        name: this.canvasName,
-        eIndex: index
-      })
-    },
-    updateBody (list) {
-      // console.log('update--', list)
-      // this.fieldList = list
-      this.$store.commit('canvas/updateHoldWidget', {
-        name: this.canvasName,
-        elements: list
-      })
-    },
-    // 根据tag重新修改当前主录入组件
-    updateWidgetByTag (tag, index) {
-      console.log('updateWidgetByTag:', tag, index)
-      const element = this.formatField({ tag })
-      this.newField = { element, index }
-      this.$store.commit('canvas/updateTheWidget', {
-        name: this.canvasName,
-        eIndex: index,
-        attrs: element
-        // elements: this.fieldList
-      })
-      this.$emit('onSelect', { type: 'component', data: element })
-      this.$forceUpdate()
+      if (index !== -1) {
+        this.$delete(this.fieldList, index)
+      }
     }
   }
 }

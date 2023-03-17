@@ -11,17 +11,17 @@
         el-button(@click="toggleSettingJson") 查看配置文件
       el-button-group.tool-wrap__right
         //- computed中设立saveable无法监听到store的变化
-        el-button(:disabled="actCanvas|saveable", @click="toExportProps.visable=true") 导出
-        el-button(:disabled="actCanvas|saveable", @click="onClear") 清空
+        el-button(:disabled="preventSaved", @click="toExportProps.visable=true") 导出
+        el-button(:disabled="preventSaved", @click="onClear") 清空
         //- el-button(:disabled="actCanvas|saveable", @click="onPreview") 预览
-        el-dropdown(:disabled="actCanvas|saveable", @command="handlePreview")
+        el-dropdown(:disabled="preventSaved", @command="handlePreview")
           el-button 预览
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu(slot="dropdown")
             el-dropdown-item(command="onPreview") 预览
             el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
-        el-button(type="primary", :disabled="isEdit || actCanvas|saveable", @click="onSave") 暂存
-        el-button(type="primary", :disabled="actCanvas|saveable", @click="publishOnline") 发布
+        el-button(type="primary", :disabled="isEdit || preventSaved", @click="onSave") 暂存
+        el-button(type="primary", :disabled="preventSaved", @click="publishOnline") 发布
     //- :canvas="canvasName|getActCanvas(allCanvas)"
     DragPage(
       ref="dragPanel"
@@ -29,7 +29,9 @@
       :formItemConfig="formItemConfig"
       :canvasName="canvasName"
       :canvas="actCanvas"
-      @onSelectItem="onSelectElement")
+      v-model="canvasBody"
+      @onSelectItem="onSelectElement"
+      @update="updateFieldList")
   .right-panel(v-if="toggleSettingOpen")
     SettingPanel(
       ref="settingPanel"
@@ -117,15 +119,17 @@ export default {
       formLabelHidden: false, // 表单字段是否隐藏
       afterLoading: false,
       isEditMode: false, // 编辑模式
-      componentVM: 'FormTemp' // 暂且是表单类型，TODO 扩展其他类型
+      componentVM: 'FormTemp', // 暂且是表单类型，TODO 扩展其他类型
+      computedBody: []
     }
   },
   filters: {
     getActCanvas (name, all) {
       return all[name] || {}
     },
-    saveable (actCanvas) {
-      return !(!!actCanvas && actCanvas?.body?.length)
+    prevent (body) {
+      // console.info('prevent:', !body, !body.length)
+      return !body || !body.length
     },
     filterCanvasStr (obj) {
       return JSON.stringify(obj, null, '\t')
@@ -144,6 +148,23 @@ export default {
       // ---有缓存，出现置后性
       return this.afterLoading ? this.$store.getters.getCurView : {}
     // },
+    },
+    canvasBody: {
+      get () {
+        // return this.actCanvas?.body || []
+        return this.computedBody || []
+      },
+      set (list) {
+        this.computedBody = list
+        this.$store.commit('canvas/updateHoldWidget', {
+          name: this.canvasName,
+          elements: list
+        })
+      }
+    },
+    preventSaved () {
+      // console.info('prevent:', !this.canvasBody, !this.canvasBody.length)
+      return !this.canvasBody || !this.canvasBody.length
     },
     allCanvasStr () {
       return JSON.stringify(this.allCanvas, null, '\t')
@@ -164,19 +185,20 @@ export default {
   watch: {
     formLabelHidden: {
       handler (flag, oldFlag) {
-        console.info('改变画布标签:', flag, oldFlag)
+        // console.info('改变画布标签:', flag, oldFlag)
         if (flag !== oldFlag) {
           this.actCanvas.body.forEach(f => this.$set(f, 'labelHidden', flag))
         }
       }
-    // },
-    // actCanvas: {
-    //   deep: true,
-    //   immediate: true,
-    //   handler (canvas, oldCanvas) {
-    //     console.log('actCanvas:', canvas)
-    //     this.formLabelHidden = canvas?.attrs?.labelHidden
-    //   }
+    },
+    actCanvas: {
+      deep: true,
+      immediate: true,
+      handler (canvas, oldCanvas) {
+        // console.log('actCanvas:', canvas)
+        this.computedBody = canvas?.body
+        //     this.formLabelHidden = canvas?.attrs?.labelHidden
+      }
     }
   },
   methods: {
@@ -186,16 +208,21 @@ export default {
         this.settingJsonVisable = !this.settingJsonVisable
       })
     },
+    updateFieldList (list) {
+      // console.log('更新整个body:', list)
+      this.canvasBody = list
+    },
     updateConfig (type, newData) {
       // console.log('更新', type, newData)
       if (type === 'comp') {
         this.formItemConfig = newData
-        this.updateFieldStorage(newData)
+        this.updateFieldConfig(newData)
       }
       if (type === 'assist') {
         // 卡槽设计
         this.formItemConfig = { ...this.formItemConfig, ...newData }
-        this.updateFieldStorage(this.formItemConfig)
+        // 更新主字段属性（卡槽属性包含在主字段属性内）
+        this.updateFieldConfig(this.formItemConfig)
       }
       if (type === 'formAttrs') {
         // 表单标签隐藏的属性，影响全局字段
@@ -205,23 +232,15 @@ export default {
       // console.log('containers 更新', this.actCanvas)
       // this.formItemConfig = attrs
     },
-    updateFieldStorage (attrs) {
-      // 由内部更新到store
-      if (!this.formItemConfig) return
-      const curView = this.$store.getters.getCurView
-      // console.log('此刻:', curView)
-      const eindex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
+    // 更新字段属性
+    updateFieldConfig (attrs) {
+      if (!this.formItemConfig || !attrs) return
+      const eindex = this.canvasBody.findIndex(field => field.key === this.formItemConfig.key)
       if (eindex !== -1) {
-        this.$store.commit('canvas/updateTheWidget', {
-          name: this.canvasName,
-          // fname,
-          eindex,
-          attrs
-        })
-        // this.formItemConfig = attrs
-        this.$nextTick(() => this.$forceUpdate())
+        this.$set(this.canvasBody, eindex, attrs)
       }
     },
+    // 废弃
     onDragged: debounce(({ from, to }) => {
       // console.info('on Dragged', from, to)
     }, 800),

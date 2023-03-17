@@ -45,23 +45,23 @@ const mutations = {
     }
   },
   /* 画布中新增组件 */
-  addWidget (states, { name, element, eIndex = 0 }) {
-    // console.info('画布vuex新增:', name, element)
-    const elements = states.canvas[name]?.body
-    if (elements) {
-      elements.splice(eIndex, 0, element)
-    } else {
-      states.canvas[name] = new CanvasModel({ body: element ? [element] : [] }, defaultFormAttrs)
-    }
-    states.editingName = name
-  },
+  // addWidget (states, { name, element, eIndex = 0 }) {
+  //   // console.info('画布vuex新增:', name, element)
+  //   const elements = states.canvas[name]?.body
+  //   if (elements) {
+  //     elements.splice(eIndex, 0, element)
+  //   } else {
+  //     states.canvas[name] = new CanvasModel({ body: element ? [element] : [] }, defaultFormAttrs)
+  //   }
+  //   states.editingName = name
+  // },
   /* 删除 */
-  deleteWidget (states, { name, eIndex }) {
-    const elements = states.canvas[name]?.body
-    if (elements) {
-      elements.splice(eIndex, 1)
-    }
-  },
+  // deleteWidget (states, { name, eIndex }) {
+  //   const elements = states.canvas[name]?.body
+  //   if (elements) {
+  //     elements.splice(eIndex, 1)
+  //   }
+  // },
   /* 清空, 不是清除 */
   clear (states, name) {
     // console.log('清空')
@@ -73,12 +73,12 @@ const mutations = {
   updateHoldWidget (states, { name, element = {}, eIndex, elements }) {
     states.canvas[name].body = elements
   },
-  updateTheWidget (states, { name, eindex = null, attrs = null }) {
-    const section = states.canvas[name]
-    if (section && eindex !== null && attrs) {
-      section.body[eindex] = attrs
-    }
-  },
+  // updateTheWidget (states, { name, eindex = null, attrs = null }) {
+  //   const section = states.canvas[name]
+  //   if (section && eindex !== null && attrs) {
+  //     section.body[eindex] = attrs
+  //   }
+  // },
   /** 更新单画布事件 */
   updateActions (states, { name, actions = null, type = 'REWRITE', actionName = '', actionVal }) {
     const canvas = states.canvas[name]
@@ -139,11 +139,6 @@ const actions = {
   },
   toggleCanvas () {
   }
-  // updateFormActions ({ state, commit }, { name, actions = null }) {
-  //   const section = state.canvas[name]
-  //   if (section && actions) {
-  //   }
-  // }
 }
 
 export default {

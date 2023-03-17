@@ -130,23 +130,23 @@ export default {
     },
     updateButton (buttons) {
       console.log('更新按钮')
-    },
-    updateFieldStorage (attrs) {
-      // 由内部更新到store
-      if (!this.formItemConfig) return
-      const curView = this.$store.getters.getCurView
-      // console.log('此刻:', curView)
-      const eindex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
-      if (eindex !== -1) {
-        this.$store.commit('canvas/updateTheWidget', {
-          name: this.canvasName,
-          // fname,
-          eindex,
-          attrs
-        })
-        // this.formItemConfig = attrs
-        this.$nextTick(() => this.$forceUpdate())
-      }
+    // },
+    // updateFieldStorage (attrs) {
+    //   // 由内部更新到store
+    //   if (!this.formItemConfig) return
+    //   const curView = this.$store.getters.getCurView
+    //   // console.log('此刻:', curView)
+    //   const eindex = curView?.body?.findIndex(field => field.key === this.formItemConfig.key)
+    //   if (eindex !== -1) {
+    //     this.$store.commit('canvas/updateTheWidget', {
+    //       name: this.canvasName,
+    //       // fname,
+    //       eindex,
+    //       attrs
+    //     })
+    //     // this.formItemConfig = attrs
+    //     this.$nextTick(() => this.$forceUpdate())
+    //   }
     }
   }
 }
