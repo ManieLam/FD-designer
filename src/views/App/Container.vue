@@ -20,7 +20,7 @@
           el-dropdown-menu(slot="dropdown")
             el-dropdown-item(command="onPreview") 预览
             el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
-        el-button(type="primary", :disabled="isEdit || preventSaved", @click="onSave") 暂存
+        el-button(type="primary", :disabled="!!isEdit || preventSaved", @click="onSave") 暂存
         el-button(type="primary", :disabled="preventSaved", @click="publishOnline") 发布
     //- :canvas="canvasName|getActCanvas(allCanvas)"
     DragPage(

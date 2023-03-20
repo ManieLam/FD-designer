@@ -44,7 +44,7 @@ export default {
     formatSubmitParams ({ isFullDose, isSubmit, body = [] }) {
       // 是否全量数据提交，isSubmit：提交型接口交互，带表单录入的数据或全量数据
       // console.info('更新body参数：', arguments)
-      const range = !isSubmit ? {} : isFullDose ? this.fullData : this.formData
+      const range = isFullDose ? this.fullData : (this.formData || {})
       // 转换body参数
       const bodyParams = body && body.length ? this.formatVarParams(body) : {}
       // console.log('range:', range)
