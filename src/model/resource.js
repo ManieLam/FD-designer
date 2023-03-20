@@ -26,7 +26,10 @@ export const ApiDataHandles = {
   }
 }
 
-/* 数据源结构 */
+/** 数据源结构
+ * isFullDose与isSubmit区别：
+ *  isFullDose是默认数据集的提交，而isSubmit只表示是提交动作，会带当前表单填入的数据和body的数据提交
+ */
 export function ApiData (config = {}) {
   return {
     method: 'GET',

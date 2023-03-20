@@ -44,7 +44,7 @@ export default {
     formatSubmitParams ({ isFullDose, isSubmit, body = [] }) {
       // 是否全量数据提交，isSubmit：提交型接口交互，带表单录入的数据或全量数据
       // console.info('更新body参数：', arguments)
-      const range = isFullDose ? this.fullData : (this.formData || {})
+      const range = isSubmit ? this.formData : (isFullDose ? this.fullData : (this.formData || {}))
       // 转换body参数
       const bodyParams = body && body.length ? this.formatVarParams(body) : {}
       // console.log('range:', range)
@@ -112,6 +112,8 @@ export default {
     // 初始化接口请求后操作
     doResolve (res, api) {
       if (!res) return false // 返回空值，不执行后续赋值行为
+      // 阻断isFullDose：true类型, 防止数据在新增后由于返回的是null被覆盖
+      // console.info('初始化数据', res)
       if (api?.isDefault && !api.isSubmit) {
         // 只有初始化数据需要对默认数据集合赋值， 即只有需要赋值的接口才会做赋值
         // console.info('res:', res)

@@ -130,7 +130,7 @@ el-dialog.async-required-dialog(
                     @click="toggleCustomList('body')")
               .row-item
                 //- el-checkbox.m-l-16(v-model="apiData.isSubmit") 是否提交表单
-                el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否将表单数据提交（多数据源时，仅提交默认数据集）
+                el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否将表单数据全量提交（多数据源时，仅提交默认数据集）
               ParamsList(v-show="hasBody", keyName="body", v-model="apiData.body", :editAble="true", @onClearAll="toggleCustomList('body')")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
@@ -427,6 +427,7 @@ export default {
           // console.log('是否改名:', unChanged ? '是' : '否', newData.name)
           newData.__isGlobal = unChanged
           newData.__isEdit = this.isEdit
+          newData.isSubmit = this.isSubmit
           this.$emit('chosen', newData, this.isContinues)
           if (!this.isContinues) {
             this.dialogVisabled = false
