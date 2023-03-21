@@ -117,25 +117,7 @@ export default {
           const filterArr = [preSlotRender, suffixSlotRender].filter(e => !!e && e.tag !== 'button')
           // console.log('filter:', filterArr)
           this.setDefaultValue(filterArr)
-          // this.setSlotDefValue(filterArr)
         }
-      }
-    },
-    setSlotDefValue (fieldList) {
-      for (const field of fieldList) {
-        console.log('field', field)
-        const { defaultValue, name } = field
-        const { apiName } = defaultValue
-        let datas = this.fullData
-        if (apiName) {
-          // 存在自定义挑选数据源
-          datas = this.formDataCollect.get(apiName) || {}
-          console.log('datas:', datas)
-        }
-        // 插槽字段不存在在formFields中
-        const value = formatDefValFunc.call(this, datas, this.formFields, field)
-        console.log('setSlotDefValue:', value)
-        this.$set(this.fullData, name, value)
       }
     },
     // 初始化接口请求后操作
