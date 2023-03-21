@@ -92,21 +92,50 @@ export default {
     },
 
     // 设置默认值
-    setDefaultValue () {
-      const keys = Object.keys(this.fieldObj)
+    setDefaultValue (fields = this.fieldObj) {
+      const keys = Array.isArray(fields) ? fields : Object.keys(fields)
       for (const field of keys) {
         // console.info('field:', field)
-        const fieldProperty = this.fieldObj[field]?.form
+        const fieldName = typeof field === 'object' ? field.name : field
+        // 插槽没有form属性
+        const fieldProperty = typeof field === 'object' ? field : this.fieldObj[fieldName]?.form
         const { apiName } = fieldProperty?.defaultValue || {}
-        // console.log(field, '数据源:', apiName)
 
+        // console.log(field, '数据源:', apiName)
         let datas = this.fullData
         if (apiName) {
           // 存在自定义挑选数据源
           datas = this.formDataCollect.get(apiName) || {}
+          // console.log('datas:', datas)
         }
         const value = formatDefValFunc.call(this, datas, this.formFields, fieldProperty)
-        this.$set(this.fullData, field, value)
+        this.$set(this.fullData, fieldName, value)
+        // 存在插槽
+        const { preSlotRender, suffixSlotRender } = fieldProperty
+        if (preSlotRender || suffixSlotRender) {
+          // 默认值里有的数据，但是自定义数据中也有，取值时候，最终表单里的默认数据集也会覆盖为自定义数据源的数据
+          const filterArr = [preSlotRender, suffixSlotRender].filter(e => !!e && e.tag !== 'button')
+          // console.log('filter:', filterArr)
+          this.setDefaultValue(filterArr)
+          // this.setSlotDefValue(filterArr)
+        }
+      }
+    },
+    setSlotDefValue (fieldList) {
+      for (const field of fieldList) {
+        console.log('field', field)
+        const { defaultValue, name } = field
+        const { apiName } = defaultValue
+        let datas = this.fullData
+        if (apiName) {
+          // 存在自定义挑选数据源
+          datas = this.formDataCollect.get(apiName) || {}
+          console.log('datas:', datas)
+        }
+        // 插槽字段不存在在formFields中
+        const value = formatDefValFunc.call(this, datas, this.formFields, field)
+        console.log('setSlotDefValue:', value)
+        this.$set(this.fullData, name, value)
       }
     },
     // 初始化接口请求后操作
