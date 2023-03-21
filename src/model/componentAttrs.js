@@ -33,6 +33,7 @@ export const formItemTags = {
  * @param tip 信息提示
  * @param options 属性的配置选项
  * @param chains 属性的配置的联动函数
+ * @param preventInSlot 阻止在插槽中使用
 */
 
 const switchDefaultOptions = [{ label: '允许', value: true }, { label: '不允许', value: false }]
@@ -41,8 +42,8 @@ const switchDefaultOptions = [{ label: '允许', value: true }, { label: '不允
 const FormtagAttrs = {
   type: { label: '类型', key: 'type', tag: 'AnsoDataformText' },
   name: { label: '字段键名', key: 'name', tag: 'el-input' },
-  label: { label: '文本标签', key: 'label', tag: 'el-input' },
-  labelHidden: { label: '文本隐藏', key: 'labelHidden', tag: 'el-switch', 'active-text': '隐藏' },
+  label: { label: '文本标签', key: 'label', tag: 'el-input', preventInSlot: true },
+  labelHidden: { label: '文本隐藏', key: 'labelHidden', tag: 'el-switch', 'active-text': '隐藏', preventInSlot: true },
   validate: { label: '校验', key: 'validate', tag: 'form-validate' },
   placeholder: { label: '占位内容', key: 'placeholder', tag: 'el-input' },
   defaultValue: { label: '默认值', key: 'defaultValue', tag: 'form-defaultValue' },
@@ -176,14 +177,16 @@ export const input = {
       // tag: 'el-input',
       tag: 'form-affixes',
       key: 'prepend',
-      affixesType: 'prepend'
+      affixesType: 'prepend',
+      preventInSlot: true
     },
     {
       label: '后缀',
       // tag: 'el-input',
       tag: 'form-affixes',
       key: 'append',
-      affixesType: 'append'
+      affixesType: 'append',
+      preventInSlot: true
     },
     FormtagAttrs.defaultValue
   ],

@@ -3,6 +3,7 @@
   CompSetting(
     v-if="type && formItemConfig[type]"
     v-bind="$attrs"
+    compType="assist"
     :formItemConfig="currentConfig"
     @update="updateConfig")
 </template>

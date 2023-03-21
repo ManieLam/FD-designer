@@ -49,7 +49,7 @@ import componentAttrs from '@/model/componentAttrs'
 import { cloneDeep, isNil } from 'lodash'
 export default {
   name: 'CompSetting',
-  props: ['formItemConfig', 'canvasName'],
+  props: ['formItemConfig', 'canvasName', 'compType'],
   components: {
     AttrSettingForm,
     CompActionSetting,
@@ -87,7 +87,9 @@ export default {
       return this.formItemConfig?.tag
     },
     attrs () {
-      return componentAttrs[this.tag]?.attrs || []
+      const attrs = componentAttrs[this.tag]?.attrs || []
+      // 阻断某些属性在卡槽时不支持配置
+      return this.compType && this.compType === 'assist' ? attrs.filter(attr => !attr.preventInSlot) : attrs
     },
     actions () {
       return componentAttrs[this.tag]?.actions || []
