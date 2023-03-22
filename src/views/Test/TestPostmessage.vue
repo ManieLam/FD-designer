@@ -1,9 +1,12 @@
 <template lang='pug'>
 .test-content.p-16
-  .input
-    label(for="frame-input__src") 输入页面在线预览地址
-    el-input#frame-input__src(style="width: 150px", v-model="frameSrc", placeholder="输入页面在线预览地址")
-  iframe#theFrame(:src="frameSrc", frameborder="1", height="600px")
+  section
+    .input
+      label(for="frame-input__src") 输入页面在线预览地址
+      el-input#frame-input__src(style="width: 200px", v-model="frameSrc", placeholder="输入页面在线预览地址")
+    iframe#theFrame(:src="frameSrc", frameborder="1")
+  //- section
+  //-   label 数据交互信息
 </template>
 
 <script>
@@ -11,12 +14,12 @@ export default {
   name: 'TestPostmessage',
   data () {
     return {
-      frameSrc: '#/online/cfb/28', // 请不要带?model=1
+      // frameSrc: '#/online/cfb/28', // 请不要带?model=1
       // frameSrc: '#/online/q2/21', // 请不要带?model=1
       // frameSrc: '#/online/fixed/27', // 请不要带?model=1
-      // frameSrc: '#/online/button/24', // 请不要带?model=1
-      // frameSrc: '#/online/25/25', // 请不要带?model=1
-      iframeDom: null
+      frameSrc: '#/online/button/24', // 请不要带?model=1
+      iframeDom: null,
+      mesgList: [] // 消息队列
     }
   },
   computed: {
@@ -61,5 +64,15 @@ export default {
 </script>
 
 <style scoped lang=sass>
-
+.test-content
+  height: 100%
+  display: flex
+  flex-direction: row
+  > section
+    flex: 1
+  #theFrame
+    padding: 8px
+    margin-top: 8px
+    height: 100%
+    width: 100%
 </style>
