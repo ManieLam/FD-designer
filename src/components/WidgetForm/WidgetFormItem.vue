@@ -13,7 +13,8 @@ export default {
     'compTag',
     'keyName',
     'scopedSlots',
-    'selectItem'
+    'selectItem',
+    'formAttrs'
   ],
   components: {
     Draggable
@@ -110,7 +111,7 @@ export default {
     }
   },
   render (h) {
-    const { label, name } = this.currentConfig || {}
+    const { label, name, tag, labelHidden, labelWidth, errorToptip, labelTip } = this.currentConfig || {}
     // 前后缀暂时只支持各1位
     // const domList = [preSlotRender, this.scopedSlots[name] || this.compTag, suffixSlotRender]
     return (
@@ -119,22 +120,22 @@ export default {
         id={`${this.keyName}-formitem-${name}`}
         props={this.$attrs.formItemProp}
         on={this.$listeners}
-        class={this.currentConfig.tag === 'text' ? 'el-form-item-text' : ''}
+        class={tag === 'text' ? 'el-form-item-text' : ''}
         label={label}
         prop={this.name}
-        label-hidden={this.currentConfig.labelHidden}
-        label-width={this.currentConfig.labelWidth ? this.currentConfig.labelWidth : ''}
-        is-toptiperror={this.currentConfig.errorToptip}
+        label-hidden={labelHidden} // labelHidden 已经在外部组装完成（字段配置优先级 > 表单配置, 默认跟随表单配置）
+        label-width={!labelHidden ? this.formAttrs?.labelWidth + 'px' : (labelWidth || '')} // labelWidth必须认表单,但是是跟随表单元素判断是否隐藏
+        is-toptiperror={errorToptip}
       >
         <template slot="label">
           <span>{label}</span>
-          {this.currentConfig.labelTip
+          {labelTip
             ? (
               <el-popover
                 placement="top-start"
                 trigger="hover"
                 width="200"
-                content={this.currentConfig.labelTip}
+                content={labelTip}
                 id={`${this.name}-labelTip`}>
                 <i
                   slot="reference"

@@ -50,6 +50,7 @@
             :index="index"
             :selectItem="selectItem"
             :scopedSlots="$scopedSlots"
+            :formAttrs="formAttrs"
             @input="changeItem($event, index)"
             @onSelect="onSelectItem")
           .tool-wrap(v-if="!(ele.preSlotRender || ele.suffixSlotRender)")

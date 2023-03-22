@@ -84,7 +84,7 @@ import DragPage from '../DragPage'
 // import CanvasPanel from '../CanvasPanel'
 import SettingPanel from '../SettingPanel'
 // import Draggable from 'vuedraggable'
-import { debounce } from 'lodash'
+import { debounce, isNil } from 'lodash'
 import CodeEditor from '@/components/CodeEditor'
 import { templateRegister, getVueComp } from '@/components/Translator/index.js'
 import Vue from 'vue'
@@ -187,7 +187,11 @@ export default {
       handler (flag, oldFlag) {
         // console.info('改变画布标签:', flag, oldFlag)
         if (flag !== oldFlag) {
-          this.actCanvas.body.forEach(f => this.$set(f, 'labelHidden', flag))
+          this.actCanvas.body.forEach(f => {
+            if (isNil(f.labelHidden)) {
+              this.$set(f, 'labelHidden', flag)
+            }
+          })
         }
       }
     },
