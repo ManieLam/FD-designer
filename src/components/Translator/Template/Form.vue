@@ -109,7 +109,7 @@ export default {
     // 发起异步请求
     requireImmediateRemote () {
       const { actions } = this.config || {}
-      if (actions?.immediateRemoteApi) {
+      if (actions?.immediateRemoteApi?.list?.length) {
         // TODO 设置规则后，根据规则发起请求
         /**
          * 并发：promise.all
@@ -119,6 +119,8 @@ export default {
           requires: actions.immediateRemoteApi.list,
           rules: actions.immediateRemoteApi.rule
         })
+      } else {
+        this.setDefaultValue()
       }
     },
     // 内置的按钮重置函数
@@ -277,13 +279,15 @@ export default {
   },
   created () {
     // 获取relation
-    this.getRelation()
+    // this.getRelation()
   },
   mounted () {
     // 格式化字段
     this.formFields = this.formatFields()
     // 清除验证
     this.onClearValidate()
+    // 获取relation
+    this.getRelation()
     // 获取初次加载数据源
     this.requireImmediateRemote()
     // 初始化窗口通道
