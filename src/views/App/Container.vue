@@ -187,9 +187,13 @@ export default {
       handler (flag, oldFlag) {
         // console.info('改变画布标签:', flag, oldFlag)
         if (flag !== oldFlag) {
+          const checkList = []
           this.actCanvas.body.forEach(f => {
-            if (isNil(f.labelHidden)) {
+            if (isNil(f.labelHidden) || f.__labelHiddenByForm) {
               this.$set(f, 'labelHidden', flag)
+              this.$set(f, '__labelHiddenByForm', true)
+            } else {
+              checkList.push(f)
             }
           })
         }
@@ -219,6 +223,9 @@ export default {
     updateConfig (type, newData) {
       // console.log('更新', type, newData)
       if (type === 'comp') {
+        if (newData.labelHidden !== this.formLabelHidden) {
+          newData.__labelHiddenByForm = false
+        }
         this.formItemConfig = newData
         this.updateFieldConfig(newData)
       }

@@ -63,6 +63,7 @@ export default [
         label: '是否隐藏文本标签',
         key: 'labelHidden',
         tag: 'el-switch',
+        tip: '单字段同属性修改，则该修改不会再对其有效',
         'active-text': '隐藏'
       },
       {
