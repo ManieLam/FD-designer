@@ -3,65 +3,37 @@
  * */
 import { formAttrs as defaultFormAttrs } from '@/model/defaultConfig'
 import { CanvasModel } from '@/model/canvas' // 定义画布数据
-// import { isEqual, omit } from 'lodash'
+import { MessageBox } from 'element-ui'
+import { isEmpty, isEqual } from 'lodash'
 
 const state = () => ({
-  canvas: {}, // { canvas_0: <{page: [], title: ''}:pageModel> }
-  editingName: '' // 正在编辑的画布名称
-  // count: 1
+  canvas: {}, // { canvas_0: <{page: [], title: ''}:pageModel> } , 记录在sessionStorage
+  editingName: '', // 正在编辑的画布名称, 记录在sessionStorage
+  openCount: 1
 })
 
 const mutations = {
   /* 切换画布 */
-  toggle (states, name) {},
-  /* 新增画布 */
-  add (states, { name, routerName, data }) {
-    if (routerName) {
-      // 追加本地化，如：预览切换编辑
-      const localCanvas = localStorage.getItem('Canvas-all')
-      const allCanvas = localCanvas ? JSON.parse(localStorage.getItem('Canvas-all')) : {}
-      const existIndex = Object.entries(allCanvas).findIndex(([cKey, cObj]) => {
-        return cKey === routerName || cObj.routerName === routerName
-      })
-      // console.log('eee:', existItem, existItemName)
-      if (existIndex > -1) {
-        // console.log('编辑已存在的页面')
-        // 本地存在该页面编辑
-        const existItemName = Object.keys(allCanvas)[existIndex]
-        // console.log('existItemName:', existItemName)
-        states.canvas[existItemName] = data
-        states.editingName = existItemName
-      } else {
-        // console.log('本地追加')
-        // 本地追加
-        states.editingName = routerName
-        states.canvas[routerName] = new CanvasModel(data, defaultFormAttrs)
-        // localStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
-        // sessionStorage.setItem('Canvas-editing', routerName)
-      }
-    } else {
-      // 初始新增
-      states.canvas[name] = new CanvasModel({ body: [] }, defaultFormAttrs)
+  toggle (states, name) {
+    if (name) {
+      // console.log('切换到name:', name)
+      states.editingName = name
+      sessionStorage.setItem('Canvas-editing', name)
     }
   },
-  /* 画布中新增组件 */
-  // addWidget (states, { name, element, eIndex = 0 }) {
-  //   // console.info('画布vuex新增:', name, element)
-  //   const elements = states.canvas[name]?.body
-  //   if (elements) {
-  //     elements.splice(eIndex, 0, element)
-  //   } else {
-  //     states.canvas[name] = new CanvasModel({ body: element ? [element] : [] }, defaultFormAttrs)
-  //   }
-  //   states.editingName = name
-  // },
-  /* 删除 */
-  // deleteWidget (states, { name, eIndex }) {
-  //   const elements = states.canvas[name]?.body
-  //   if (elements) {
-  //     elements.splice(eIndex, 1)
-  //   }
-  // },
+  /* 新增画布 */
+  add (states, { name }) {
+    // 初始新增
+    // states.canvas[name] = new CanvasModel({ body: [], routerName: name }, defaultFormAttrs)
+    states.canvas = {
+      ...states.canvas,
+      [name]: new CanvasModel({ body: [], routerName: name }, defaultFormAttrs)
+    }
+    const editingName = name || 'canvas_0'
+    states.editingName = editingName
+    sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+    sessionStorage.setItem('Canvas-editing', editingName)
+  },
   /* 清空, 不是清除 */
   clear (states, name) {
     // console.log('清空')
@@ -69,16 +41,57 @@ const mutations = {
     // 如果存在routerName和configId则保留，这是是否已发布的标志
     states.canvas[name] = new CanvasModel({ configId, routerName }, defaultFormAttrs)
   },
-  /* 更新 */
+  /* 更新画布整体 */
+  edit (states, { name, routerName, data = {} }) {
+    const configId = data?.configId // 区分是否编辑
+    if (!configId) return
+    // 追加本地化，如：预览切换编辑
+    const localCanvas = sessionStorage.getItem('Canvas-all')
+    const allCanvas = localCanvas ? JSON.parse(sessionStorage.getItem('Canvas-all')) : {}
+    states.canvas = allCanvas
+    const existIndex = Object.entries(allCanvas).findIndex(([cKey, cObj]) => cObj.configId === configId)
+    if (existIndex > -1) {
+      // console.log('编辑已存在的页面')
+      // 本地存在该页面编辑
+      const existItemName = Object.keys(allCanvas)[existIndex]
+      // 切换到该页面
+      states.editingName = existItemName
+      // 存在变动
+      const isChange = !isEqual(allCanvas[existItemName], data)
+      if (isChange) {
+        // console.log('inEqual:', allCanvas[existItemName])
+        // console.log('inEqual1:', data)
+        // 是采用上次保存的画布，还是使用刷新后重新获取的线上数据为准呢。 --- 场景：多人编辑
+        MessageBox.confirm(
+          `您当前修改的画布${existItemName}还未发布，是否将线上数据覆盖当前？`,
+          '提示',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        ).then((confirm) => {
+          if (confirm) {
+            // 确定覆盖
+            states.canvas[existItemName] = data
+            sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+            // states.editingName = existItemName
+          }
+        })
+      }
+    } else {
+      // 本地追加
+      // console.log('本地追加:')
+      states.editingName = routerName
+      states.canvas[routerName] = new CanvasModel(data, defaultFormAttrs)
+      sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+      sessionStorage.setItem('Canvas-editing', routerName)
+    }
+  },
+  /* 更新画布所有字段 */
   updateHoldWidget (states, { name, element = {}, eIndex, elements }) {
     states.canvas[name].body = elements
   },
-  // updateTheWidget (states, { name, eindex = null, attrs = null }) {
-  //   const section = states.canvas[name]
-  //   if (section && eindex !== null && attrs) {
-  //     section.body[eindex] = attrs
-  //   }
-  // },
   /** 更新单画布事件 */
   updateActions (states, { name, actions = null, type = 'REWRITE', actionName = '', actionVal }) {
     const canvas = states.canvas[name]
@@ -113,31 +126,80 @@ const mutations = {
   updateCanvasResource () {
   },
   /* 导出、全部导出 */
-  export (states, name, isAll = false) {}
+  export (states, name, isAll = false) {},
+  /* 移除缓存中的画布 */
+  close (states, name) {
+    if (name) {
+      const newCanvas = { ...states.canvas }
+      delete newCanvas[name]
+      states.canvas = newCanvas
+      // delete states.canvas[name]
+      // console.log('states.canvas:', states.canvas)
+      sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+      states.editingName = ''
+      sessionStorage.setItem('Canvas-editing', '')
+    }
+  }
 }
 
 const actions = {
-  /* 初始化 */
+  /** 初始化
+   * 0 没有任何数据，空页面 = 新建
+   * 1 存在本地缓存，空页面 = 渲染第一个缓存
+   * 2 带id访问，空页面 = 渲染id（编辑）
+   * 3 带id访问，存在该本地缓存 = 渲染id（编辑）
+   */
   init ({ state, commit }, data = {}) {
-    // console.info('初始化:', state)
-    const storages = localStorage.getItem('Canvas-all')
-    if (data.routerName) {
-      // 属于重新需要本地化数据
+    console.info('初始化:', data)
+    const storages = sessionStorage.getItem('Canvas-all') ? JSON.parse(sessionStorage.getItem('Canvas-all')) : null
+    const editingName = data.routerName || sessionStorage.getItem('Canvas-editing')
+    const isEdit = data?.data?.configId
+    const isInStorage = storages ? Object.hasOwn(storages, editingName) : false
+    // console.log('storages:', storages)
+    // console.log('isInStorage:', isInStorage)
+    // console.log('editingName:', editingName)
+    if (isEdit) {
+      // 属于重新需要本地化数据, 分为有缓存和无缓存处理
       // console.info('属于重新需要本地化数据')
-      commit('add', { name: state.editingName, ...data })
+      commit('edit', { name: editingName, ...data })
     } else {
-      if (storages) {
-        // 存在缓存
-        state.canvas = JSON.parse(storages)
-        state.editingName = sessionStorage.getItem('Canvas-editing')
+      // 新增
+      if ((!storages || isEmpty(storages)) && !isInStorage) {
+        // 首次初始化
+        // console.log('首次初始化')
+        commit('add', { name: editingName || 'canvas_0' })
       } else {
-        state.editingName = sessionStorage.getItem('Canvas-editing') || 'canvas_0'
-        commit('add', { name: state.editingName })
+        // 存在缓存
+        // console.log('存在缓存')
+        state.canvas = storages
+        commit('toggle', editingName || Object.keys(storages)[0])
       }
     }
-    // console.info('初始化:', state.editingName)
   },
+  /* 切换画布 */
   toggleCanvas () {
+  },
+  /* 移除画布 */
+  closeCanvas ({ state, commit, dispatch }, name) {
+    const canvasList = Object.keys(state.canvas) || []
+    const index = canvasList.findIndex(key => key === name)
+    // console.log('删除:', name, '删除1', state.editingName)
+    if (name === state.editingName) {
+      // 关闭当前页，需要切换到上一个页面
+      if (index > 0) {
+        commit('close', name)
+        const newIndex = index - 1
+        // console.log('closeCanvas----', newIndex)
+        if (canvasList[newIndex]) {
+          // console.log('canvasList[newIndex]:', canvasList[newIndex])
+          commit('toggle', canvasList[newIndex])
+        }
+        return
+      }
+    }
+    commit('close', name)
+    dispatch('init')
+    // dispatch('init')
   }
 }
 

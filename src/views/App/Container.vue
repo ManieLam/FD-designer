@@ -6,24 +6,38 @@
     //- TODO 支持多个画布
     //- router-view
     .tool-panel.d-flex-row-between
+      //- 左边工具栏
       el-button-group.tool-wrap__left
         //- el-button() 切换画布
         el-button(@click="toggleSettingJson") 查看配置文件
+        el-dropdown(key="canvasToggle", @command="handleChangeCanvas")
+          el-button {{ `当前画布：${canvasName}` || '切换画布'}}
+            i.el-icon-arrow-down.el-icon--right
+          el-dropdown-menu(style="width: 150px;text-align:right", slot="dropdown")
+            el-dropdown-item.dropdown-item(v-for="cName in canvasKeysInLimit", :command="cName", :key="cName", :icon="cName === canvasName ? 'el-icon-check' : ''")
+              .left-text  {{cName || ''}}
+              .right-text.btn-icon.el-icon-close.color-primary(
+                style="z-index: 2;"
+                title="丢弃修改的数据，并关闭"
+                @click.prevent.stop="() => onCloseCanvas(cName)")
+            el-dropdown-item(divided, command="more", style="margin-left: 20px", icon="el-icon-position") 查看更多画布
+      //- 右边工具栏
       el-button-group.tool-wrap__right
         //- computed中设立saveable无法监听到store的变化
-        el-button(:disabled="preventSaved", @click="toExportProps.visable=true") 导出
-        el-button(:disabled="preventSaved", @click="onClear") 清空
+        el-button(:disabled="!canvasKeysInLimit.length", @click="toExportProps.visable=true") 导出
+        el-button(@click="onCreate") 新建
+        el-button(:disabled="preventSingleSaved", @click="onClear") 清空
         //- el-button(:disabled="actCanvas|saveable", @click="onPreview") 预览
-        el-dropdown(:disabled="preventSaved", @command="handlePreview")
+        el-dropdown(key="preview", :disabled="preventSingleSaved", @command="handlePreview")
           el-button 预览
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu(slot="dropdown")
             el-dropdown-item(command="onPreview") 预览
             el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
-        el-button(type="primary", :disabled="!!isEdit || preventSaved", @click="onSave") 暂存
-        el-button(type="primary", :disabled="preventSaved", @click="publishOnline") 发布
+        el-button(type="primary", :disabled="preventSingleSaved", @click="onSave") 暂存
+        el-button(type="primary", :disabled="preventSingleSaved", @click="publishOnline") 发布
     //- :canvas="canvasName|getActCanvas(allCanvas)"
-    DragPage(
+    DragPage.drag-page-container(
       ref="dragPanel"
       :key="canvasName"
       :formItemConfig="formItemConfig"
@@ -84,7 +98,7 @@ import DragPage from '../DragPage'
 // import CanvasPanel from '../CanvasPanel'
 import SettingPanel from '../SettingPanel'
 // import Draggable from 'vuedraggable'
-import { debounce, isNil } from 'lodash'
+import { debounce, isNil, max } from 'lodash'
 import CodeEditor from '@/components/CodeEditor'
 import { templateRegister, getVueComp } from '@/components/Translator/index.js'
 import Vue from 'vue'
@@ -120,7 +134,8 @@ export default {
       afterLoading: false,
       isEditMode: false, // 编辑模式
       componentVM: 'FormTemp', // 暂且是表单类型，TODO 扩展其他类型
-      computedBody: []
+      computedBody: [],
+      CANVASMAX: 8 // 一次性可以打开画布的数量
     }
   },
   filters: {
@@ -142,6 +157,10 @@ export default {
     allCanvas () {
       return this.$store.state.canvas.canvas
     },
+    canvasKeysInLimit () {
+      // .slice(0, this.CANVASMAX) 限制
+      return Object.keys(this.allCanvas)
+    },
     actCanvas () {
       // return this.allCanvas[this.canvasName] || {} // 无效
       // TODO 下个版本迭代成多个
@@ -162,8 +181,7 @@ export default {
         })
       }
     },
-    preventSaved () {
-      // console.info('prevent:', !this.canvasBody, !this.canvasBody.length)
+    preventSingleSaved () {
       return !this.canvasBody || !this.canvasBody.length
     },
     allCanvasStr () {
@@ -186,7 +204,7 @@ export default {
     formLabelHidden: {
       handler (flag, oldFlag) {
         // console.info('改变画布标签:', flag, oldFlag)
-        if (flag !== oldFlag) {
+        if (!isNil(flag) && flag !== oldFlag && this.actCanvas.body) {
           const checkList = []
           this.actCanvas.body.forEach(f => {
             if (isNil(f.labelHidden) || f.__labelHiddenByForm) {
@@ -205,7 +223,7 @@ export default {
       handler (canvas, oldCanvas) {
         // console.log('actCanvas:', canvas)
         this.computedBody = canvas?.body
-        //     this.formLabelHidden = canvas?.attrs?.labelHidden
+        // this.formLabelHidden = canvas?.attrs?.labelHidden
       }
     }
   },
@@ -289,6 +307,17 @@ export default {
         }
       })
     },
+    onCreate () {
+      const nameList = Object.keys(this.allCanvas).map(n => n.replace(/canvas_(\d+)/, '$1')).filter(name => !isNaN(name))
+      let newName = 0
+      if (nameList.length) {
+        let maxNum = max(nameList)
+        newName = ++maxNum
+        // console.log('newName:', newName)
+      }
+      this.$store.commit('canvas/add', { name: `canvas_${newName}` })
+      this.$forceUpdate()
+    },
     onClear () {
       this.$refs.dragPanel.clear()
       this.$refs.settingPanel.clear()
@@ -296,18 +325,30 @@ export default {
       this.$store.commit('canvas/clear', this.canvasName)
       if (!this.isEdit) {
         // 非编辑状态才清除本地缓存
-        localStorage.removeItem('Canvas-all')
+        sessionStorage.removeItem('Canvas-all')
         sessionStorage.removeItem('Canvas-editing')
       }
     },
     onSave (alert = true) {
       // this.$refs.dragPage.save()
-      if (!this.isEdit) {
-        // 非编辑状态保存数据
-        localStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
-        sessionStorage.setItem('Canvas-editing', this.canvasName)
-        if (alert) this.$message.success('保存成功')
-      }
+      // if (!this.isEdit) {
+      //   // 非编辑状态保存数据
+      //   sessionStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
+      //   sessionStorage.setItem('Canvas-editing', this.canvasName)
+      //   if (alert) this.$message.success('保存成功')
+      // }
+      // 非编辑状态保存数据
+      sessionStorage.setItem('Canvas-all', JSON.stringify(this.allCanvas))
+      sessionStorage.setItem('Canvas-editing', this.canvasName)
+      if (alert) this.$message.success('暂存成功')
+    },
+    onCloseCanvas (cName) {
+      this.$store.dispatch('canvas/closeCanvas', cName)
+      this.$nextTick(() => {
+        this.formItemConfig = this.actCanvas?.body?.[0] || {}
+        this.formLabelHidden = this.actCanvas?.attrs?.labelHidden
+        this.toggleRouter(this.actCanvas?.routerName)
+      })
     },
     async getEditCanvas (rName, id) {
       let resData = {}
@@ -320,6 +361,23 @@ export default {
               ...JSON.parse(res.data.config),
               configId: res.data.id
             }
+          } else {
+            // console.log('不存在id')
+            resData = null
+            this.$confirm(
+              '当前查看的画布不存在，是否需要新增一个的画布',
+              '提醒',
+              {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }
+            ).then(confirm => {
+              if (confirm) {
+                this.onCreate()
+                this.toggleRouter()
+              }
+            })
           }
         })
       }
@@ -328,20 +386,26 @@ export default {
     async initCanvas () {
       const { name: routerName, id } = this.$route.params || {}
       // console.info('路由参数:', routerName, id)
-      if (!routerName) {
+      if (id == null) {
         // 初始化
         await this.$store.dispatch('canvas/init')
       } else {
         // 更新本地化
         const editData = await this.getEditCanvas(routerName, id)
         // console.log('编辑在线预览数据:', editData)
-
-        await this.$store.dispatch('canvas/init', { routerName, data: editData })
+        if (editData) {
+          const { routerName: newRName } = editData
+          // 以最终数据返回的routerName名称为准, 地址栏不可信
+          await this.$store.dispatch('canvas/init', { routerName: newRName, data: editData })
+        } else {
+          await this.$store.dispatch('canvas/init')
+        }
       }
       this.$nextTick(() => {
         // console.info('当前canvas', this.actCanvas)
         this.formItemConfig = this.actCanvas?.body?.[0] || {}
         this.formLabelHidden = this.actCanvas?.attrs?.labelHidden
+        // this.toggleRouter(this.actCanvas?.routerName)
       })
     },
     async initResource () {
@@ -368,6 +432,27 @@ export default {
         const newPath = href.replace(hash, `#/online/${routerName}/${configId}`)
         // 在线预览属于可能频繁打开，带窗口命名跳转
         window.open(newPath + '?mode=1', routerName)
+      }
+    },
+    toggleRouter (name = this.actCanvas.routerName) {
+      // console.log('this.actCanvas:', name, this.actCanvas)
+      if (this.actCanvas.configId && this.$route.params.name !== name) {
+        this.$router.push({ name: 'DesignerEdit', params: { name: this.canvasName, id: this.actCanvas.configId } })
+      } else if (this.$route.name !== 'Designer') {
+        this.$router.push({ name: 'Designer' })
+      }
+    },
+    // 切换画布
+    handleChangeCanvas (command) {
+      // console.log('command:', command)
+      this.formItemConfig = {}
+      if (command === this.canvasName) return // 防重复点击
+      if (command !== 'more') {
+        this.$store.commit('canvas/toggle', command)
+        // 切换字段元素
+        this.formItemConfig = this.actCanvas?.body?.[0]
+        // 修改路由
+        this.toggleRouter(command)
       }
     },
     onExport (type) {
@@ -552,4 +637,25 @@ export default {
       background: $--bgcolor-secondary
       border-color: $--border-active
 
+// .drag-page-container
+//   position: relative
+//   &::before
+//     content: 'aaa'
+//     position: absolute
+//     top: 0
+//     left: 0
+//     border: 1px dotted $--border-color-light
+//     padding: 4px
+//     width: 100%
+//     height: 26px
+
+.dropdown-item
+  line-height: 2.6
+  display: flex
+  justify-content: space-between
+  align-items: center
+  .right-text:hover
+    border: 1px solid
+    padding: 2px
+    border-radius: 50%
 </style>
