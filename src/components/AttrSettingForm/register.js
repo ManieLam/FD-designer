@@ -10,5 +10,6 @@ export default {
   'form-affixes': () => import('./FormAffixes.vue'),
   'form-attr-passthrough': () => import('./FormAttrPassthrough.vue'),
   'form-date-disabledDate': () => import('./FormDateDisabledDate.vue'),
-  'form-date-shortcut': () => import('./FormDateShortcut.vue')
+  'form-date-shortcut': () => import('./FormDateShortcut.vue'),
+  'form-layout': () => import('./FormLayout.vue')
 }

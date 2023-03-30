@@ -20,6 +20,9 @@ export const bodyItemAttrs = {
 export const formAttrs = {
   layout: 'default',
   // labelHidden: false,
+  layoutAttrs: {
+  //   layout: 'default' // 为保留原先配置的依然生效，layout不放在layoutAttrs中
+  },
   labelWidth: 100,
   labelPosition: 'right',
   buttonAlign: 'left',
@@ -27,6 +30,23 @@ export const formAttrs = {
   readOnly: false,
   keepAliveData: true,
   isGroup: false // 是否组合
+}
+
+// 根据表单layout类型设置默认值
+export const formLayoutDefAttrs = {
+  gird: {
+    gridspanNum: 3
+  },
+  row: {
+    colspanNum: 3,
+    isAutoColumn: true,
+    collapsable: false,
+    errorToptip: true
+  },
+  inline: {
+    collapsable: false,
+    errorToptip: true
+  }
 }
 
 // 默认表单按钮配置

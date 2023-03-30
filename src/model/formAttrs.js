@@ -23,6 +23,56 @@ export const formButtonAttr = [
 
 ]
 
+/* 表单类型选项 */
+export const formLayoutAttrs = {
+  /* 表单布局类型 */
+  types: [{
+    value: 'default',
+    label: '默认'
+  }, {
+    value: 'grid',
+    label: '网格'
+  }, {
+    value: 'row',
+    disabled: true,
+    label: '栅格'
+  }, {
+    value: 'inline',
+    disabled: true,
+    label: '行内'
+  }],
+  /* 网格类型的属性 */
+  gridAttrs: [
+    {
+      label: '列数',
+      key: 'gridspanNum',
+      tag: 'el-input-number',
+      max: 24,
+      min: 1
+    }
+  ],
+  /* 栅格式属性 */
+  rowAttrs: [
+    {
+      label: '列数',
+      key: 'colspanNum',
+      tag: 'el-input-number',
+      max: 24,
+      min: 1
+    },
+    {
+      label: '是否开启自适应屏幕的列数',
+      key: 'isAutoColumn',
+      tag: 'el-switch'
+    },
+    {
+      label: '是否开启小浮窗提示错误信息',
+      key: 'errorToptip',
+      tag: 'el-switch'
+    }
+  ]
+}
+
 /* 表单允许配置的属性 */
 export default [
   {
@@ -43,17 +93,21 @@ export default [
   //   placeholder: '请输入'
   // },
   {
-    label: '布局类型',
-    readonly: true,
+    label: '布局',
     key: 'layout',
-    tag: 'AnsoDataformSelect',
-    options: [{
-      value: 'default',
-      label: '默认'
-    }, {
-      value: 'grid',
-      label: '网格'
-    }]
+    group: [
+      {
+        label: '布局类型',
+        key: 'layout',
+        tag: 'AnsoDataformSelect',
+        options: formLayoutAttrs.types
+      },
+      {
+        label: '布局属性',
+        key: 'layoutAttrs',
+        tag: 'form-layout'
+      }
+    ]
   },
   {
     label: '标签',

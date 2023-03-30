@@ -54,7 +54,8 @@ export default {
         ...attrs,
         labelWidth: `${attrs.labelWidth}px`,
         type: attrs.layout,
-        disabled: attrs.readOnly
+        disabled: attrs.readOnly,
+        ...(attrs.layoutAttrs || {})
       }
     },
     // 需要发起异步搜索的字段
