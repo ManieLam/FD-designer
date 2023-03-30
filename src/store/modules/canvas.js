@@ -139,6 +139,15 @@ const mutations = {
       states.editingName = ''
       sessionStorage.setItem('Canvas-editing', '')
     }
+  },
+  /* 复制 */
+  copy (states, { name, copiedData = {} }) {
+    if (!copiedData || isEmpty(copiedData)) return
+    states.canvas = {
+      ...states.canvas,
+      [name]: new CanvasModel({ ...copiedData, configId: null, routerName: name })
+    }
+    sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
   }
 }
 
@@ -200,6 +209,19 @@ const actions = {
     commit('close', name)
     dispatch('init')
     // dispatch('init')
+  },
+  /* 复制画布 */
+  copyCanvas ({ state, commit }, data = {}) {
+    if (!data) return
+    // console.log('copy:', state.canvas)
+    const regex = /_copied_\d+|_copied/
+    const filterName = data.routerName.replace(regex, '')
+    const nameList = Object.keys(state.canvas).filter(k => k.replace(regex, '') === filterName)
+    const len = nameList.length
+    const newName = len > 1 ? `${filterName}_copied_${len - 1}` : `${filterName}_copied`
+    // console.log('newName:', newName)
+    commit('copy', { name: newName, copiedData: data })
+    commit('toggle', newName)
   }
 }
 
