@@ -40,6 +40,7 @@ const mutations = {
     const { configId, routerName } = states.canvas[name]
     // 如果存在routerName和configId则保留，这是是否已发布的标志
     states.canvas[name] = new CanvasModel({ configId, routerName }, defaultFormAttrs)
+    sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
   },
   /* 更新画布整体 */
   edit (states, { name, routerName, data = {} }) {

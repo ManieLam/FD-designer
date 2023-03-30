@@ -10,6 +10,7 @@
       el-button-group.tool-wrap__left
         //- el-button() 切换画布
         el-button(@click="toggleSettingJson") 查看配置文件
+        //- 切换画布
         el-dropdown(key="canvasToggle", @command="handleChangeCanvas")
           el-button {{ `当前画布：${canvasName}` || '切换画布'}}
             i.el-icon-arrow-down.el-icon--right
@@ -27,11 +28,13 @@
             el-dropdown-item(style="margin-left: 20px", icon="el-icon-close") 批量关闭（TODO）
             //- el-dropdown-item(style="margin-left: 20px", icon="el-icon-plus") 快捷打开（TODO）
             el-dropdown-item(command="more", style="margin-left: 20px", icon="el-icon-search") 查看更多画布
+        //- 快捷打开
+
       //- 右边工具栏
       el-button-group.tool-wrap__right
-        //- computed中设立saveable无法监听到store的变化
+        //- 打开
+        el-button(@click="onCreate") 新建
         el-button(:disabled="!canvasKeysInLimit.length", @click="toExportProps.visable=true") 导出
-        el-button(@click="onCreate") 打开
         el-button(:disabled="preventSingleSaved", @click="onCopied") 复制
         el-button(:disabled="preventSingleSaved", @click="onClear") 清空
         //- el-button(:disabled="actCanvas|saveable", @click="onPreview") 预览
@@ -333,11 +336,6 @@ export default {
       this.$refs.settingPanel.clear()
       this.formItemConfig = {}
       this.$store.commit('canvas/clear', this.canvasName)
-      if (!this.isEdit) {
-        // 非编辑状态才清除本地缓存
-        sessionStorage.removeItem('Canvas-all')
-        sessionStorage.removeItem('Canvas-editing')
-      }
     },
     onSave (alert = true) {
       // this.$refs.dragPage.save()
