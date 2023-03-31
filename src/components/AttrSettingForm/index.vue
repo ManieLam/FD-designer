@@ -22,6 +22,7 @@ el-form.setting-list(v-model="data", label-position="top")
       v-on="$listeners"
       :key="`${value.key}_${attrItem.key}`"
       :fullSetting="data"
+      :canvas="canvas"
       @input="update")
     //- 属性组配置
     .component-group(v-else-if="attrItem.group", :key="attrItem.group.key")
@@ -41,6 +42,7 @@ el-form.setting-list(v-model="data", label-position="top")
           v-bind="groupItem"
           v-on="$listeners"
           :fullSetting="data"
+          :canvas="canvas"
           @input="update")
         //- .span-tip(v-if="groupItem.tip") {{groupItem.tip}}
     //- .component-empty.secondary-text(v-else) -- 开发中 --
@@ -61,6 +63,10 @@ export default {
     attrs: {
       type: Array,
       default: () => ([])
+    },
+    canvas: {
+      type: Object,
+      default: () => ({})
     }
   },
   data () {

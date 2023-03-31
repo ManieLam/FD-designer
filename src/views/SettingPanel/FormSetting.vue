@@ -14,6 +14,7 @@
         v-on="$listeners"
         :value="attrsData"
         :attrs="attrs"
+        :canvas="canvas"
         @update="update")
       //- 设置表单行为
       .action-setting-wrap.m-t-8(v-show="activeName==='action'")
@@ -142,12 +143,13 @@ export default {
       this.activeName = name
     },
     update (attrs) {
+      // console.log('updateform:', attrs)
       this.$emit('update', 'formAttrs', attrs)
       // this.setFormState({ attrs: this.attrsData })
       // this.$emit('update', 'attrs', this.attrsData)
     },
     updateButtons (buttons) {
-      console.log('更新按钮列表')
+      // console.log('更新按钮列表')
       this.buttonList = buttons
       this.setFormState({ buttons })
       // this.$emit('updateButtons', buttons)
@@ -156,7 +158,7 @@ export default {
     /* 部分配置无法双向修改到，需要更新store/canvas */
     setFormState ({ attrs = null, actions = null, buttons = null }) {
       // 由内部更新到store
-      console.info('formSetting 更新', attrs)
+      // console.info('formSetting 更新', attrs)
       this.$store.commit('canvas/assignConfig', {
         name: this.canvasName,
         attrs,

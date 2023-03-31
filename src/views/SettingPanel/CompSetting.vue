@@ -1,7 +1,7 @@
 <template lang='pug'>
 .setting-form-wrap
   .secondary-text.empty-text(v-if="!formItemConfig.key")
-    .secondary-text(v-show="!formItemConfig.key")  请先拖拽组件, 再做操作
+    .secondary-text(v-show="!formItemConfig.key")  请先选择组件
     .secondary-text(v-show="formItemConfig.key")  当前组件不可配置
     .secondary-text {{formItemConfig.key}}
   .setting-wrap(v-else)

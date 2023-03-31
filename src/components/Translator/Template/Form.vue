@@ -93,6 +93,11 @@ export default {
     // },
     // fieldActions () {
     //   return this.config?.body.
+    },
+    fieldSpan () {
+      const spanList = this.config.attrs?.layoutAttrs?.fieldSpan
+      if (!spanList) return {}
+      return keyBy(spanList, 'fieldKey')
     }
   },
   methods: {
@@ -248,7 +253,9 @@ export default {
             },
             hasPassthrough ? this.formatPassthroughAttrs(config._passthroughAttrs, config) : {},
             // 进行该组件私有属性转换
-            privateAttrs instanceof Object ? privateAttrs : {}
+            privateAttrs instanceof Object ? privateAttrs : {},
+            // 对字段自定义占比格式化
+            this.fieldSpan[config.key] ? pick(this.fieldSpan[config.key], ['colSpan', 'rowSpan']) : { colSpan: null, rowSpan: null }
           )
         }
       })

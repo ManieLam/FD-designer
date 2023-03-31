@@ -6,7 +6,7 @@
     v-else
     ref="form"
     v-bind="formConfig.attrs"
-    :class="[{'is-active-form': selectItem === 'form'}, `form-layout-${formAttrs.layout}`]"
+    :class="[{'is-active-form': selectItem === 'form'}, `form-layout-${formAttrs.layout}`, formStyle[formAttrs.layout]]"
     :rules="rules"
     :model="formData"
     :label-width="labelWidthVal"
@@ -30,11 +30,12 @@
       transition-group(
         name="fade"
         tag="div"
-        class="widget-form-list"
+        :class="['widget-form-list']"
         :label-position="formAttrs.labelPosition")
         .widget-form-item-wrap(
           v-for="(ele, index) in fieldList"
           :key="ele.key"
+          :field-key="ele.key"
           :is-border="formAttrs.border !== false"
           :class="{'is-active': selectItem === ele.key || (!selectItem && formItemConfig.key === ele.key) }"
           :label-hidden="ele.labelHidden"
@@ -73,10 +74,15 @@
  */
 import { isEmpty } from 'lodash'
 import { formatFormRules } from '@/utils/format.js'
+import styleMixin from './mixins/style.js'
+// mixins: [styleMixin],
+
 import Draggable from 'vuedraggable'
 import WidgetFormItem from './WidgetFormItem'
+// console.log('styleMixin:', styleMixin)
 export default {
   name: 'WidgetForm',
+  mixins: [styleMixin],
   model: {
     prop: 'fields',
     event: 'update'
@@ -126,7 +132,6 @@ export default {
     buttonList () {
       // console.log('widgetForm 改变button')
       return this.formConfig?.buttons || []
-      // return this.$store.state.canvas.canvas[this.canvasName]
     },
     fieldList: {
       get () {

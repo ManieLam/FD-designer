@@ -10,7 +10,7 @@
       component(
         :ref="tab.name"
         :is="tab.components"
-        :key="formItemConfig.key"
+        :key="tab.name === 'form' ? tab.name : formItemConfig.key"
         :formItemConfig="formItemConfig"
         v-bind="{...$attrs, ...(tab.props||{})}"
         v-on="$listeners")
