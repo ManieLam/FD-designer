@@ -26,7 +26,7 @@
 import AttrSettingForm from '@/components/AttrSettingForm'
 import FormList from '@/components/AttrSettingForm/FormList'
 import { formLayoutAttrs } from '@/model/formAttrs.js'
-import { formLayoutDefAttrs } from '@/model/defaultConfig.js'
+import { getFormlayoutDefval } from '@/model/defaultConfig.js'
 export default {
   name: 'FormLayout',
   props: {
@@ -51,7 +51,8 @@ export default {
     return {
       layoutTypes: formLayoutAttrs.types,
       layoutType: '', // 选择的表单类型
-      attrList: [],
+      spanFields: [], // 存在记录colSpan和rowSpan的字段
+      attrList: [], // 不同的布局类型的下拉选项
       layoutData: {
         fieldSpan: [] // 字段占比
       },
@@ -64,11 +65,6 @@ export default {
     }
   },
   computed: {
-    // attrList () {
-    //   // const { layout } = this.fullSetting || {}
-    //   const layout = this.layoutType
-    //   return layout ? formLayoutAttrs[`${layout}Attrs`] : []
-    // },
     fields () {
       return this.canvas?.body.map(f => {
         return {
@@ -89,41 +85,33 @@ export default {
     }
   },
   watch: {
+    // 变更类型
     'fullSetting.layout': {
-      immediate: true,
       handler (type, oldType) {
-        this.layoutType = type
-        this.attrList = type ? formLayoutAttrs[`${type}Attrs`] : []
         if (type !== oldType) {
-          this.attrsData = { ...formLayoutDefAttrs[type] }
+          this.init()
         }
       }
     }
   },
   methods: {
     update (datas) {
-      // console.log('update:', datas)
       this.attrsData = { ...this.attrsData, ...datas }
+    },
+    init (attrData) {
+      const { layout, layoutAttrs } = this.fullSetting || {}
+      this.layoutType = layout
+      this.attrList = layout ? formLayoutAttrs[`${layout}Attrs`] : []
+      this.attrsData = getFormlayoutDefval({
+        type: layout,
+        defData: attrData || layoutAttrs
+      })
+      // console.log('init:', this.attrsData)
     }
   },
   mounted () {
-    const withSpan = this.canvas?.body?.filter(f => f.rowSpan || f.colSpan).map(f => {
-      return {
-        fieldKey: f.key,
-        colSpan: f.colSpan,
-        rowSpan: f.rowSpan
-      }
-    })
-    // console.log('有字段需要调整占比:', withSpan)
-    // const list = Array.from({ length: 1 }, () => {
-    //   return this.formSpanColumnProp.map(p => p.prop)
-    // })
-    // console.log('list:', list)
-    this.attrsData = {
-      ...this.value,
-      fieldSpan: withSpan
-    }
-    // this.layoutType = this.fullSetting.layout
+    // 在表单设计器中的画布与配置设置不读取body中的属性，只根据表单attrs属性更新
+    this.init()
   }
 }
 </script>

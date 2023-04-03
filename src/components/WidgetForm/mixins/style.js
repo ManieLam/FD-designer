@@ -19,7 +19,7 @@ export default {
   },
   watch: {
     formLayoutAttrs: {
-      // immediate: true,
+      immediate: true,
       deep: true,
       handler (attrs) {
         const { layout } = attrs
@@ -41,7 +41,7 @@ export default {
       return sheet.classes
     },
     formatGrid (attrs = {}) {
-      const { gridspanNum, fieldSpan } = attrs
+      const { gridspanNum, fieldSpan = [] } = attrs
       // 根据不同字段设置的rowSpan，colSpan 计算
       const customSpan = fieldSpan.reduce((res, cur) => {
         const { fieldKey, colSpan, rowSpan } = cur

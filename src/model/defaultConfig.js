@@ -34,19 +34,27 @@ export const formAttrs = {
 
 // 根据表单layout类型设置默认值
 export const formLayoutDefAttrs = {
-  gird: {
-    gridspanNum: 3
+  grid: {
+    gridspanNum: 3,
+    fieldSpan: []
   },
   row: {
     colspanNum: 3,
     isAutoColumn: true,
     collapsable: false,
-    errorToptip: true
+    errorToptip: true,
+    fieldSpan: []
   },
   inline: {
     collapsable: false,
     errorToptip: true
   }
+}
+export function getFormlayoutDefval ({ type = 'default', defData = {} }) {
+  return formLayoutDefAttrs[type] ? {
+    ...formLayoutDefAttrs[type],
+    ...defData
+  } : defData
 }
 
 // 默认表单按钮配置
