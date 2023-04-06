@@ -27,7 +27,7 @@
             el-dropdown-item(style="margin-left: 20px", icon="el-icon-position") 批量发布（TODO）
             el-dropdown-item(style="margin-left: 20px", icon="el-icon-close") 批量关闭（TODO）
             //- el-dropdown-item(style="margin-left: 20px", icon="el-icon-plus") 快捷打开（TODO）
-            el-dropdown-item(command="more", style="margin-left: 20px", icon="el-icon-search") 查看更多画布
+            el-dropdown-item(style="margin-left: 20px", icon="el-icon-search", command="more") 查看更多画布
         //- 快捷打开
 
       //- 右边工具栏
@@ -99,6 +99,13 @@
       .block-item(id="export-json", @click="exportJson") 配置文件
       //- .block-item(id="export-vue", @click="exportVue") vue文件
       .block-item(id="export-html", @click="onExport('html')") html+js+css文件
+  //- 画布
+  SmartDialog(
+    title="已发布的画布列表"
+    width="95%"
+    size="lg"
+    v-model="moreCanvas.visable")
+    CanvasTable()
 </template>
 
 <script>
@@ -107,9 +114,10 @@ import WidgetPanel from './WidgetPanel'
 import DragPage from '../DragPage'
 // import CanvasPanel from '../CanvasPanel'
 import SettingPanel from '../SettingPanel'
+import CodeEditor from '@/components/CodeEditor'
+import CanvasTable from '../CanvasTable'
 // import Draggable from 'vuedraggable'
 import { debounce, isNil, max } from 'lodash'
-import CodeEditor from '@/components/CodeEditor'
 import { templateRegister, getVueComp } from '@/components/Translator/index.js'
 import Vue from 'vue'
 // import FromTemp from '@/components/Translator/Template/Form'
@@ -121,7 +129,8 @@ export default {
     DragPage,
     WidgetPanel,
     SettingPanel,
-    CodeEditor
+    CodeEditor,
+    CanvasTable
     // FromTemp
   },
   data () {
@@ -140,6 +149,10 @@ export default {
         visable: false,
         data: {}
       },
+      /* 展示更多已发布画布 */
+      moreCanvas: {
+        visable: false
+      },
       formLabelHidden: false, // 表单字段是否隐藏
       afterLoading: false,
       isEditMode: false, // 编辑模式
@@ -157,7 +170,8 @@ export default {
       return !body || !body.length
     },
     filterCanvasStr (obj) {
-      return JSON.stringify(obj, null, '\t')
+      return JSON.stringify(obj, null, 4)
+      // return JSON.stringify(obj)
     }
   },
   computed: {
@@ -238,6 +252,9 @@ export default {
     }
   },
   methods: {
+    toggleMoreCanvas () {
+      this.moreCanvas.visable = !this.moreCanvas.visable
+    },
     toggleSettingJson () {
       this.$forceUpdate()
       this.$nextTick(() => {
@@ -461,6 +478,8 @@ export default {
         this.formItemConfig = this.actCanvas?.body?.[0]
         // 修改路由
         this.toggleRouter(command)
+      } else if (command === 'more') {
+        this.toggleMoreCanvas()
       }
     },
     onExport (type) {
@@ -531,8 +550,11 @@ export default {
             data: {
               config: JSON.stringify({
                 ...this.previewProps.data,
+                canvasTitle: '',
                 routerName: value
-              })
+              }),
+              canvasName: value,
+              canvasTitle: ''
             }
           }).then(res => {
             // console.log('配置数据上传服务端后:', res)
@@ -558,12 +580,14 @@ export default {
       }
     },
     updateOnline (canvas) {
-      const { configId, routerName } = canvas
+      const { configId, routerName, canvasTitle } = canvas
       this.$normalRequire({
         url: `/fileserver/ui/config/edit/${configId}`,
         method: 'POST',
         data: {
-          config: JSON.stringify(canvas)
+          config: JSON.stringify(canvas),
+          canvasName: routerName,
+          canvasTitle
         }
       }).then(res => {
         // console.info('res:', res)
