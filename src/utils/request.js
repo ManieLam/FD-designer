@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 import { cloneDeep } from 'lodash'
 
+export const httpBaseURL = ''
 export const httpHeader = (props, timeStamp) => {
   return {
     ...props.header

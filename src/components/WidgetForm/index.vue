@@ -178,22 +178,11 @@ export default {
       })
     },
     labelWidthVal () {
-      const { labelHidden, labelPosition, labelWidth } = this.formAttrs || {}
+      const { labelHidden, labelPosition, labelWidth, layout } = this.formAttrs || {}
       // TODO 当行内和row类型开发，则开启
-      // return labelHidden || labelPosition === 'top' ? '' : this.inline || this.type === 'row' ? '' : this.labelWidth
-      return labelHidden || labelPosition === 'top' ? '0px' : `${labelWidth}px`
+      return labelHidden || labelPosition === 'top' ? '' : this.inline || ['row', 'grid'].includes(layout) ? '' : `${labelWidth}px`
     }
   },
-  // filters: {
-  //   setFormitemConfig (set, fset) {
-  //     // 表单子元素的属性配置在vuex中已经读取
-  //     // const customSet = omit(fset, ['labelWidth', 'keepAliveData', 'layout', 'title'])
-  //     // return merge(set, {
-  //     //   readOnly: fset.readOnly
-  //     // })
-  //     return set
-  //   }
-  // },
   methods: {
     // onClick ({ type, data }) {
     //   this.selectItem = type === 'component' ? data.key : type

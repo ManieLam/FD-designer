@@ -19,6 +19,7 @@ export const CanvasModel = function ({ body = [], attrs = {}, actions = {}, temp
     groups: {},
     resources: {},
     template,
+    canvasTitle: '',
     ...arguments[0]
   }
 }
