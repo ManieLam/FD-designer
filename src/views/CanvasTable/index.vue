@@ -4,6 +4,10 @@
     style="min-height: 800px"
     v-bind="tableConfig"
     :columns="columns")
+    //- 头部插槽
+    template(v-slot:toolbar-right)
+      el-checkbox(v-model="multiEditing") 批量编辑
+    //- 字段插槽
     template(v-slot:column-canvasTitle="{ row, column, value }")
       el-input(v-if="row._isEditing", v-model="editingData.canvasTitle", @keyup.native.enter="saveEdit(row)")
         el-button(
@@ -92,6 +96,11 @@ export default {
               this.$set(row, 'canvasTitle', row._oldData.canvasTitle)
             }
           },
+          // {
+          //   name: 'open',
+          //   type: 'text',
+          //   icon: 'el-'
+          // },
           {
             // label: '删除',
             name: 'delete',
@@ -120,12 +129,31 @@ export default {
         ]
       },
       tableData: [],
-      editingData: {}
+      editingData: {},
+      multiEditing: false
     }
   },
   watch: {},
   methods: {
     edit (button, row) {
+      // this.editingData = row
+      // this.$store.commit('canvas/edit', { name: row.canvasName || row.routerName, ...row })
+      // 由于新增时候canvas中没有configId, 需要再次编辑的时候补充
+      const config = row.config ? JSON.parse(row.config) : {}
+      const nData = {
+        ...row,
+        config: {
+          ...config,
+          configId: config.configId || row.id
+        },
+        // 旧数据没有canvasName，只有routerName，此处做数据更正
+        canvasName: row.canvasName || config.routerName
+      }
+      this.$emit('close', nData, this.multiEditing)
+    },
+    /* 批量编辑 */
+    multEdit () {},
+    editTitle (button, row) {
       this.$set(row, '_isEditing', true)
       this.$set(row, '_oldData', cloneDeep(row))
       this.editingData = row
@@ -187,7 +215,8 @@ export default {
       const config = row.config ? JSON.parse(row.config) : {}
       // console.log(arguments)
       const { routerName, configId } = config
-      return routerName && configId ? `/#/online/${routerName}/${configId}` : ''
+      const id = configId || row.id
+      return routerName && id ? `/#/online/${routerName}/${id}` : ''
     }
   },
   mounted () { }

@@ -105,7 +105,7 @@
     width="95%"
     size="lg"
     v-model="moreCanvas.visable")
-    CanvasTable()
+    CanvasTable(@close="openCanvasByConfig")
 </template>
 
 <script>
@@ -417,7 +417,7 @@ export default {
       } else {
         // 更新本地化
         const editData = await this.getEditCanvas(routerName, id)
-        // console.log('编辑在线预览数据:', editData)
+        console.log('编辑在线预览数据:', editData)
         if (editData) {
           const { routerName: newRName } = editData
           // 以最终数据返回的routerName名称为准, 地址栏不可信
@@ -563,7 +563,7 @@ export default {
               this.$store.commit('canvas/assignConfig', {
                 name: this.canvasName,
                 assignObj: {
-                  configId: res.data?.id,
+                  configId: res.data?.id, // 首次发布前没有configId，需要补充
                   routerName: value
                 }
               })
@@ -600,6 +600,28 @@ export default {
         } else {
           this.$message.error(res)
         }
+      })
+    },
+    // 关闭选择更多画布弹窗(单个)/快捷搜索打开某个画布
+    async openCanvasByConfig (canvas = {}, multiEditing) {
+      if (!multiEditing) this.moreCanvas.visable = false
+      // console.log('canvas:', canvas)
+      const name = canvas.canvasName
+      // 更新本地化
+      const editData = await this.getEditCanvas(name, canvas.id)
+      // console.log('编辑在线预览数据:', editData)
+      if (editData) {
+        const { routerName: newRName } = editData
+        // 以最终数据返回的routerName名称为准, 地址栏不可信
+        await this.$store.dispatch('canvas/init', { routerName: newRName, data: editData })
+      } else {
+        await this.$store.dispatch('canvas/init')
+      }
+      this.$nextTick(() => {
+        // console.info('当前canvas', this.actCanvas)
+        this.formItemConfig = this.actCanvas?.body?.[0] || {}
+        this.formLabelHidden = this.actCanvas?.attrs?.labelHidden
+        // this.toggleRouter(this.actCanvas?.routerName)
       })
     }
   },
