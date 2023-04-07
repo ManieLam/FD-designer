@@ -1,6 +1,8 @@
 <template lang='pug'>
 .canvas-list-page
   AnsoDatatable.h-100(
+    ref="table"
+    key="canvasTable"
     style="min-height: 800px"
     v-bind="tableConfig"
     :columns="columns")
@@ -107,7 +109,6 @@ export default {
             icon: 'el-icon-delete-solid',
             type: 'text',
             textType: 'primary',
-            disabled: true,
             tooltip: {
               content: '删除',
               placement: 'top'
@@ -194,11 +195,14 @@ export default {
       // this.$linkTo.billDetail({ detail: row.id })
       this.$normalRequire({
         url: this.$api.canvas.delete(row.id),
-        method: 'delete'
+        method: 'post'
       }).then(res => {
         // console.log('reponse:', res)
         if (res && res.code === 0) {
           this.$message.success('删除成功')
+          this.$nextTick(() => {
+            this.$refs.table.getTableData()
+          })
         }
       })
     },

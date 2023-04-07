@@ -8,7 +8,7 @@ export default {
   save: '/fileserver/ui/config/save',
   /* 删除画布 */
   delete: (id) => {
-    return `/ui/config/delete/${id}`
+    return `/fileserver/ui/config/delete/${id}`
   },
   /* 获取单个画布详情 */
   getDetail: (id) => {
