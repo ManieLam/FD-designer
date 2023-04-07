@@ -18,7 +18,9 @@
           type="primary"
           title="保存修改"
           @click="() => saveEdit(row)")
-      AnsoDataformText(v-else :value="value", :field="column.canvasTitle", :data="row")
+      .column-item__span.d-flex-v-center(v-else)
+        AnsoDataformText(:value="value", :field="column.canvasTitle", :data="row")
+        el-link.m-l-8(type="info", size="sm", icon="el-icon-edit", title="修改标题", @click="() => editTitle(row)")
     template(v-slot:column-routePath="scope")
       AnsoLink.link-text(
         :value="renderRoutePath(scope)"
@@ -154,7 +156,7 @@ export default {
     },
     /* 批量编辑 */
     multEdit () {},
-    editTitle (button, row) {
+    editTitle (row) {
       this.$set(row, '_isEditing', true)
       this.$set(row, '_oldData', cloneDeep(row))
       this.editingData = row

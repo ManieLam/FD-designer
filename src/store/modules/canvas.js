@@ -4,7 +4,7 @@
 import { formAttrs as defaultFormAttrs } from '@/model/defaultConfig'
 import { CanvasModel } from '@/model/canvas' // 定义画布数据
 import { MessageBox } from 'element-ui'
-import { isEmpty, isEqual } from 'lodash'
+import { isEmpty, isEqual, pick } from 'lodash'
 
 const state = () => ({
   canvas: {}, // { canvas_0: <{page: [], title: ''}:pageModel> } , 记录在sessionStorage
@@ -57,8 +57,10 @@ const mutations = {
       const existItemName = Object.keys(allCanvas)[existIndex]
       // 切换到该页面
       states.editingName = existItemName
-      // 存在变动
-      const isChange = !isEqual(allCanvas[existItemName], data)
+      // 存在变动字段
+      const _oldData = pick(allCanvas[existItemName], ['body', 'attrs', 'actions', 'buttons', 'template'])
+      const _newData = pick(data, ['body', 'attrs', 'actions', 'buttons', 'template'])
+      const isChange = !isEqual(_oldData, _newData)
       if (isChange) {
         // console.log('inEqual:', allCanvas[existItemName])
         // console.log('inEqual1:', data)

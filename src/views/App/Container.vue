@@ -14,15 +14,16 @@
         el-dropdown(key="canvasToggle", @command="handleChangeCanvas")
           el-button {{ `当前画布：${canvasName}` || '切换画布'}}
             i.el-icon-arrow-down.el-icon--right
-          el-dropdown-menu.dropdown-menu__canvas(style="width: 200px;text-align:right", slot="dropdown")
-            el-dropdown-item.dropdown-item(v-for="cName in canvasKeysInLimit", :command="cName", :key="cName")
+          el-dropdown-menu.dropdown-menu__canvas(style="width: 300px;text-align:right", slot="dropdown")
+            el-dropdown-item.dropdown-item(v-for="canvas in canvasKeysInLimit", :command="canvas.name", :key="canvas.name")
               .left-text
-                i.m-r-4.color-primary(:class="cName === canvasName ? 'el-icon-check' : ''")
-                span {{cName || ''}}
+                i.m-r-4.color-primary(:class="canvas.name === canvasName ? 'el-icon-check' : ''")
+                span {{canvas.name || ''}}
+                span {{canvas.title ? `（ ${canvas.title} ）` : ''}}
               .right-text.btn-icon.el-icon-close.color-primary(
                 style="z-index: 2;"
                 title="丢弃修改的数据，并关闭"
-                @click.prevent.stop="() => onCloseCanvas(cName)")
+                @click.prevent.stop="() => onCloseCanvas(canvas.name)")
             el-dropdown-item(divided)
             el-dropdown-item(icon="el-icon-position") 批量发布（TODO）
             el-dropdown-item(icon="el-icon-close") 批量关闭（TODO）
@@ -183,7 +184,12 @@ export default {
     },
     canvasKeysInLimit () {
       // .slice(0, this.CANVASMAX) 限制
-      return Object.keys(this.allCanvas)
+      return Object.entries(this.allCanvas).map(([key, r]) => {
+        return {
+          name: key,
+          title: r.canvasTitle
+        }
+      })
     },
     actCanvas () {
       // return this.allCanvas[this.canvasName] || {} // 无效
@@ -384,7 +390,9 @@ export default {
           if (res?.data) {
             resData = {
               ...JSON.parse(res.data.config),
-              configId: res.data.id
+              configId: res.data.id,
+              canvasTitle: res.data.canvasTitle,
+              canvasName: res.data.canvasName
             }
           } else {
             // console.log('不存在id')
@@ -609,7 +617,7 @@ export default {
       const name = canvas.canvasName
       // 更新本地化
       const editData = await this.getEditCanvas(name, canvas.id)
-      // console.log('编辑在线预览数据:', editData)
+      console.log('编辑在线预览数据:', editData)
       if (editData) {
         const { routerName: newRName } = editData
         // 以最终数据返回的routerName名称为准, 地址栏不可信
