@@ -23,11 +23,11 @@
                 style="z-index: 2;"
                 title="丢弃修改的数据，并关闭"
                 @click.prevent.stop="() => onCloseCanvas(cName)")
-            el-dropdown-item(divided, style="margin-left: 20px")
-            el-dropdown-item(style="margin-left: 20px", icon="el-icon-position") 批量发布（TODO）
-            el-dropdown-item(style="margin-left: 20px", icon="el-icon-close") 批量关闭（TODO）
-            //- el-dropdown-item(style="margin-left: 20px", icon="el-icon-plus") 快捷打开（TODO）
-            el-dropdown-item(style="margin-left: 20px", icon="el-icon-search", command="more") 查看更多画布
+            el-dropdown-item(divided)
+            el-dropdown-item(icon="el-icon-position") 批量发布（TODO）
+            el-dropdown-item(icon="el-icon-close") 批量关闭（TODO）
+            //- el-dropdown-item(icon="el-icon-plus") 快捷打开（TODO）
+            el-dropdown-item(icon="el-icon-search", command="more") 查看更多画布
         //- 快捷打开
 
       //- 右边工具栏
