@@ -406,6 +406,7 @@ export const fileComp = {
     FormtagAttrs.labelHidden,
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
+    FormtagAttrs.validate,
     { label: '是否多选', key: 'multiple', tag: 'el-checkbox', labelHidden: true },
     {
       label: '显示类型',
