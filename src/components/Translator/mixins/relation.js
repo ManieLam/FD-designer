@@ -70,7 +70,7 @@ export default {
         }
         if (fByRemote?.length) {
           // 根据每个字段配置了动态异步获取relation，赋值
-          Promise.all(fByRemote.map(f => this.$require(f.optionApi)
+          Promise.all(fByRemote.map(f => this.$require(this.formatRequire(f.optionApi))
             .then(res => { return res || {} })))
             .then((results) => {
               results.forEach((r, i) => {

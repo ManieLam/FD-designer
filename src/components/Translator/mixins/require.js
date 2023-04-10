@@ -31,7 +31,9 @@ export default {
     },
     formatVarParams (varlist = []) {
       return Array.from(varlist).reduce((res, item) => {
-        res[item.key] = this.transParamsVal(item.varType, item.value)
+        const value = this.transParamsVal(item.varType, item.value)
+        // console.log('value:', value)
+        res[item.key] = value
         return res
       }, {})
     },
@@ -75,7 +77,9 @@ export default {
     },
     formatHeader ({ header }) {
       if (header && Array.isArray(header) && header.length) {
-        return this.formatVarParams(header)
+        const formater = this.formatVarParams(header)
+        // console.log('header:', header, formater)
+        return formater
       }
     },
     /**
@@ -83,6 +87,7 @@ export default {
      * @return 格式化后的请求地址、请求参数对象
     */
     formatRequire (require = {}) {
+      // console.log('formatRequire--', require)
       return {
         ...require,
         url: this.formatPath(require),
