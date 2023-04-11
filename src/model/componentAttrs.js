@@ -137,6 +137,14 @@ export const text = {
     FormtagAttrs.label,
     FormtagAttrs.labelHidden,
     FormtagAttrs.defaultValue
+  ],
+  styles: [
+    {
+      label: '字体颜色',
+      key: 'color',
+      tag: 'el-input',
+      placeholder: '请输入颜色色号'
+    }
   ]
 }
 

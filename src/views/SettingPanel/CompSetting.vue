@@ -37,6 +37,13 @@
         :value="attrsData"
         :attrs="actions"
         @input="updateAction")
+      StyleSetting(
+        v-show="activeName === 'style'"
+        v-bind="$attrs"
+        :key="`style_${formItemConfig.key}`"
+        :value="attrsData.styles"
+        :attrs="styles"
+        @input="updateStyle")
 
 </template>
 
@@ -45,12 +52,14 @@
 import AttrSettingForm from '@/components/AttrSettingForm'
 import CompActionSetting from './CompActionSetting'
 import ButtonGroupSetting from './ButtonGroupSetting/index.vue'
+import StyleSetting from './StyleSetting.vue'
 import componentAttrs from '@/model/componentAttrs'
 import { cloneDeep, isNil } from 'lodash'
 export default {
   name: 'CompSetting',
   props: ['formItemConfig', 'canvasName', 'compType'],
   components: {
+    StyleSetting,
     AttrSettingForm,
     CompActionSetting,
     ButtonGroupSetting
@@ -62,7 +71,9 @@ export default {
       //   { label: '行为', name: 'action' }
       // ],
       activeName: '',
-      tempAttrsData: {}
+      tempAttrsData: {
+        styles: {}
+      }
       // attrsData: {}
     }
   },
@@ -94,6 +105,9 @@ export default {
     actions () {
       return componentAttrs[this.tag]?.actions || []
     },
+    styles () {
+      return componentAttrs[this.tag]?.styles || []
+    },
     /* 记录透传属性： 属于透传属性，并且存在修改该属性 */
     passthourghAttrs () {
       return this.attrs.filter(attr => attr.passthroughAttr && !isNil(this.attrsData[attr.key])).map(attr => attr.key)
@@ -112,6 +126,7 @@ export default {
     tabList () {
       return this.formItemConfig?.tag === 'button' ? [{ label: '按钮组', name: 'button' }] : [
         { label: '属性', name: 'attr' },
+        { label: '样式', name: 'style' },
         { label: '行为', name: 'action' }
       ]
     }
@@ -129,6 +144,9 @@ export default {
     updateAction (actions) {
       // console.log('更新外部数据:', actions)
       this.updateAnAttr({ name: 'actions', value: actions })
+    },
+    updateStyle (value) {
+      this.updateAnAttr({ name: 'styles', value })
     },
     updateButton (buttons) {
       console.log('更新按钮')

@@ -11,7 +11,8 @@ export const bodyItemAttrs = {
   tag: '', // 字段使用的组件类型（select/input/table/其他注册供使用的组件name）
   tip: '', // TODO 辅助文字提示
   defaultValue: {}, // 默认值配置对象
-  actions: [], // 行为事件操作队列，不同组件对应不同actions
+  actions: [], // 行为事件操作队列，不同组件对应不同actions,
+  styles: {}, // 样式
   visabled: true, // TODO 是否可见(默认true)， 可选择自定义事件
   disbaled: false // TODO 是否禁用(默认false)， 可选择自定义事件
 }

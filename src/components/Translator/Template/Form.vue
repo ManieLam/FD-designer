@@ -4,11 +4,12 @@
     id="customForm"
     v-model="fullData"
     v-bind="formAttrs"
-    :class="{'form-withFixed': formAttrs.buttonFixed}"
+    :class="[{'form-withFixed': formAttrs.buttonFixed}, formStyleValue]"
     :formFields="formFields"
     :buttonList="actButtons"
   ></AnsoDataform>
 </template>
+
 <script>
 import { isEqual, cloneDeep, keyBy, pick, isEmpty } from 'lodash'
 import { formatFormRules } from '@/utils/format.js'
@@ -17,13 +18,14 @@ import { channelEvent, validPostMesgToParent } from '../utils/eventBus'
 import relationMixin from '../mixins/relation'
 import requireMixin from '../mixins/require'
 import componentFormat from '../mixins/componentFormat'
+import styleMixin from '../mixins/style'
 
 // import { MessageBox } from 'element-ui'
 // import { useEval } from '@/utils/request.js'
 // MessageBox.zIndex = 2000
 export default {
   name: 'FormTemp',
-  mixins: [relationMixin, requireMixin, componentFormat],
+  mixins: [relationMixin, requireMixin, componentFormat, styleMixin],
   props: {
     config: {
       type: Object,
@@ -242,6 +244,7 @@ export default {
       return this.config?.body.map(config => {
         const hasPassthrough = config._passthroughAttrs && config._passthroughAttrs.length
         const privateAttrs = this.formatFormItem(config) || {}
+        if (config.styles) this.formatFieldStyle(config)
         return {
           name: config.name,
           label: config.label,
