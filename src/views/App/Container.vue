@@ -519,6 +519,15 @@ export default {
       console.info(comps)
     },
     afterPublish ({ name, configId, isUpdate }) {
+      // 更新画布信息
+      this.$store.commit('canvas/assignConfig', {
+        name: this.canvasName,
+        assignObj: {
+          configId: configId, // 首次发布前没有configId，需要补充
+          routerName: name
+        }
+      })
+      this.$nextTick(() => { this.onSave(false) })
       // 新窗口打开在线预览页面
       const { hash, href } = window.location
       const newPath = href.replace(hash, `#/online/${name}/${configId}`)
@@ -535,7 +544,7 @@ export default {
         window.open(newPath + '?mode=1', name)
       })
     },
-    // 发布在线预览，数据上传服务端（TODO）
+    // 发布在线预览，数据上传服务端
     publishOnline () {
       /* :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false" */
       const curCanvas = this.allCanvas[this.canvasName]
@@ -567,17 +576,6 @@ export default {
           }).then(res => {
             // console.log('配置数据上传服务端后:', res)
             if (res && res.data) {
-              // 更新画布信息
-              this.$store.commit('canvas/assignConfig', {
-                name: this.canvasName,
-                assignObj: {
-                  configId: res.data?.id, // 首次发布前没有configId，需要补充
-                  routerName: value
-                }
-              })
-              this.$nextTick(() => {
-                this.onSave(false)
-              })
               // 创建新页面
               this.afterPublish({ name: value, configId: res?.data?.id })
             }
@@ -588,6 +586,7 @@ export default {
       }
     },
     updateOnline (canvas) {
+      // console.log('更新发布:', canvas)
       const { configId, routerName, canvasTitle } = canvas
       this.$normalRequire({
         url: `/fileserver/ui/config/edit/${configId}`,
@@ -604,7 +603,7 @@ export default {
           //   this.onSave(false)
           // })
           this.afterPublish({ name: routerName, configId, isUpdate: true })
-          this.$message.success('发布成功')
+          // this.$message.success('发布成功')
         } else {
           this.$message.error(res)
         }
@@ -617,7 +616,7 @@ export default {
       const name = canvas.canvasName
       // 更新本地化
       const editData = await this.getEditCanvas(name, canvas.id)
-      console.log('编辑在线预览数据:', editData)
+      // console.log('编辑在线预览数据:', editData)
       if (editData) {
         const { routerName: newRName } = editData
         // 以最终数据返回的routerName名称为准, 地址栏不可信
