@@ -27,7 +27,7 @@ export default {
         this[func](...arguments)
       }
     },
-    formatTextStyle ({ tag, styles }) {
+    formatTextStyle ({ tag, styles, name }) {
       // console.log('渲染样式：', styles)
       // anso-info-render
       const colorSheet = styles.color ? {
@@ -36,7 +36,7 @@ export default {
         }
       } : {}
       const sheet = {
-        [`& .form-item_component[tag="${tag}"]`]: {
+        [`& .form-item_component[tag="${tag}"][name="${name}"]`]: {
           ...colorSheet
         }
       }
