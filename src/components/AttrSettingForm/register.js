@@ -11,5 +11,6 @@ export default {
   'form-attr-passthrough': () => import('./FormAttrPassthrough.vue'),
   'form-date-disabledDate': () => import('./FormDateDisabledDate.vue'),
   'form-date-shortcut': () => import('./FormDateShortcut.vue'),
-  'form-layout': () => import('./FormLayout.vue')
+  'form-layout': () => import('./FormLayout.vue'),
+  'form-object-attr': () => import('./FormObjectAttr.vue')
 }
