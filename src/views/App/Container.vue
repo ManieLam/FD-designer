@@ -341,7 +341,7 @@ export default {
       })
     },
     onCreate () {
-      const nameList = Object.keys(this.allCanvas).map(n => n.replace(/canvas_(\d+)/, '$1')).filter(name => !isNaN(name))
+      const nameList = Object.keys(this.allCanvas).map(n => n.replace(/^canvas_(\d+)/, '$1')).filter(name => !isNaN(name))
       let newName = 0
       if (nameList.length) {
         let maxNum = max(nameList)
@@ -527,7 +527,11 @@ export default {
           routerName: name
         }
       })
-      this.$nextTick(() => { this.onSave(false) })
+      this.$nextTick(() => {
+        this.onSave(false)
+        this.$store.commit('canvas/toggle', name)
+        this.$forceUpdate()
+      })
       // 新窗口打开在线预览页面
       const { hash, href } = window.location
       const newPath = href.replace(hash, `#/online/${name}/${configId}`)
@@ -537,11 +541,23 @@ export default {
         title: text + '成功',
         message: h('p', null, [
           h('span', null, text + '在线预览成功, 查看地址:'),
-          h('i', { style: { color: '#3171F2' } }, newPath)
+          h('i', { style: { color: '#3171F2' } }, newPath),
+          h('span', {
+            style: { color: '#3171F2', padding: '8px', cursor: 'pointer' },
+            on: {
+              click: () => this.copyOnlinePath(newPath)
+            }
+          },
+          '复制')
         ]),
         confirmButtonText: '跳转查看'
       }).then(action => {
         window.open(newPath + '?mode=1', name)
+      })
+    },
+    copyOnlinePath (path) {
+      navigator.clipboard.writeText(path).then(() => {
+        this.$message.success('复制地址成功')
       })
     },
     // 发布在线预览，数据上传服务端
@@ -566,9 +582,10 @@ export default {
             method: 'post',
             data: {
               config: JSON.stringify({
-                ...this.previewProps.data,
+                ...curCanvas,
                 canvasTitle: '',
-                routerName: value
+                routerName: value,
+                canvasName: value
               }),
               canvasName: value,
               canvasTitle: ''
@@ -581,6 +598,7 @@ export default {
             }
           })
         })
+        // console.log('curCanvas:', curCanvas)
       } else {
         this.updateOnline(curCanvas)
       }

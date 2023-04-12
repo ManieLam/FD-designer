@@ -122,7 +122,15 @@ const mutations = {
       }
       // if (buttons) states.canvas[name].buttons = buttons.sort((a, b) => a?.sort - b?.sort)
       // console.info('保存：', assignObj)
-      if (assignObj) states.canvas[name] = Object.assign(states.canvas[name], assignObj)
+      if (assignObj) {
+        // states.canvas[name] = Object.assign(states.canvas[name], assignObj)
+        const newName = assignObj.routerName || name
+        states.canvas[newName] = { ...states.canvas[name], ...assignObj }
+        if (assignObj.routerName !== name) {
+          states.canvas[name] = {}
+          delete states.canvas[name]
+        }
+      }
     }
   },
   /* 记录画布异步请求资源 */
@@ -143,9 +151,10 @@ const mutations = {
       sessionStorage.setItem('Canvas-editing', '')
     }
   },
-  /* 复制 */
+  /* 复制 /online/testCopy/50 */
   copy (states, { name, copiedData = {} }) {
     if (!copiedData || isEmpty(copiedData)) return
+    // console.log('复制对象:', copiedData)
     states.canvas = {
       ...states.canvas,
       [name]: new CanvasModel({ ...copiedData, configId: null, routerName: name })
