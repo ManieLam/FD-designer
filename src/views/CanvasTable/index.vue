@@ -124,7 +124,7 @@ export default {
             icon: 'el-icon-document-copy',
             textType: 'primary',
             tooltip: {
-              content: '复制',
+              content: '复制配置',
               placement: 'top'
             },
             func: this.copy
@@ -195,18 +195,31 @@ export default {
     },
     delete (button, row) {
       // this.$linkTo.billDetail({ detail: row.id })
-      this.$normalRequire({
-        url: this.$api.canvas.delete(row.id),
-        method: 'post'
-      }).then(res => {
-        // console.log('reponse:', res)
-        if (res && res.code === 0) {
-          this.$message.success('删除成功')
-          this.$nextTick(() => {
-            this.$refs.table.getTableData()
-          })
-        }
-      })
+      this.$confirm(
+        `确定是否删除${row.canvasName || ''}-${row.canvasTitle || ''}`,
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+          center: true
+        })
+        .then(confirm => {
+          if (confirm) {
+            this.$normalRequire({
+              url: this.$api.canvas.delete(row.id),
+              method: 'post'
+            }).then(res => {
+              // console.log('reponse:', res)
+              if (res && res.code === 0) {
+                this.$message.success('删除成功')
+                this.$nextTick(() => {
+                  this.$refs.table.getTableData()
+                })
+              }
+            })
+          }
+        })
     },
     // saveDelete () {},
     copy (button, row) {

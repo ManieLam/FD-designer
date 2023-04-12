@@ -68,8 +68,8 @@ export default {
     fields () {
       return this.canvas?.body.map(f => {
         return {
-          label: f.label,
-          value: f.key
+          label: f?.label || '',
+          value: f?.key || ''
         }
       }) || []
     },
