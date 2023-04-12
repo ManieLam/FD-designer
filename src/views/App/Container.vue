@@ -12,18 +12,18 @@
         el-button(@click="toggleSettingJson") 查看配置文件
         //- 切换画布
         el-dropdown(key="canvasToggle", @command="handleChangeCanvas")
-          el-button {{ `当前画布：${canvasName}` || '切换画布'}}
+          el-button {{ `当前画布：${actCanvas.routerName}(${actCanvas.canvasTitle})` || '切换画布'}}
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu.dropdown-menu__canvas(style="width: 300px;text-align:right", slot="dropdown")
             el-dropdown-item.dropdown-item(v-for="canvas in canvasKeysInLimit", :command="canvas.name", :key="canvas.name")
               .left-text
-                i.m-r-4.color-primary(:class="canvas.name === canvasName ? 'el-icon-check' : ''")
+                i.m-r-4.color-primary(:class="actCanvas.id ? canvas.id === actCanvas.configId : canvas.name === canvasName ? 'el-icon-check' : ''")
                 span {{canvas.name || ''}}
                 span {{canvas.title ? `（ ${canvas.title} ）` : ''}}
               .right-text.btn-icon.el-icon-close.color-primary(
                 style="z-index: 2;"
                 title="丢弃修改的数据，并关闭"
-                @click.prevent.stop="() => onCloseCanvas(canvas.name)")
+                @click.prevent.stop="() => onCloseCanvas(canvas.name, canvas.id)")
             el-dropdown-item(divided)
             el-dropdown-item(icon="el-icon-position") 批量发布（TODO）
             el-dropdown-item(icon="el-icon-close") 批量关闭（TODO）
@@ -186,6 +186,7 @@ export default {
       // .slice(0, this.CANVASMAX) 限制
       return Object.entries(this.allCanvas).map(([key, r]) => {
         return {
+          id: r.configId,
           name: key,
           title: r.canvasTitle
         }
@@ -373,8 +374,8 @@ export default {
       sessionStorage.setItem('Canvas-editing', this.canvasName)
       if (alert) this.$message.success('暂存成功')
     },
-    onCloseCanvas (cName) {
-      this.$store.dispatch('canvas/closeCanvas', cName)
+    onCloseCanvas (name, id) {
+      this.$store.dispatch('canvas/closeCanvas', { name, id })
       this.$nextTick(() => {
         this.formItemConfig = this.actCanvas?.body?.[0] || {}
         this.formLabelHidden = this.actCanvas?.attrs?.labelHidden
@@ -585,7 +586,7 @@ export default {
                 ...curCanvas,
                 canvasTitle: '',
                 routerName: value,
-                canvasName: value
+                canvasName: value // 用于计算未发布前copeied次数
               }),
               canvasName: value,
               canvasTitle: ''

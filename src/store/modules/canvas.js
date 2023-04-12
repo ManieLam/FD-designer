@@ -1,5 +1,6 @@
 /** 记录画布, 同步记录在localstorage
  * 画布数据结构查看 CanvasModel
+ * TODO routerName与canvasName的冲突
  * */
 import { formAttrs as defaultFormAttrs } from '@/model/defaultConfig'
 import { CanvasModel } from '@/model/canvas' // 定义画布数据
@@ -139,16 +140,27 @@ const mutations = {
   /* 导出、全部导出 */
   export (states, name, isAll = false) {},
   /* 移除缓存中的画布 */
-  close (states, name) {
-    if (name) {
+  close (states, index) {
+    // if (name) {
+    //   const newCanvas = { ...states.canvas }
+    //   delete newCanvas[name]
+    //   states.canvas = newCanvas
+    //   // delete states.canvas[name]
+    //   // console.log('states.canvas:', states.canvas)
+    //   sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+    //   states.editingName = ''
+    //   sessionStorage.setItem('Canvas-editing', '')
+    // }
+    // 未发布的画布只有name，name可能会重复，id不会重复，但id只存在于已发布的画布
+    // console.log('delete index:', index)
+    if (index !== -1) {
       const newCanvas = { ...states.canvas }
+      const name = Object.values(newCanvas)[index]?.routerName
       delete newCanvas[name]
       states.canvas = newCanvas
-      // delete states.canvas[name]
-      // console.log('states.canvas:', states.canvas)
       sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
       states.editingName = ''
-      sessionStorage.setItem('Canvas-editing', '')
+      sessionStorage.setItem('Canvas-editing', states.editingName)
     }
   },
   /* 复制 /online/testCopy/50 */
@@ -157,7 +169,7 @@ const mutations = {
     // console.log('复制对象:', copiedData)
     states.canvas = {
       ...states.canvas,
-      [name]: new CanvasModel({ ...copiedData, configId: null, routerName: name })
+      [name]: new CanvasModel({ ...copiedData, configId: null, routerName: name, canvasName: name })
     }
     sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
   }
@@ -201,24 +213,25 @@ const actions = {
   toggleCanvas () {
   },
   /* 移除画布 */
-  closeCanvas ({ state, commit, dispatch }, name) {
-    const canvasList = Object.keys(state.canvas) || []
-    const index = canvasList.findIndex(key => key === name)
+  closeCanvas ({ state, commit, dispatch }, { name, id } = {}) {
+    const canvasList = Object.entries(state.canvas) || []
+    const index = canvasList.findIndex(([key, canvas]) => id ? canvas.configId === id : canvas.routerName === name)
     // console.log('删除:', name, '删除1', state.editingName)
+    // console.log('find index:', index)
     if (name === state.editingName) {
       // 关闭当前页，需要切换到上一个页面
       if (index > 0) {
-        commit('close', name)
+        commit('close', index)
         const newIndex = index - 1
         // console.log('closeCanvas----', newIndex)
         if (canvasList[newIndex]) {
           // console.log('canvasList[newIndex]:', canvasList[newIndex])
-          commit('toggle', canvasList[newIndex])
+          commit('toggle', canvasList[newIndex].routerName)
         }
         return
       }
     }
-    commit('close', name)
+    commit('close', index)
     dispatch('init')
     // dispatch('init')
   },

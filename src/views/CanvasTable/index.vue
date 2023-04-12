@@ -216,6 +216,8 @@ export default {
                 this.$nextTick(() => {
                   this.$refs.table.getTableData()
                 })
+                // 关闭已打开的画布
+                this.$store.dispatch('canvas/closeCanvas', { name: row.canvasName, id: row.id })
               }
             })
           }
