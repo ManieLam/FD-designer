@@ -82,7 +82,11 @@ el-dialog.async-required-dialog(
                       div 2. 动态地址参数请使用${xxx}的格式填入，并在相应下面【请求参数】中补充对应的取值方式。
                       div 3. "?"后的query参数，格式为："xxx=${xxx}"。"="前方为参数key，后方可选填。并在相应下面【请求参数】中补充对应的取值方式。
                     i.icon.el-icon-info.m-l-8
-              el-input(v-model="apiData.url", placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置")
+              //- 请求地址的3位转换
+              //- el-input(v-model="apiurlMix[2]", placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置")
+              //-   template(slot="prepend")
+              //-     AnsoDataformSelect(v-model="apiurlMix[0]", :options="$gbServer")
+              ApiUrl(:value="apiData.url", @input="handleApiUrl")
 
             el-form-item(label="请求方式", prop="method")
               el-radio-group(v-model="apiData.method" size="mini")
@@ -169,6 +173,7 @@ el-dialog.async-required-dialog(
 <script>
 import ParamsList from './ParamsList'
 import ApiGroup from './ApiGroup.vue'
+import ApiUrl from './ApiUrl.vue'
 import { keyBy, isEqual, debounce, groupBy } from 'lodash'
 import CodeEditor from '@/components/CodeEditor/index'
 import { ApiData, ApiDataHandles, ApiBodyParams } from '@/model/resource.js'
@@ -198,7 +203,8 @@ export default {
   components: {
     ParamsList,
     CodeEditor,
-    ApiGroup
+    ApiGroup,
+    ApiUrl
   },
   filters: {
     filterPrePlaceholder (desc) {
@@ -236,13 +242,26 @@ export default {
             trigger: 'blur'
           }
         ],
-        url: { required: true, message: '必填', trigger: 'change' },
+        url: [
+          { required: true, message: '必填', trigger: 'change' },
+          {
+            validator: (rule, value, callback) => {
+              const check = value.match(/^<(\w+)>\/<(\w+)>|https?:\/\/|http?:\/\//ig)
+              if (check && check.length >= 2) {
+                callback(new Error('地址配置错误：如已配置环境，请使用相对地址'))
+              } else {
+                callback()
+              }
+            }
+          }
+        ],
         method: { required: true, message: '必填', trigger: 'change' }
       },
       funcEditVisibles: [],
       /* 查看所有已选api */
       allSelectedVisable: false,
       canvasResources: [],
+      apiurlMix: Array.from({ length: 3 }),
       /* 筛选内容 */
       isFilterIng: false, // 筛选中
       filterList: [], // 筛选的列表
@@ -305,10 +324,6 @@ export default {
     apiGroup () {
       const list = this.isFilterIng ? this.filterList : this.apiList
       return groupBy(list, (api) => encodeURI(api.group || '全局'))
-    // },
-    // // 表单内已选数据源
-    // formApiList () {
-    //   const
     },
     isEdit () {
       return this.chosenData?.__isEdit
@@ -506,7 +521,21 @@ export default {
     },
     openFuncEdit (actNames) {
       this.funcEditVisibles = actNames
-    }
+    },
+    // 手动修改url
+    handleApiUrl: debounce(function (url) {
+      if (!isEqual(this.apiData.url, url)) {
+        this.$set(this.apiData, 'url', url)
+        // 满足条件则不允许被全局修改：主动修改环境或http://或https://起始的url
+        const matchs = [].concat(
+          url.match(/^https?:\/\/|http?:\/\//ig)
+          // /<(\w+)>\/<(\w+)>/.match(url) !== this.$store.state.server.inuse
+        )
+        // 此时<(\w+)>\/<(\w+)>.match(url) !== 全局配置的环境时
+        this.$set(this.apiData, '__preventGlobal', matchs && matchs.length)
+        this.$refs.apiForm.validateField('url')
+      }
+    }, 800)
   },
   mounted () {
     // console.info('remote mounted')

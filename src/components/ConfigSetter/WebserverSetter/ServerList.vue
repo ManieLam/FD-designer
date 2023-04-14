@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { EnvModel, defaultEnvConf } from '@/model/service'
+import { EnvModel } from '@/model/service'
 export default {
   name: 'ServerList',
   props: {
@@ -33,7 +33,7 @@ export default {
   components: {},
   data () {
     return {
-      list: defaultEnvConf
+      list: this.$gbServer
     }
   },
   computed: {

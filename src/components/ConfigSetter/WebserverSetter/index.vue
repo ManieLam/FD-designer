@@ -31,12 +31,13 @@ el-dialog.webserver-setter-dialog(
             el-button-group
               el-button(@click="onClose") 关闭
               el-button(@click="onSave") 保存修改
-              el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 应用所有画布
+              el-button(type="primary", :disabled="true", title="对分组内所有画布影响", @click="chooseChange") 应用当前分组(TODO)
+              el-button(type="primary", title="保存至当前画布，不影响全局", @click="chooseChange") 应用当前画布
 </template>
 
 <script>
 /* 环境配置 */
-import { defaultEnvConf } from '@/model/service'
+// import { defaultEnvConf } from '@/model/service'
 import ServerList from './ServerList.vue'
 import ServerContent from './ServerContent.vue'
 export default {
@@ -80,7 +81,7 @@ export default {
       this.$emit('onClose')
     },
     init () {
-      this.serviceData = defaultEnvConf?.[0]
+      this.serviceData = this.$gbServer?.[0]
     }
 
   },

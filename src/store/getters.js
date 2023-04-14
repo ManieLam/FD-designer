@@ -102,7 +102,37 @@ const getters = {
     const index = list.findIndex(item => item.name === name)
     return index > -1 ? list[index] : {}
   },
-  getResourceGroup: state => state.resources.groups
+  getResourceGroup: state => state.resources.groups,
+  /* 获取服务环境 */
+  getSysServer: state => state.server.list,
+  getServerByName: state => name => {
+    if (name) {
+      const list = state.server.list
+      const index = list.findIndex(item => item.name === name)
+      return index > -1 ? list[index] : {}
+    } else {
+      return null
+    }
+  },
+  /** 钻取获得正在使用的环境IP名，服务名，服务地址
+   * @return <array>:[ip, service, url]
+   *  */
+  getServerInuse: (state, getters) => {
+    const inuseServer = getters.getServerByName(state.server.inuse)
+    console.log('inuseServer:', inuseServer)
+    console.log('inuse Service:', state.server.inuse)
+    // let arr = Array.from({ length: 3 })
+    if (inuseServer) {
+      // return Array.from({ length: 3 }, {})
+      const service = inuseServer?.urls?.find(url => url.name === state.server.inuse)
+      return [
+        inuseServer.name,
+        state.server.inuse,
+        service.url
+      ]
+    }
+    return []
+  }
   // cachedViews: state => state.tagsView.cachedViews
   // menus: state => state.menus.menuList
   // shortcuts: state => state.shortcuts

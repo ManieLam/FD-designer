@@ -59,8 +59,8 @@ const mutations = {
       // 切换到该页面
       states.editingName = existItemName
       // 存在变动字段
-      const _oldData = pick(allCanvas[existItemName], ['body', 'attrs', 'actions', 'buttons', 'template'])
-      const _newData = pick(data, ['body', 'attrs', 'actions', 'buttons', 'template'])
+      const _oldData = pick(allCanvas[existItemName], ['body', 'attrs', 'actions', 'buttons', 'template', 'resources'])
+      const _newData = pick(data, ['body', 'attrs', 'actions', 'buttons', 'template', 'resources'])
       const isChange = !isEqual(_oldData, _newData)
       if (isChange) {
         // console.log('inEqual:', allCanvas[existItemName])

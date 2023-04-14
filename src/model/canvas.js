@@ -17,7 +17,8 @@ export const CanvasModel = function ({ body = [], attrs = {}, actions = {}, temp
     },
     buttons: Object.values(formButtons).sort((a, b) => a?.sort - b?.sort),
     groups: {},
-    resources: {},
+    resources: {}, // 当前使用的所有接口（分析）
+    server: {}, // 服务环境
     template,
     canvasTitle: '',
     ...arguments[0]
