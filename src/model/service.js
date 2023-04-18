@@ -1,3 +1,4 @@
+/* 环境数据模板 */
 export const EnvModel = function (config) {
   return {
     name: '',
@@ -8,6 +9,16 @@ export const EnvModel = function (config) {
       url: ''
     }],
     vars: [],
+    ...config
+  }
+}
+
+/* 服务数据模板 */
+export const ServiceModel = function (config = {}) {
+  return {
+    name: 'BASE',
+    title: '默认服务',
+    url: '',
     ...config
   }
 }

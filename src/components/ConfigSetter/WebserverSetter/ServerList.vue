@@ -14,7 +14,7 @@
       :id="service.name"
       :is-active="compSelected.name === service.name"
       @click="() => onSelect(service)")
-      .text-left {{service.label}}
+      .text-left {{service.title}}
       .text-right(v-show="service.delAble")
         i.iconfont.el-icon-delete(@click="onDeleteEnv(index)", title="删除环境")
 </template>

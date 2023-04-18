@@ -112,12 +112,8 @@ export default {
             arr = [`<${matchs[1]}>`, `<${matchs[2]}>`, last]
           } else {
             // 不带地址，使用默认服务
-            const def = this.$store.getters.getServerByName(this.$store.state.server.inuse) || {}
-            const defURL = def?.urls.find(url => url.name === 'BASE')
-            arr = [`<${def.name}>`, `<${defURL.name}>`, data]
-            // const [ipName, serviceName] = this.$store.getters.getServerInuse
-            // console.log('获取默认地址:', ipName, serviceName)
-            // arr = [ipName, serviceName, data]
+            const [ipName, serviceName] = this.$store.getters.getServerInuse
+            arr = [`<${ipName}>`, `<${serviceName}>`, data]
           }
         }
       }

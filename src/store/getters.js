@@ -115,20 +115,17 @@ const getters = {
     }
   },
   /** 钻取获得正在使用的环境IP名，服务名，服务地址
-   * @return <array>:[ip, service, url]
+   * @return <array>:[ip:<string>, service<string>, url<string>]
    *  */
   getServerInuse: (state, getters) => {
-    const inuseServer = getters.getServerByName(state.server.inuse)
-    console.log('inuseServer:', inuseServer)
-    console.log('inuse Service:', state.server.inuse)
-    // let arr = Array.from({ length: 3 })
+    const [ip, service] = state.server.inuse || []
+    const inuseServer = getters.getServerByName(ip)
     if (inuseServer) {
-      // return Array.from({ length: 3 }, {})
-      const service = inuseServer?.urls?.find(url => url.name === state.server.inuse)
+      const serviceObj = inuseServer?.urls?.find(url => url.name === service)
       return [
-        inuseServer.name,
-        state.server.inuse,
-        service.url
+        ip,
+        service,
+        serviceObj.url
       ]
     }
     return []

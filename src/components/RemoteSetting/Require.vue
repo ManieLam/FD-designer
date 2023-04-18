@@ -526,13 +526,6 @@ export default {
     handleApiUrl: debounce(function (url) {
       if (!isEqual(this.apiData.url, url)) {
         this.$set(this.apiData, 'url', url)
-        // 满足条件则不允许被全局修改：主动修改环境或http://或https://起始的url
-        const matchs = [].concat(
-          url.match(/^https?:\/\/|http?:\/\//ig)
-          // /<(\w+)>\/<(\w+)>/.match(url) !== this.$store.state.server.inuse
-        )
-        // 此时<(\w+)>\/<(\w+)>.match(url) !== 全局配置的环境时
-        this.$set(this.apiData, '__preventGlobal', matchs && matchs.length)
         this.$refs.apiForm.validateField('url')
       }
     }, 800)
