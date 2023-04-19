@@ -12,11 +12,12 @@ export default {
       // console.info('varType:', varType, valKey)
       const val = Array.isArray(varType) ? varType[0] : varType
       // console.log('val:', val)
+      // console.log('fullData:', this.fullData)
       switch (val) {
         case 'const':
           return valKey
         case 'formData':
-          return this.formData[valKey]
+          return this.fullData[valKey]
         case 'collectData': {
           // 最后一位为数据源key
           const ranges = this.formDataCollect.get(varType[varType.length - 1]) || {}
