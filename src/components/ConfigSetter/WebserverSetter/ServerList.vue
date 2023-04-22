@@ -9,10 +9,10 @@
   .left-wrap-list.d-flex-1.m-t-8
     //- 左边环境列表
     .left-item.list-row.d-flex-row-between.align-items-center.hover-change-bgColor(
-      v-for="(service, index) in list"
+      v-for="(service, index) in compList"
       :key="service.name"
       :id="service.name"
-      :is-active="compSelected.name === service.name"
+      :is-active="curSelect.name === service.name"
       @click="() => onSelect(service)")
       .text-left {{service.title}}
       .text-right(v-show="service.delAble")
@@ -26,6 +26,10 @@ export default {
   props: {
     // 当前选择的对象
     value: {
+      type: Array,
+      default: () => ([])
+    },
+    selected: {
       type: Object,
       default: () => ({})
     }
@@ -33,38 +37,49 @@ export default {
   components: {},
   data () {
     return {
-      list: this.$gbServer
+      // curSelect: this.selected
+      // compList: this.$gbServer
     }
   },
   computed: {
-    compSelected: {
+    compList: {
       get () {
         return this.value
       },
-      set (data) {
-        this.$emit('input', data)
+      set (list) {
+        // console.log('set compList', list)
+        this.$emit('input', list)
+      }
+    },
+    curSelect: {
+      get () {
+        return this.selected
+      },
+      set (obj) {
+        this.$emit('onSelect', obj)
       }
     }
   },
-  watch: {},
+  watch: {
+  },
   methods: {
     onDeleteEnv (index) {
-      this.list.splice(index, 1)
+      this.compList.splice(index, 1)
     },
     // 增加环境
     addService () {
-      const hasEmpty = this.list.find(item => !item.label)
+      const hasEmpty = this.compList.find(item => !item.label)
       // console.info('不存在空白环境:', hasEmpty)
       if (!hasEmpty) {
         // 不存在空白环境才可添加
         // const evnKey = `env_${ New Date().getTime() }`
-        this.list.push(new EnvModel({
+        this.compList.push(new EnvModel({
           name: 'env_' + new Date().getTime(),
           delAble: true
         }))
         this.$nextTick(() => {
-          // this.serviceData = this.list[this.list.length - 1]
-          this.compSelected = this.list[this.list.length - 1]
+          // this.serviceData = this.compList[this.compList.length - 1]
+          this.curSelect = this.compList[this.compList.length - 1]
           // this.$emit('select', this.selected)
         })
       } else {
@@ -72,8 +87,8 @@ export default {
       }
     },
     onSelect (service) {
-      this.$emit('select', service)
-      this.compSelected = service
+      // this.$emit('select', service)
+      this.curSelect = service
     }
   },
   mounted () {}

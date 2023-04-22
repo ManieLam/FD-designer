@@ -4,12 +4,45 @@ export default {
   data () {
     return {
       settingJsonVisable: false, // 查看json数据
-      toggleSettingOpen: true // 切换配置区
+      toggleSettingOpen: true, // 切换配置区
+      webserverSetting: false, // 查看环境
+      webServiceActions: [
+        {
+          label: '应用当前画布',
+          name: 'apply',
+          type: 'primary',
+          func: this.changeEnvInuse
+        }
+      ]
     }
   },
   methods: {
     // 查看环境
-    handleCheckEnv () {},
+    handleCheckEnv () {
+      this.webserverSetting = !this.webserverSetting
+    },
+    // 切换正在使用的环境
+    changeEnvInuse ({ envs, selected }) {
+      if (!selected.urls.length) {
+        this.$confirm(
+          '当前没有配置服务，不能应用到当前环境',
+          '错误',
+          {
+            confirmButtonText: '重新设置'
+          }
+        )
+        return
+      }
+      this.$store.commit('canvas/ASSIGN_CONFIG', {
+        name: this.canvasName,
+        assignObj: {
+          env: {
+            inuse: selected,
+            list: envs
+          }
+        }
+      })
+    },
     // 查看配置文件
     toggleSettingJson () {
       this.$forceUpdate()
@@ -23,7 +56,7 @@ export default {
       this.formItemConfig = {}
       if (command === this.canvasName) return // 防重复点击
       if (command !== 'more') {
-        this.$store.commit('canvas/toggle', command)
+        this.$store.commit('canvas/TOGGLE', command)
         // 切换字段元素
         this.formItemConfig = this.actCanvas?.body?.[0]
         // 修改路由
@@ -41,7 +74,7 @@ export default {
         newName = ++maxNum
         // console.log('newName:', newName)
       }
-      this.$store.commit('canvas/add', { name: `canvas_${newName}` })
+      this.$store.commit('canvas/ADD', { name: `canvas_${newName}` })
       this.$forceUpdate()
     },
     // 复制
@@ -53,7 +86,7 @@ export default {
       this.$refs.dragPanel.clear()
       this.$refs.settingPanel.clear()
       this.formItemConfig = {}
-      this.$store.commit('canvas/clear', this.canvasName)
+      this.$store.commit('canvas/CLEAR', this.canvasName)
     },
     // 暂存
     onSave (alert = true) {
@@ -74,6 +107,7 @@ export default {
     // 预览
     handlePreview (command) {
       // console.info('点击预览:', command)
+      if (!command) return
       this[command].call()
     },
     // 普通预览

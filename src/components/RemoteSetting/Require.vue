@@ -86,7 +86,7 @@ el-dialog.async-required-dialog(
               //- el-input(v-model="apiurlMix[2]", placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置")
               //-   template(slot="prepend")
               //-     AnsoDataformSelect(v-model="apiurlMix[0]", :options="$gbServer")
-              ApiUrl(:value="apiData.url", @input="handleApiUrl")
+              ApiUrl(:value="apiData.url", @input="handleApiUrl", @changeInPrivate="changeInPrivate")
 
             el-form-item(label="请求方式", prop="method")
               el-radio-group(v-model="apiData.method" size="mini")
@@ -371,7 +371,7 @@ export default {
     editApi (api, index) {
       console.log('editApi:', api)
       this.originGlobalApi = api
-      // 当为【提交】按钮配置，则设置为true
+      // 当为【提交】按钮配置，则设置isFullDose为true，带参数提交
       this.apiData = new ApiData({ ...api, isFullDose: this.isSubmit })
     },
     removeApi (api) {
@@ -528,7 +528,10 @@ export default {
         this.$set(this.apiData, 'url', url)
         this.$refs.apiForm.validateField('url')
       }
-    }, 800)
+    }, 800),
+    changeInPrivate (flag) {
+      this.$set(this.apiData, '__private', flag)
+    }
   },
   mounted () {
     // console.info('remote mounted')

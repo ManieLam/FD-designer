@@ -1,6 +1,6 @@
 <template lang='pug'>
 el-dialog.webserver-setter-dialog(
-  title="环境服务配置"
+  :title="dialogTitle"
   :visible.sync="dialogVisabled"
   width="90%"
   center
@@ -8,39 +8,46 @@ el-dialog.webserver-setter-dialog(
   :close-on-click-modal="false"
   @close="$emit('refuse')")
   .webserver-setter-container
-    //- .top-wrap.d-flex-row-between.m-b-8
-    //-   .left-wrap__top 环境
-    //-     small.color-primary.left-top__tip(v-show="serviceData.name")
-    //-       span 【{{serviceData.method}}】
-    //-       span {{serviceData.url}}
-    //-       span(v-show="serviceData.demo") {{serviceData.demo}}
+    .top-wrap.d-flex-row-between.m-b-8
+      .left-wrap__top 当前使用环境：
+        small.color-primary.left-top__tip {{ lastInuseENV.title }}
+    //-       span 【{{envData.method}}】
+    //-       span {{envData.url}}
+    //-       span(v-show="envData.demo") {{envData.demo}}
       //- el-button-group.right-wrap__top
       //-   el-button(icon="el-icon-plus", @click="addApi") 新增数据源
     .bottom-wrap.d-flex-row-between
       //- 左
-      ServerList(:key="serviceData.name", :value="serviceData", @input="onChangeEnv")
+      ServerList(
+        :selected="envData"
+        v-model="envList"
+        @onSelect="onSelectEnv")
       //- 右
       .right-wrap.d-flex-column.d-flex-1
-        ServerContent(:key="serviceData.name", v-model="serviceData")
+        ServerContent(v-model="envData", @syncServer="syncServer")
         //- 下
         .right-bottom__fixed.d-flex-row-between
           el-button-group
             //- el-button(@click="testLink") 测试链接
-            //- el-button(:disabled="!serviceData.name", title="保存至全局，允许下次继续使用", @click="globalSave(serviceData)") 保存至全局
+            //- el-button(:disabled="!envData.name", title="保存至全局，允许下次继续使用", @click="globalSave(envData)") 保存至全局
           .button-group
             el-button-group
-              el-button(@click="onClose") 关闭
-              el-button(@click="onSave") 保存修改
-              el-button(type="primary", :disabled="true", title="对分组内所有画布影响", @click="applyToGroup") 应用当前分组环境(TODO)
-              el-button(type="primary", title="保存至当前画布，不影响全局", @click="applyToCanvas") 应用当前画布环境
+              el-button(
+                v-for="btn in actionButtons"
+                v-bind="btn"
+                :key="btn.name"
+                @click="() => btn.func(funcProps)") {{ btn.label }}
+              //- el-button(@click="onClose") 关闭
+              //- el-button(@click="onSave") 保存修改
+              //- el-button(type="primary", :disabled="true", title="对分组内所有画布影响", @click="applyToGroup") 应用当前分组环境(TODO)
+              //- el-button(type="primary", title="保存至当前画布，不影响全局", @click="applyToCanvas") 应用当前画布环境
 </template>
 
 <script>
 /* 环境配置 */
-// import { defaultEnvConf } from '@/model/service'
 import ServerList from './ServerList.vue'
 import ServerContent from './ServerContent.vue'
-import { cloneDeep, isEqual } from 'lodash'
+// import { cloneDeep } from 'lodash' // , keyBy, difference
 // import { ServiceModel } from '@/model/service'
 export default {
   name: 'WebserverSetter',
@@ -48,6 +55,16 @@ export default {
     value: {
       type: Boolean,
       default: false
+    },
+    // 当前画布配置
+    canvas: {
+      type: Object,
+      default: () => ({})
+    },
+    // 自定义方法
+    actions: {
+      type: Array,
+      default: () => ([])
     }
   },
   components: {
@@ -57,12 +74,58 @@ export default {
   data () {
     return {
       isChanged: false, // 环境是否有修改
+      envList: this.canvas?.env?.list || this.$gbServer || [], // 环境列表，默认取本地环境, 只能删除自定义的环境
       // serviceList: defaultEnvConf, // 环境列表，默认取本地环境, 只能删除自定义的环境
-      serviceData: {}, // 环境配置数据
-      serviceTemp: {}
+      // envData: {}, // 环境配置数据
+      serviceTemp: {},
+      // lastInuseENV: {},
+      defaultActions: [
+        {
+          label: '关闭',
+          name: 'close',
+          func: this.onclose
+        },
+        {
+          label: '保存修改',
+          name: 'save',
+          func: this.onSave
+        }
+      ]
     }
   },
   computed: {
+    lastInuseENV () {
+      // 隔绝envData, 记录上次更改的环境数据
+      return this.canvas ? this.$store.getters.getServerInuse : {}
+    },
+    funcProps () {
+      return {
+        envs: this.envList,
+        selected: this.envData
+      }
+    },
+    actionButtons () {
+      return [].concat(
+        this.defaultActions,
+        this.actions
+      )
+    },
+    // envList () {
+    //   return this.canvas?.env?.list || this.$gbServer || []
+    // },
+    envData: {
+      get () {
+        return this.serviceTemp
+      },
+      set (value) {
+        this.serviceTemp = value
+      }
+    },
+    dialogTitle () {
+      return this.canvas
+        ? `${this.canvas?.routerName}(${this.canvas?.canvasTitle || ''})画布环境配置`
+        : '环境配置'
+    },
     dialogVisabled: {
       get () {
         return this.value
@@ -75,90 +138,81 @@ export default {
       return this.$store.state.canvas.editingName || ''
     }
   },
-  watch: {
-    serviceData: {
-      handler (data, oldData) {
-        // const urlKeys = Object.keys(keyBy(this.serviceData.urls, 'name'))
-        // const defList = this.$store.state.server.list?.filter(item => item.default) || []
-        // const newDef = defList.map(({ urls }) => {
-        //   const curKeys = keyBy(urls, 'name')
-        //   const others = difference(urlKeys, Object.keys(curKeys))?.map(key => new ServiceModel(curKeys[key]))
-        //   urls = urls.concat(others)
-        // })
-        // console.log('newDef:', newDef)
-      }
-    }
-  },
+  // watch: {
+  //   'this.canvas.env': {
+  //     immediate: true,
+  //     handler  (env) {
+  //       if (env) {
+  //         this.envList = env.list || this.$gbServer || []
+  //         this.envData = cloneDeep(this.canvas?.env?.inuse)
+  //       }
+  //     }
+  //   }
+  // },
   methods: {
-    onChangeEnv (data) {
-      // console.log('onChangeEnv:', data)
-      this.serviceTemp = cloneDeep(this.serviceData)
-      if (!isEqual(this.serviceTemp, data)) {
-        this.syncService()
-        this.serviceData = data
+    init () {
+      if (!this.canvas) {
+        this.$store.commit('canvas/INIT_SERVER')
       }
-    //   this.isChanged = !isEqual(data, this.serviceData)
-    //   this.serviceData = data
+      this.$nextTick(() => {
+        this.envList = this.canvas?.env?.list || this.$gbServer || []
+        // const inuse = this.canvas?.env?.inuse
+        this.envData = this.$store.getters.getServerInuse
+      })
+      // this.$store.commit('server/syncServices')
+      // // this.envData = this.$gbServer?.[0]
+      // this.$nextTick(() => {
+      //   const [ip] = this.$store.getters.getServerInuse
+      //   this.envData = this.$store.getters.getServerByName(ip)
+      // })
     },
-    syncService () {
+    // 同步更新画布中的默认服务地址
+    syncServer (newUrls = []) {
+      this.$set(this.envList, 'urls', newUrls)
+      // this.$store.commit('canvas/UPDATE_SERVER', {
+      //   name: this.canvas.routerName,
+      //   data: newUrls,
+      //   type: 'serviceOptions'
+      // })
     },
-    // 保存修改
-    onSave () {
-      this.$store.commit('server/updateOne', { name: this.serviceData?.name, source: this.serviceData })
-      this.$store.dispatch('server/updateService', this.serviceData.urls)
-    },
-    // 应用画布
-    applyToCanvas () {
-      // console.log('当前配置的数据:', this.serviceData)
-      if (!this.serviceData?.urls?.length) {
-        this.$confirm(
-          '当前没有配置服务，不能应用到当前环境',
-          '错误',
-          {
-            confirmButtonText: '重新设置'
+    // 保存环境修改
+    onSave ({ selected, envs }) {
+      // 只保存当前
+      const newList = this.envList
+      const index = newList.findIndex(env => env.name === this.envData.name)
+      // console.log('保存:', index)
+      if (index > -1) {
+        this.$set(this.envList, index, this.envData)
+      }
+      // TODO 同步每个环境中的服务, 只同步类型，不同步url
+      /* const newUrlObj = keyBy(this.envData.urls, 'name')
+      const urlKeys = Object.keys(newUrlObj)
+      // 只对default: true的环境，且非本环境做修改
+      const newEnvList = this.envList.list?.map((env) => {
+        if (env.default && env.name !== this.envData.name) {
+          const curKeys = keyBy(env.urls, 'name')
+          const others = difference(urlKeys, Object.keys(curKeys))?.map(key => new ServiceModel(newUrlObj[key]))
+          console.log('others:', others)
+          // urls = urls.concat(others)
+          return {
+            ...env,
+            urls: env.urls.concat(others)
           }
-        )
-        return
-      }
-      this.$store.commit('canvas/assignConfig', {
-        name: this.editingName,
-        assignObj: {
-          server: this.serviceData
+        } else {
+          return this.envData
         }
       })
-      // const newElements
-      // this.$store.commit('canvas/updateHoldWidget', {
-      //   name: this.editingName,
-      //   elements: newElements
-      // })
-      // 满足条件则不允许被全局修改：主动修改环境或http://或https://起始的url
-      // const matchs = [].concat(
-      //     url.match(/^https?:\/\/|http?:\/\//ig)
-      //     /<(\w+)>\/<(\w+)>/.match(url)?.[0] !== this.$store.getters.getServerInuse
-      //   )
-      // console.log('获取到的getter:', this.$store.getters.getServerInuse)
-      // // 此时<(\w+)>\/<(\w+)>.match(url) !== 全局配置的环境时
-      // this.$set(this.apiData, '__preventGlobal', matchs && matchs.length)
+      console.log('新环境列表:', newEnvList) */
+      this.$emit('onSave', newList)
     },
-    // 应用分组
-    applyToGroup () {},
-    // onSelectServer (env) {
-    //   this.serviceData = env
-    // },
-    onClose () {
+    // 切换选择环境
+    onSelectEnv (env) {
+      this.envData = env
+    },
+    onclose () {
       this.dialogVisabled = false
-      this.$emit('onClose')
-    },
-    init () {
-      this.$store.commit('server/init')
-      this.$store.commit('server/syncServices')
-      // this.serviceData = this.$gbServer?.[0]
-      this.$nextTick(() => {
-        const [ip] = this.$store.getters.getServerInuse
-        this.serviceData = this.$store.getters.getServerByName(ip)
-      })
+      this.$emit('close')
     }
-
   },
   mounted () {
     this.init()

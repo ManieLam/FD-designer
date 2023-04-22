@@ -3,11 +3,6 @@
   .left-panel
     WidgetPanel(@onDragged="onDragged")
   .center-panel
-    .tool-panel.d-flex
-      //- 环境
-      .primary-text
-        span.secondary-text 当前api请求环境：{{actCanvas.server.inuse || '无环境'}}
-        el-button.m-l-8(key="canvasENV", @click="handleCheckEnv") 查看环境
     .tool-panel.d-flex-row-between
       //- 左边工具栏
       el-button-group.tool-wrap__left
@@ -33,7 +28,6 @@
             //- el-dropdown-item(icon="el-icon-plus") 快捷打开（TODO）
             el-dropdown-item(icon="el-icon-search", command="more") 查看更多画布
         //- TODO 快捷打开
-
       //- 右边工具栏
       el-button-group.tool-wrap__right
         //- 打开
@@ -48,9 +42,19 @@
           el-button 预览
             i.el-icon-arrow-down.el-icon--right
           el-dropdown-menu(slot="dropdown")
+            el-dropdown-item
+              //- 环境
+              span.secondary-text 当前画布服务环境：
+              span.color-primary.font-secondary {{actCanvas && actCanvas.env ? (actCanvas.env.inuse.title) : '无环境'}}
+                i.m-l-8.el-icon-edit.cursor-pointer(key="canvasENV", title="切换环境", @click="handleCheckEnv")
             el-dropdown-item(command="onPreview") 预览
             el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
     //- :canvas="canvasName|getActCanvas(allCanvas)"
+    //- .tool-panel.d-flex-v-center.m-t-8
+    //-   //- 环境
+    //-   span.secondary-text 当前api请求环境：
+    //-   span.color-primary.font-secondary {{actCanvas && actCanvas.env ? (actCanvas.env.inuse.title) : '无环境'}}
+    //-     i.m-l-8.el-icon-edit.cursor-pointer(key="canvasENV", title="切换环境", @click="handleCheckEnv")
     DragPage.drag-page-container(
       ref="dragPanel"
       :key="canvasName"
@@ -110,6 +114,13 @@
     size="lg"
     v-model="moreCanvas.visable")
     CanvasTable(@close="openCanvasByConfig")
+  //- 查看环境配置
+  WebserverSetter(
+    ref="webserverSetter"
+    :canvas="actCanvas"
+    :actions="webServiceActions"
+    @onSave="onSaveWebService"
+    v-model="webserverSetting")
 </template>
 
 <script>
@@ -120,8 +131,11 @@ import DragPage from '@/views/DragPage'
 import SettingPanel from '@/views/SettingPanel'
 import CodeEditor from '@/components/CodeEditor'
 import CanvasTable from '@/views/CanvasTable'
+import WebserverSetter from '@/components/ConfigSetter/WebserverSetter'
+
 // import Draggable from 'vuedraggable'
 import { debounce, isNil } from 'lodash'
+
 import headerMethods from './methods/header'
 import requireMethods from './methods/require'
 import exportMethods from './methods/export'
@@ -140,7 +154,8 @@ export default {
     WidgetPanel,
     SettingPanel,
     CodeEditor,
-    CanvasTable
+    CanvasTable,
+    WebserverSetter
     // FromTemp
   },
   data () {
@@ -174,7 +189,6 @@ export default {
     },
     filterCanvasStr (obj) {
       return JSON.stringify(obj, null, 4)
-      // return JSON.stringify(obj)
     }
   },
   computed: {
@@ -208,7 +222,8 @@ export default {
       },
       set (list) {
         this.computedBody = list
-        this.$store.commit('canvas/updateHoldWidget', {
+        // updateHoldWidget
+        this.$store.commit('canvas/UPDATE_HOLD_WIDGET', {
           name: this.canvasName,
           elements: list
         })
@@ -347,7 +362,7 @@ export default {
       } else {
         // 更新本地化
         const editData = await this.getEditCanvas(routerName, id)
-        console.log('编辑在线预览数据:', editData)
+        // console.log('编辑在线预览数据:', editData)
         if (editData) {
           const { routerName: newRName } = editData
           // 以最终数据返回的routerName名称为准, 地址栏不可信
@@ -364,7 +379,7 @@ export default {
       })
     },
     async initResource () {
-      await this.$store.commit('resources/init')
+      await this.$store.commit('resources/INIT')
       // await this.$store.commit('resources/initGroup')
     },
     toggleRouter (name = this.actCanvas.routerName) {
@@ -401,12 +416,23 @@ export default {
         this.formLabelHidden = this.actCanvas?.attrs?.labelHidden
         // this.toggleRouter(this.actCanvas?.routerName)
       })
+    },
+    // 保存画布环境的修改
+    onSaveWebService (envList = []) {
+      this.$store.commit('canvas/UPDATE_SERVER', {
+        name: this.canvasName,
+        data: envList,
+        type: 'list'
+      })
     }
   },
   created () {
     this.afterLoading = false
     this.initCanvas()
     this.initResource()
+    this.$nextTick(() => {
+      this.$store.commit('canvas/INIT_SERVER', { name: this.canvasName })
+    })
   },
   mounted () {
     this.afterLoading = true

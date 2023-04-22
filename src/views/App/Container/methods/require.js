@@ -79,8 +79,8 @@ export default {
       }
     },
     afterPublish ({ name, configId, isUpdate }) {
-      // 更新画布信息
-      this.$store.commit('canvas/assignConfig', {
+      // 更新画布信息 assignConfig
+      this.$store.commit('canvas/ASSIGN_CONFIG', {
         name: this.canvasName,
         assignObj: {
           configId: configId, // 首次发布前没有configId，需要补充
@@ -89,7 +89,7 @@ export default {
       })
       this.$nextTick(() => {
         this.onSave(false)
-        this.$store.commit('canvas/toggle', name)
+        this.$store.commit('canvas/TOGGLE', name)
         this.$forceUpdate()
       })
       // 新窗口打开在线预览页面

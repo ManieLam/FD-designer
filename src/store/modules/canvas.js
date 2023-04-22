@@ -4,6 +4,8 @@
  * */
 import { formAttrs as defaultFormAttrs } from '@/model/defaultConfig'
 import { CanvasModel } from '@/model/canvas' // 定义画布数据
+import { gbServer } from '@/utils/import'
+import { ENV_VAR, ServiceModel, EnvRecordModel } from '@/model/service'
 import { MessageBox } from 'element-ui'
 import { isEmpty, isEqual, pick } from 'lodash'
 
@@ -15,7 +17,7 @@ const state = () => ({
 
 const mutations = {
   /* 切换画布 */
-  toggle (states, name) {
+  TOGGLE (states, name) {
     if (name) {
       // console.log('切换到name:', name)
       states.editingName = name
@@ -23,7 +25,7 @@ const mutations = {
     }
   },
   /* 新增画布 */
-  add (states, { name }) {
+  ADD (states, { name }) {
     // 初始新增
     // states.canvas[name] = new CanvasModel({ body: [], routerName: name }, defaultFormAttrs)
     states.canvas = {
@@ -36,7 +38,7 @@ const mutations = {
     sessionStorage.setItem('Canvas-editing', editingName)
   },
   /* 清空, 不是清除 */
-  clear (states, name) {
+  CLEAR (states, name) {
     // console.log('清空')
     const { configId, routerName } = states.canvas[name]
     // 如果存在routerName和configId则保留，这是是否已发布的标志
@@ -44,7 +46,7 @@ const mutations = {
     sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
   },
   /* 更新画布整体 */
-  edit (states, { name, routerName, data = {} }) {
+  EDIT (states, { name, routerName, data = {} }) {
     const configId = data?.configId // 区分是否编辑
     if (!configId) return
     // 追加本地化，如：预览切换编辑
@@ -85,19 +87,19 @@ const mutations = {
       }
     } else {
       // 本地追加
-      // console.log('本地追加:')
+      console.log('本地追加:')
       states.editingName = routerName
       states.canvas[routerName] = new CanvasModel(data, defaultFormAttrs)
       sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
       sessionStorage.setItem('Canvas-editing', routerName)
     }
   },
-  /* 更新画布所有字段 */
-  updateHoldWidget (states, { name, element = {}, eIndex, elements }) {
+  /* 更新画布所有字段 updateHoldWidget */
+  UPDATE_HOLD_WIDGET (states, { name, element = {}, eIndex, elements }) {
     states.canvas[name].body = elements
   },
-  /** 更新单画布事件 */
-  updateActions (states, { name, actions = null, type = 'REWRITE', actionName = '', actionVal }) {
+  /** 更新单画布事件 updateActions */
+  UPDATE_ACTIONS (states, { name, actions = null, type = 'REWRITE', actionName = '', actionVal }) {
     const canvas = states.canvas[name]
     if (canvas && canvas.actions?.length) {
       if (type === 'REWRITE') {
@@ -109,8 +111,8 @@ const mutations = {
       console.warn('画布中暂无表单')
     }
   },
-  // 更新单画布属性
-  assignConfig (states, config) {
+  // 更新单画布属性 assignConfig
+  ASSIGN_CONFIG (states, config) {
     const { name, attrs = null, actions = null, buttons = null, assignObj = null } = config
     const section = states.canvas[name]
     if (section) {
@@ -138,19 +140,9 @@ const mutations = {
   updateCanvasResource () {
   },
   /* 导出、全部导出 */
-  export (states, name, isAll = false) {},
+  EXPORT (states, name, isAll = false) {},
   /* 移除缓存中的画布 */
-  close (states, index) {
-    // if (name) {
-    //   const newCanvas = { ...states.canvas }
-    //   delete newCanvas[name]
-    //   states.canvas = newCanvas
-    //   // delete states.canvas[name]
-    //   // console.log('states.canvas:', states.canvas)
-    //   sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
-    //   states.editingName = ''
-    //   sessionStorage.setItem('Canvas-editing', '')
-    // }
+  CLOSE (states, index) {
     // 未发布的画布只有name，name可能会重复，id不会重复，但id只存在于已发布的画布
     // console.log('delete index:', index)
     if (index !== -1) {
@@ -164,7 +156,7 @@ const mutations = {
     }
   },
   /* 复制 /online/testCopy/50 */
-  copy (states, { name, copiedData = {} }) {
+  COPY (states, { name, copiedData = {} }) {
     if (!copiedData || isEmpty(copiedData)) return
     // console.log('复制对象:', copiedData)
     states.canvas = {
@@ -172,6 +164,73 @@ const mutations = {
       [name]: new CanvasModel({ ...copiedData, configId: null, routerName: name, canvasName: name })
     }
     sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+  },
+  /* 初始化画布的服务, 对旧数据没有设置env环境的做补充 */
+  INIT_SERVER (states, { name }) {
+    const curCanvas = states.canvas[name]
+    // console.log('curCanvas:', curCanvas)
+    const server = { ...gbServer }
+    if (!curCanvas.env) {
+      curCanvas.env = new EnvRecordModel()
+      if (!curCanvas.env.list.length) {
+        // 从默认的环境中，每个环境同步共同的服务数据
+        curCanvas.env.list = server.map(item => item.urls)
+      }
+      if (!curCanvas.env.inuse.name) {
+        curCanvas.env.inuse = server.find(list => list.name === ENV_VAR?.default)
+      }
+      if (!curCanvas.env.serviceOptions?.length) {
+        curCanvas.env.serviceOptions = [new ServiceModel()]
+      }
+    }
+  },
+  /* 更新画布中的服务，每次只更新一种属性 */
+  UPDATE_SERVER (states, { name, type = 'env', data }) {
+    // const curEnv = states.canvas[name].env
+    switch (type) {
+      case 'env': {
+        if (Array.isArray(data)) {
+          console.log('更新env:', data)
+          states.canvas[name].env = data
+        }
+        break
+      }
+      case 'list': {
+        if (Array.isArray(data)) { states.canvas[name].env.list = data }
+        break
+      }
+      case 'insue': {
+        if (data instanceof Object) { states.canvas[name].env.inuse = data }
+        break
+      }
+      case 'serviceOptions': {
+        if (Array.isArray(data)) {
+          states.canvas[name].env.serviceOptions = data
+        }
+        break
+      }
+    }
+    sessionStorage.setItem('Canvas-all', JSON.stringify(states.canvas))
+  // },
+  // SYNC_ENV_URLS (states, { name, urlData }) {
+  //   const curEnv = states.canvas[name].env
+  //   // 同步每个环境中的服务, 只同步类型，不同步url
+  //   const newUrlObj = keyBy(urlData, 'name')
+  //   const urlKeys = Object.keys(newUrlObj)
+  //   // 只对default: true的环境修改
+  //   const defEnvs = curEnv.list?.map((env) => {
+  //     if (env.default) {
+  //       const curKeys = keyBy(env.urls, 'name')
+  //       const others = difference(urlKeys, Object.keys(curKeys))?.map(key => new ServiceModel(newUrlObj[key]))
+  //       console.log('others:', others)
+  //       // urls = urls.concat(others)
+  //       return {
+  //         ...env,
+  //         urls: env.urls.concat(others)
+  //       }
+  //     }
+  //   })
+  //   states.canvas[name].env.list = newDef
   }
 }
 
@@ -183,7 +242,7 @@ const actions = {
    * 3 带id访问，存在该本地缓存 = 渲染id（编辑）
    */
   init ({ state, commit }, data = {}) {
-    console.info('初始化:', data)
+    // console.info('初始化:', data)
     const storages = sessionStorage.getItem('Canvas-all') ? JSON.parse(sessionStorage.getItem('Canvas-all')) : null
     const editingName = data.routerName || sessionStorage.getItem('Canvas-editing')
     const isEdit = data?.data?.configId
@@ -194,18 +253,18 @@ const actions = {
     if (isEdit) {
       // 属于重新需要本地化数据, 分为有缓存和无缓存处理
       // console.info('属于重新需要本地化数据')
-      commit('edit', { name: editingName, ...data })
+      commit('EDIT', { name: editingName, ...data })
     } else {
       // 新增
       if ((!storages || isEmpty(storages)) && !isInStorage) {
         // 首次初始化
         // console.log('首次初始化')
-        commit('add', { name: editingName || 'canvas_0' })
+        commit('ADD', { name: editingName || 'canvas_0' })
       } else {
         // 存在缓存
         // console.log('存在缓存')
         state.canvas = storages
-        commit('toggle', editingName || Object.keys(storages)[0])
+        commit('TOGGLE', editingName || Object.keys(storages)[0])
       }
     }
   },
@@ -221,17 +280,17 @@ const actions = {
     if (name === state.editingName) {
       // 关闭当前页，需要切换到上一个页面
       if (index > 0) {
-        commit('close', index)
+        commit('CLOSE', index)
         const newIndex = index - 1
         // console.log('closeCanvas----', newIndex)
         if (canvasList[newIndex]) {
           // console.log('canvasList[newIndex]:', canvasList[newIndex])
-          commit('toggle', canvasList[newIndex].routerName)
+          commit('TOGGLE', canvasList[newIndex].routerName)
         }
         return
       }
     }
-    commit('close', index)
+    commit('CLOSE', index)
     dispatch('init')
     // dispatch('init')
   },
@@ -245,8 +304,8 @@ const actions = {
     const len = nameList.length
     const newName = len > 1 ? `${filterName}_copied_${len - 1}` : `${filterName}_copied`
     // console.log('newName:', newName)
-    commit('copy', { name: newName, copiedData: data })
-    commit('toggle', newName)
+    commit('COPY', { name: newName, copiedData: data })
+    commit('TOGGLE', newName)
   }
 }
 

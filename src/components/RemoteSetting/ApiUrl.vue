@@ -1,28 +1,39 @@
 <template lang='pug'>
 //- 请求地址的3位转换
-el-input.api-input(
-  v-model="apiurlMix[2]"
-  placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置"
-  @input="handleInput")
-  template(slot="prepend")
-    .apiurl-prepend(@click="toggleChooseServer")
-        span.prepend-server(v-if="!isFullInput", :hidden="isFullInput") {{curServerURL || ''}}
-        span.apiurl-prepend.el-icon-plus(v-else)
-        el-cascader-panel.prepend-server-cascader(
-          v-if="chooseServerVisable"
-          slot="dropdown"
-          :value="serverName"
-          :options="allServer"
-          :props="chooseServerPanel"
-          @change="chooseServer")
+.section-api-url
+  //- el-checkbox(v-model="isFollowParent")
+  //-   span.secondary-text 跟随画布设置
+  el-input.api-input(
+    :value="apiurlMix[2]"
+    placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置"
+    @input="handleInput")
+    template(slot="prepend")
+      .apiurl-prepend(@click="toggleChooseServer")
+          span.prepend-server(v-if="!isFullInput", :hidden="isFullInput") {{curServerURL || ''}}
+          span.apiurl-prepend-icon.el-icon-plus(v-else)
+          el-cascader-panel.prepend-server-cascader(
+            v-if="chooseServerVisable"
+            slot="dropdown"
+            :value="serverName"
+            :options="allServer"
+            :props="chooseServerPanel"
+            @change="chooseServer")
+  //- template(slot="append")
+  //-   .apiurl-append
+  //-     el-checkbox(v-model="isFollowParent") 跟随画布设置
 </template>
 
 <script>
+// import { debounce } from 'lodash'
 export default {
   name: 'ApiUrl',
   props: {
     value: {
       type: String,
+      default: () => ({})
+    },
+    apiData: {
+      type: Object,
       default: () => ({})
     }
   },
@@ -40,17 +51,13 @@ export default {
       regex: {
         isHttp: /^https?:\/\/|http?:\/\//i
       },
+      // isFollowParentService: true,
       urlStr: ''
     }
   },
   computed: {
     allServer () {
-      return this.$store.getters.getSysServer?.map(s => {
-        return {
-          ...s,
-          value: s.name
-        }
-      }) || []
+      return this.$store.getters.getCanvasEnv()
     },
     serverName () {
       return [
@@ -63,25 +70,50 @@ export default {
       return ip ? this.allServer.find(s => s.name === ip) : {}
     },
     curServerURL () {
-      return this.curServer?.urls?.find(url => url.name === this.serverName[1])?.url || ''
+      const name = this.serverName[0].indexOf('__') > -1 ? 'BASE' : this.serverName[1]
+      return this.curServer?.urls?.find(url => url.name === name)?.url || '无服务'
     },
     isFullInput () {
       return !this.apiurlMix[0] && !this.apiurlMix[1] && this.regex.isHttp.test(this.apiurlMix[2])
     },
     apiurlMix: {
       get () {
+        console.log('get apiurl')
         return this.strToArr(this.urlStr)
       },
       set (value) {
+        console.log('set apiurl', value)
         this.urlStr = this.arrToStr(value)
         this.$emit('input', this.urlStr)
       }
+    // },
+    // isFollowParent: {
+    //   get () {
+    //     console.log('get follow')
+    //     // ip和服务都是默认替换字样，则是跟随画布配置
+    //     const checkIp = this.apiurlMix[0] === '__parent.id__'
+    //     const checkService = this.apiurlMix[1] === '__parent.service__'
+    //     return checkIp && checkService
+    //   },
+    //   set (value) {
+    //     console.log('set follow', value)
+    //     if (value) {
+    //       this.apiurlMix[0] = '__parent.id__'
+    //       this.apiurlMix[1] = '__parent.service__'
+    //     } else {
+    //       this.apiurlMix[0] = ''
+    //       this.apiurlMix[1] = ''
+    //     }
+    //     // this.$emit('change', { ...this.apiData, isFollowParent: value })
+    //   }
     }
   },
   watch: {
     value: {
       handler (value) {
-        this.apiurlMix = this.strToArr(this.value)
+        if (value !== this.urlStr) {
+          this.apiurlMix = this.strToArr(this.value)
+        }
       }
     }
   },
@@ -98,9 +130,10 @@ export default {
     },
     strToArr (data = '') {
       let arr = Array.from({ length: 3 })
+      // console.log('strToArr data:', data)
       if (typeof data === 'string') {
-        const matchs = data.match(/^<(\w+)>\/<(\w+)>*/)
-        // console.log('matchs:', matchs)
+        const matchs = data.match(/^<(\w+)>\/<(\w.+)>/)
+        console.log('matchs:', matchs)
         if (this.regex.isHttp.test(data) && !matchs) {
           // 自输入的链接，不做分割
           arr = ['', '', data]
@@ -108,12 +141,13 @@ export default {
           if (matchs) {
             // 带动态服务地址
             const last = data.replace(matchs[0], '')
-            // console.log('last--:', data, last)
             arr = [`<${matchs[1]}>`, `<${matchs[2]}>`, last]
           } else {
             // 不带地址，使用默认服务
-            const [ipName, serviceName] = this.$store.getters.getServerInuse
-            arr = [`<${ipName}>`, `<${serviceName}>`, data]
+            // console.info(this.$store.getters.getServerInuse)
+            // const [ipName, serviceName] = this.$store.getters.getServerInuse
+            // arr = [`<${ipName}>`, `<${serviceName}>`, data]
+            arr = ['__parent.ip__', '__parent.default__', data]
           }
         }
       }
@@ -123,15 +157,21 @@ export default {
       this.chooseServerVisable = !this.chooseServerVisable
     },
     chooseServer (value) {
+      console.log('选择服务:', value)
+      const inuseEnv = this.$store.getters.getServerInuse
       this.apiurlMix = [
         `<${value[0]}>`,
         `<${value[1]}>`,
         this.apiurlMix[2]
       ]
+      // 通知修改为非跟随父类默认值
+      this.$emit('changeInPrivate', inuseEnv && inuseEnv.name !== value[0])
     },
     handleInput: function (value) {
       // console.log('监听到apiurlMix:', value)
-      this.apiurlMix = value
+      const dataList = [...this.apiurlMix]
+      dataList[2] = value
+      this.apiurlMix = dataList
     }
   },
   created () {
@@ -152,6 +192,8 @@ export default {
   &[hidden="true"]
     width: 0
     min-width: 0
+  // .apiurl-prepend-icon
+  //   width: 100px
 .prepend-server-cascader
   position: absolute
   top: 32px

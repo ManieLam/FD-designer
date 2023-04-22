@@ -32,12 +32,12 @@ const state = {
 }
 const mutations = {
   init (states) {
-    const storages = localStorage.getItem('Server-all') // 默认读取本地缓存，TODO 补充公共导入的配置
-    const inuse = localStorage.getItem('Server-inuse')
-    const serviceList = localStorage.getItem('Server-service')
-    states.list = storages ? JSON.parse(storages) : gbServer || []
-    states.inuse = inuse ? JSON.parse(inuse) : ['local', 'BASE']
-    states.serviceList = serviceList ? JSON.parse(serviceList) : [new ServiceModel({ title: '默认服务', name: 'BASE' })]
+    // const storages = localStorage.getItem('Server-all') // 默认读取本地缓存，TODO 补充公共导入的配置
+    // const inuse = localStorage.getItem('Server-inuse')
+    // const serviceList = localStorage.getItem('Server-service')
+    // states.list = storages ? JSON.parse(storages) : gbServer || []
+    // states.inuse = inuse ? JSON.parse(inuse) : ['local', 'BASE']
+    // states.serviceList = serviceList ? JSON.parse(serviceList) : [new ServiceModel({ title: '默认服务', name: 'BASE' })]
   },
   addOne (states, source) {
     // states.list.push(source)
@@ -102,6 +102,10 @@ const actions = {
     state.serviceList = list
     commit('saveServices', list)
     commit('syncServices', list)
+  // },
+  // addService ({ commit, state }, source) {
+  //   commit('addOne', source)
+    // commit('saveServices', state.list)
   }
 }
 

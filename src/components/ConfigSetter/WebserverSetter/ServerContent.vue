@@ -10,7 +10,8 @@
         v-model="computedData.urls"
         style="width: 90%"
         :columnProps="urlColumnProps"
-        :draggable="false")
+        :draggable="false"
+        :initListDatafunc="initServiceRowfunc")
         template(v-slot:name="slotProp")
           label.service-label.primary-text {{slotProp.index + 1}}
     el-form-item(label="环境变量", prop="vars")
@@ -20,6 +21,7 @@
 
 <script>
 import { debounce } from 'lodash'
+import { v4 as uuidv4 } from 'uuid'
 export default {
   name: 'ServerContent',
   props: {
@@ -44,23 +46,19 @@ export default {
     }
   },
   watch: {
-    computedData: {
+    'computedData.urls': {
       deep: true,
-      handler: debounce(function (data, oldData) {
-        data.urls.forEach(item => {
-          if (!item || item.name) return item
-          if (item.url) {
-            // const name = data.url?.match(/(?<=\/)\w+$/g)
-            const name = item.url?.replace(/http:\/\/|https:\/\//gi, '')
-            if (name) item.name = name || ''
-            return item
-          }
-        })
-        // console.log('匹配到的名称:', urls)
-      }, 1000)
+      handler: debounce(function (urls, oldUrls) {
+        // console.log('匹配到的改变:', urls, oldUrls)
+        this.$emit('syncServer', urls)
+      }, 800)
     }
   },
   methods: {
+    initServiceRowfunc (obj, key) {
+      obj[key] = key === 'name' ? uuidv4() : ''
+      return obj
+    }
     // setComputedUrl (urls) {
     //   console.log('改变后的urls:', urls)
     //   // this.computedData.urls

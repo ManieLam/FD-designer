@@ -49,6 +49,7 @@ const getters = {
   /* 获取当前画布配置 */
   getCurView: state => {
     const curName = state.canvas.editingName || 'canvas_0'
+    console.info('画布名:', curName)
     if (curName) {
       // console.info('获取当前画布')
       const data = state.canvas.canvas[curName]
@@ -103,36 +104,38 @@ const getters = {
     return index > -1 ? list[index] : {}
   },
   getResourceGroup: state => state.resources.groups,
-  /* 获取服务环境 */
-  getSysServer: state => state.server.list,
-  getServerByName: state => name => {
-    if (name) {
-      const list = state.server.list
-      const index = list.findIndex(item => item.name === name)
+  /* 获取画布所有环境 */
+  getCanvasEnv: (state, getters) => cname => {
+    const canvasName = cname || state.canvas.editingName
+    if (canvasName) {
+      const envList = getters.getCanvasView(canvasName).env.list
+      return envList.map(env => {
+        return {
+          ...env,
+          value: env.name
+        }
+      })
+    }
+  },
+  /* 获取某个环境数据 */
+  getEnvByName: (state, getters) => async (envName) => {
+    if (envName) {
+      const list = await getters.getCurView.env.list
+      const index = list.findIndex(item => item.name === envName)
       return index > -1 ? list[index] : {}
     } else {
       return null
     }
   },
-  /** 钻取获得正在使用的环境IP名，服务名，服务地址
-   * @return <array>:[ip:<string>, service<string>, url<string>]
-   *  */
+  /** 获取当前画布使用的环境
+   * @return Object
+   **/
   getServerInuse: (state, getters) => {
-    const [ip, service] = state.server.inuse || []
-    const inuseServer = getters.getServerByName(ip)
-    if (inuseServer) {
-      const serviceObj = inuseServer?.urls?.find(url => url.name === service)
-      return [
-        ip,
-        service,
-        serviceObj.url
-      ]
-    }
-    return []
+    console.info('getter:', getters.getCurView)
+    const env = getters.getCurView?.env || {}
+    const inuse = env.inuse || 'LOCAL'
+    return env.list?.find(e => e.name === inuse) || {}
   }
-  // cachedViews: state => state.tagsView.cachedViews
-  // menus: state => state.menus.menuList
-  // shortcuts: state => state.shortcuts
 }
 
 export default getters
