@@ -264,19 +264,34 @@ export default {
       })
     },
     initPostMesgWithParent () {
-      window.addEventListener('message', ({ data, origin }) => {
+      // console.log('初始化数据通道')
+      window.onmessage = function (event) {
+        const { data } = event
         // 只接受允许范围通道消息， TODO 允许指定域数据
         // 剔除非允许的通道消息
         const validChannels = Object.keys(data).filter(name => validPostMesgToParent.includes(name))
         validChannels.forEach(channel => {
           const cfunc = channelEvent[channel]
-          // console.info('cfunc:', cfunc)
+          // console.info('onmessage cfunc:', cfunc)
           if (cfunc && typeof cfunc === 'function') {
             // console.info('通道事件:', channel)
             cfunc.call(this, data[channel])
           }
         })
-      }, false)
+      }
+      // window.addEventListener('message', ({ data, origin }) => {
+      //   // 只接受允许范围通道消息， TODO 允许指定域数据
+      //   // 剔除非允许的通道消息
+      //   const validChannels = Object.keys(data).filter(name => validPostMesgToParent.includes(name))
+      //   validChannels.forEach(channel => {
+      //     const cfunc = channelEvent[channel]
+      //     // console.info('cfunc:', cfunc)
+      //     if (cfunc && typeof cfunc === 'function') {
+      //       // console.info('通道事件:', channel)
+      //       cfunc.call(this, data[channel])
+      //     }
+      //   })
+      // }, false)
     },
     /* 对按钮类的事件绑定，按钮范围：表单/插槽辅助等 */
     initCustomButton () {
