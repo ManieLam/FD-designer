@@ -7,16 +7,32 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'DragPage',
-    component: () => import(/* webpackChunkName: "about" */ '@/views/DragPage/index.vue')
-  // },
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    name: 'Designer',
+    component: () => import(/* webpackChunkName: "designer" */ '@/views/App/Designer.vue')
+  },
+  {
+    path: '/edit/:name/:id',
+    name: 'DesignerEdit',
+    component: () => import(/* webpackChunkName: "designer" */ '@/views/App/Designer.vue')
+    // redirect: {
+    //   name: 'Designer',
+    //   params: {
+    //     name: 'redirect',
+    //     id: 'redirect'
+    //   }
+    // }
+  },
+  {
+    path: '/online/:name/:id',
+    name: 'Online',
+    meta: { title: '在线预览' },
+    // component: { render: (e) => e('router-view') }
+    component: () => import(/* webpackChunkName: "online" */ '@/views/App/PreviewOnline.vue')
+  },
+  {
+    path: '/testPostmessage',
+    name: 'TestPostmessage',
+    component: () => import(/* webpackChunkName: "test" */ '@/views/Test/TestPostmessage.vue')
   }
 ]
 

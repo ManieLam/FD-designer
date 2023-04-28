@@ -5,11 +5,14 @@
       v-for="tab in tabList"
       :key="tab.name"
       :name="tab.name"
-      :label="tab.label")
+      :label="tab.label"
+      :disabled="tab.disabled|filterDisabled")
       component(
         :ref="tab.name"
         :is="tab.components"
-        v-bind="$attrs"
+        :key="tab.name === 'form' ? tab.name : formItemConfig.key"
+        :formItemConfig="formItemConfig"
+        v-bind="{...$attrs, ...(tab.props||{})}"
         v-on="$listeners")
 </template>
 
@@ -17,23 +20,53 @@
 /** 属性、行为配置区 */
 export default {
   name: 'SettingPanel',
+  props: {
+    formItemConfig: {
+      type: Object,
+      default: () => ({})
+    }
+  },
   data () {
     return {
       activeName: 'component',
       tabList: [{
-        label: '组件配置区',
+        label: '组件配置',
         name: 'component',
         components: () => import('./CompSetting')
       }, {
-        label: '表单配置区',
+        label: '表单配置',
         name: 'form',
         components: () => import('./FormSetting')
+      }, {
+        label: '卡槽配置',
+        name: 'assist',
+        disabled: this.assistTabDisabled,
+        props: {},
+        components: () => import('./AssistSetting')
       }]
+    }
+  },
+  filters: {
+    filterDisabled (disabled) {
+      if (!disabled) return false
+      if (disabled && typeof disabled === 'function') {
+        const res = disabled()
+        // console.info('是否禁用', res)
+        return res
+      }
     }
   },
   methods: {
     clear () {
       this.$forceUpdate()
+    },
+    assistTabDisabled () {
+      // console.log('formItemConfig:', this.formItemConfig)
+      if (this.formItemConfig) {
+        const attrsKeys = Object.keys(this.formItemConfig)
+        return !attrsKeys.some(key => ['preSlotRender', 'suffixSlotRender'].includes(key))
+      }
+      return true
     }
   }
 }

@@ -1,0 +1,84 @@
+/* 跟随anso-ui样式布局，TODO 替换成anso-ui同套样式 */
+.form-item-content__32
+  min-height: 32px
+  line-height: 32px
+  padding-top: 4px
+  padding-bottom: 4px
+/* 对所有类型表单通用 */
+.widget-form-list
+  &[label-position="right"]
+    .el-form-item__label
+      text-align: right
+      padding: 0 $--formItem-label-padding 0 0
+  &[label-position="center"]
+    .el-form-item__label
+      text-align: center
+  &[label-position="left"]
+    .el-form-item__label
+      text-align: left
+      padding: 0 $--formItem-label-padding 0 0
+  > .el-form-item__label
+    width: 100%
+    padding: 0
+
+/* 表单单行录入元素 */
+.widget-form-item-wrap
+  // 允许隐藏label
+  &[label-hidden="true"] .el-form-item__label
+    display: none
+
+/* default类型的表单 */
+.form-layout-default
+  .widget-form-item-wrap
+    padding: 8px
+    & + .widget-form-item-wrap
+      margin-top: 8px
+  .widget-form-item
+    margin: 0
+
+/* grid类型的表单 */
+.form-layout-grid .widget-form-list
+  display: grid
+  // grid-template-columns: repeat(3, 1fr) // 列是动态的，不写死
+  width: 100%
+  // grid-gap: 
+  // 字段间样式
+  .widget-form-item-wrap
+    display: grid
+    justify-items: center
+    align-items: center
+    width: 100%
+    &[is-border]
+      // border: 1px solid $--form-divider-border-color
+      // margin-left: -1px
+      // margin-top: -1px
+    // .tool-wrap
+    .widget-form-item
+      display: flex
+      justify-items: center
+      align-items: center
+      margin-bottom: 0
+      padding: 0
+      width: 100%
+      height: 100%
+      background: $--form-label-background
+      grid-template-columns: 1fr 2fr
+      > .el-form-item__content
+        background: $--form-content-background
+        display: flex
+        align-items: center
+        justify-items: center
+        flex: 1
+        height: 100%
+        padding: $--formItem-space $--padding-size-medium
+        border-left: 1px solid $--form-divider-border-color
+        margin-left: 0 !important // 去除原先element-ui中.el-form-item__content 自带的margin-left
+        @extend .form-item-content__32
+      > label.el-form-item__label
+        padding: $--padding-primary
+        @extend .form-item-content__32
+        
+        
+      
+
+

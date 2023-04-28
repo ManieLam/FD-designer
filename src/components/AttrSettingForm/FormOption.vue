@@ -20,21 +20,16 @@
         td
           el-input(v-model="item.label")
         td
-          i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  @click="remove(item, index)")
-        td
-          i.el-icon-plus.color-primary.btn-radius-50(v-if="index === list.length - 1", @click="add")
+          i.el-icon-minus.color-primary.btn-radius-50(:disabled="list.length===1",  title="删除选项", @click="remove(item, index)")
+        //- td
+        //-   i.el-icon-plus.color-primary.btn-radius-50(v-if="index === list.length - 1", title="添加子选项", @click="addChild")
+      tr.drag-list
+        i.el-icon-plus.color-primary.btn-radius-50(title="新增一级选项", @click="add")
   .list-async(v-if="optionType === 'optionApi'")
     //- 动态配置数据源
-    el-button(@click="setAsyncVisible = !setAsyncVisible") {{ asyncFunc.url ? '重新选择数据源' : '配置数据源' }}
-    .list-column__default.m-t-4(v-show="asyncFunc.url")
-      .left-wrap
-        .d-flex-v-center
-          i.el-icon-check.color-primary.m-r-8
-          .color-warning {{asyncFunc.method}}
-          .secondary-text.m-l-8 {{asyncFunc.url}}
-        .color-text-secondary.font-size-small.m-l-8 {{ asyncFunc.demo || ''}}
-      .right-wrap
-    RemoteSettingRequire(key="option", title="配置选项动态数据源", v-model="setAsyncVisible", :chosenData="asyncFunc",  @chosen="getAsyncSeting")
+    form-remote(key="option", title="配置选项数据接口", v-model="asyncFunc")
+    .tip-text.secondary-text.m-l-8
+      i.icon.el-icon-info 通过接口一口气拉取选项
     //- 选择现有字典
   .list-async(v-if="optionType === 'optionRelationKey'")
     el-input(v-model.trim.lazy="optionRelationKey", placeholder="请填写字典关键名")
@@ -44,7 +39,6 @@
 
 <script>
 import Draggable from 'vuedraggable'
-import RemoteSettingRequire from '../RemoteSetting/Require'
 /** 自定义选项配置
  * 遇到`xxxAsyncFunc`的命名，就使用异步请求方法，执行是在运行表单时候运行，即在业务方使用
  * 遇到`optionRelationKey`,则使用relation请求,在表单中如有勾选[首次加载字典], 则默认执行
@@ -71,8 +65,8 @@ export default {
     }
   },
   components: {
-    Draggable,
-    RemoteSettingRequire
+    Draggable
+    // RemoteSettingRequire
   },
   data () {
     return {
@@ -81,7 +75,7 @@ export default {
         // 以取值命名value，方便数据同时存在options/optionApi后
         { label: '手动添加', value: 'options' },
         { label: '动态字典', value: 'optionRelationKey' },
-        { label: '动态数据源', value: 'optionApi' },
+        { label: '数据接口', value: 'optionApi' },
         { label: '批量导入', value: 'optionsImport', disabled: true }
       ],
       setAsyncVisible: false,
@@ -132,6 +126,7 @@ export default {
     add () {
       this.list.push({ label: '', value: '' })
     },
+    addChild () {},
     remove (ele, index) {
       if (this.list.length) {
         this.$delete(this.list, index)

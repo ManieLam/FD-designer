@@ -12,6 +12,11 @@ module.exports = {
       '/api': {
         target: 'http://0.0.0.0:4523/m1/1812979-0-default',
         changeOrigin: true
+      },
+      '/fileserver': {
+        target: 'http://10.0.60.34:18090',
+        changeOrigin: true,
+        pathRewrite: { '^/fileserver': '/api/fileserver' }
       }
     }
   },

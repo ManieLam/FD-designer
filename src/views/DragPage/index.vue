@@ -1,4 +1,5 @@
 <template lang='pug'>
+//- draggable别把value改成v-model,会取错元素填入
 draggable.list-group.drag-page-container(
   :value="fieldList"
   group="form"
@@ -7,18 +8,25 @@ draggable.list-group.drag-page-container(
   //- div.list-group-item(v-for="item in rows",:key="item.id") {{item.name}}
   //- AnsoDataform(v-bind="formSetting", :formFields="fields", :buttonList="buttonList")
   transition-group.widget-form-list.h-100(name="fade", tag="div")
+    //- WidgetForm.h-100(
+    //-   ref="form"
+    //-   key="widgetForm"
+    //-   v-on="$listeners"
+    //-   v-bind="$attrs"
+    //-   :config="formConfig"
+    //-   @add="handleWidgetAdd"
+    //-   @remove="removeWidget"
+    //-   @update="updateCanvas")
     //- 当前先做一个
     WidgetForm.h-100(
       ref="form"
-      key="widgetForm"
+      :key="canvasName"
       v-on="$listeners"
       v-bind="$attrs"
       :fields="fieldList"
-      :added="newField"
-      :formConfig="formConfig"
+      :formConfig="canvas"
       @add="handleWidgetAdd"
-      @remove="removeWidget"
-      @update="updateCanvas")
+      @remove="removeWidget")
     //- 可能多个表单
     //- el-form.form-designer_default()
 
@@ -28,18 +36,22 @@ draggable.list-group.drag-page-container(
 /** 拖拽的面板页面，多个画布，通过复制这个组件生成 */
 import draggable from 'vuedraggable'
 import WidgetForm from '@/components/WidgetForm'
-import { formItemTags } from '@/utils/componentAttrs.js'
-// import { mapGetters } from 'vuex'
+// import WidgetForm from '@/components/WidgetForm/V2'
+// import { formItemTags } from '@/model/componentAttrs.js'
+import { formatField } from '@/utils/format.js'
+import { cloneDeep } from 'lodash'
 export default {
   name: 'DragPage',
   components: {
     draggable,
     WidgetForm
   },
+  model: {
+    prop: 'list',
+    event: 'change'
+  },
   // TODO 根据配置属性同步field.form配置
   props: {
-    // formConfig:,
-    // formItemConfig,
     canvasName: {
       type: String,
       default: ''
@@ -51,101 +63,64 @@ export default {
     canvas: {
       type: Object,
       default: () => ({})
+    },
+    list: {
+      type: Array,
+      default: () => ([])
     }
   },
   data () {
     return {
       keyName: '',
-      // formSetting: {},
-      fieldList: [],
-      formItemTags,
-      newField: {}
+      computedList: [],
+      formatField
     }
   },
   computed: {
-    formConfig () {
-      return this.canvas?.form || {}
+    fieldList: {
+      get () {
+        return this.computedList
+      },
+      set (list) {
+        // console.log('dragPage 变了:', list)
+        this.computedList = list
+        this.$emit('change', list)
+      }
     }
   },
   watch: {
-    'canvas.fields': {
-      // deep: true,
+    list: {
+    //     // deep: true,
       immediate: true,
       handler (fields) {
-        // this.fieldList = Array.from(new Set(fields)) || []
-        this.fieldList = fields || []
+        this.computedList = fields
       }
     }
   },
   methods: {
     clear () {
       this.fieldList = []
-      this.newField = {}
     },
     // TODO 改造对接配置的数据源
     checkFieldOption (tag) {},
-    // 判断类型是否为枚举，默认添加options属性
-    checkEnumerated (tag) {
-      if (tag === 'switch') {
-        return [{ label: '是', value: true }, { label: '否', value: false }]
-      }
-      return ['select', 'checkbox', 'radio', 'cascader', 'tree'].includes(tag) ? this.$defValue?.defaultOptions : null
-    },
-    formatField ({ tag }) {
-      if (!tag) return {}
-      const htmlTag = this.formItemTags[tag]
-      return {
-        name: `${tag}_${new Date().getTime()}`,
-        key: `${tag}_${new Date().getTime()}`,
-        compTag: tag,
-        label: '自定义字段',
-        tag: htmlTag,
-        options: this.checkEnumerated(htmlTag),
-        ...(this.$defValue?.[htmlTag] || {})
-        // form: {
-        // }
-      }
-    },
     handleWidgetAdd (evt) {
-      // console.info('add:', evt)
       // 针对Vuedragger的bug(拖拽后的对象非选中的对象)优化
       const tag = evt.clone?.dataset?.name
-      // console.info('add-', tag)
       const newIndex = evt.newIndex
-      const element = this.formatField({ tag: evt.clone?.dataset?.name })
-      this.newField = tag ? {
-        element,
-        newIndex
-      } : {}
+      const fields = cloneDeep(this.fieldList) // 触发外部list更新
       if (tag) {
-        // this.fieldList.splice(newIndex, 0, element)
-        // console.info('add fields')
-        this.$store.commit('canvas/add', {
-          name: this.canvasName,
-          eIndex: newIndex,
-          element
-          // elements: this.fieldList
-        })
-        // console.info('vuex:', this.$store.state.canvas)
-
-        this.$emit('onSelect', { type: 'component', data: element })
+        const element = this.formatField({ tag: evt.clone?.dataset?.name, attrConf: { labelHidden: this.canvas?.attrs?.labelHidden } })
+        fields.splice(newIndex, 0, element)
+        // console.log('拖拽新增：', newIndex, this.fieldList)
+        this.fieldList = [...fields] // 触发外部list更新
+        this.$emit('onSelectItem', { type: 'component', data: element })
         this.$forceUpdate()
       }
     },
     removeWidget (ele, index) {
-      // this.$delete(this.fieldList, index)
-      this.$store.commit('canvas/deleteWidget', {
-        name: this.canvasName,
-        eIndex: index
-      })
-    },
-    updateCanvas (list) {
-      // console.log('update--', list)
-      // this.fieldList = list
-      this.$store.commit('canvas/update', {
-        name: this.canvasName,
-        elements: list
-      })
+      if (index !== -1) {
+        this.$delete(this.fieldList, index)
+      }
     }
   }
 }

@@ -18,7 +18,7 @@ import { gbApiRequires } from '@/utils/import' // 假设这个属于公共导入
 import { ApiData } from '@/model/resource'
 import { groupBy } from 'lodash'
 
-const formatResource = gbApiRequires.map(r => ApiData(r))
+const formatResource = gbApiRequires.map(r => ApiData({ ...r, __isGlobal: true }))
 
 const state = {
   /* 全部全局接口的一维数组，包含业务或默认全局 */
@@ -37,7 +37,7 @@ const mutations = {
   },
   addOne (states, source) {
     // states.list.push(source)
-    states.list.splice(0, 0, source)
+    states.list.splice(0, 0, { ...source, __isGlobal: true })
   },
   removeOne (states, dIndex) {
     states.list.splice(dIndex, 1)
@@ -67,7 +67,8 @@ const mutations = {
 
 const actions = {
   updateList ({ commit, state }, sources = []) {
-    state.list = sources
+    console.info('sources:', sources)
+    state.list = sources.map(s => { return { ...s, __isGlobal: true } })
     commit('saveStorage', sources)
   }
 }

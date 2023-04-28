@@ -6,7 +6,8 @@ el-dialog.async-required-dialog(
   width="70%"
   center
   :append-to-body="true"
-  :close-on-click-modal="false")
+  :close-on-click-modal="false"
+  @close="$emit('refuse')")
   .async-required-container
     .top-wrap.d-flex-row-between.m-b-8
       .left-wrap__top {{apiData.name ? '已选中:' : '请选择一个数据源'}}
@@ -18,7 +19,7 @@ el-dialog.async-required-dialog(
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
     .bottom-wrap.d-flex-row-between
       //- 左
-      .left-wrap.m-r-8.d-flex-column
+      .left-wrap.m-r-8.d-flex-column.d-flex-1
         .left-wrap-tool
           .d-flex-row-between.d-flex-v-center
             .d-flex-1.text 可选数据源
@@ -41,11 +42,13 @@ el-dialog.async-required-dialog(
         .left-wrap-list.d-flex-1
           ApiGroup.left-api-group(
             v-for="(list, title) in apiGroup"
+            v-bind="$attrs"
             :key="title"
-            :apiData="apiData"
+            :selectedApi="apiData"
             :title="decodeURI(title)"
             :list="list"
             :full="apiGroup"
+            :multiSelectAble="isMulti"
             @upgrade="upgradeGroup"
             @remove="removeGroup"
             @addApi="addApi"
@@ -60,8 +63,9 @@ el-dialog.async-required-dialog(
         //-   :collapseDefault="false"
         //-   title="已选数据源")
       //- 右
-      .right-wrap.d-flex-column
+      .right-wrap.d-flex-column.d-flex-2
         .right-custom-data.d-flex-1.p-r-8
+          //- 接口配置
           el-form(ref="apiForm", :model="apiData", label-position="top", :rules="rules")
             el-form-item(label="所属分组", prop="group")
               el-input(v-model="apiData.group", placeholder="请输入分组标题名称")
@@ -84,34 +88,49 @@ el-dialog.async-required-dialog(
               el-radio-group(v-model="apiData.method" size="mini")
                 el-radio-button(v-for="method in apiMethods", :key="method", :label="method")
 
-            el-form-item(prop="header")
+            el-form-item.form-item-label_w100(prop="header")
               .d-flex-row-between.align-items-center(slot="label")
                 .label-left 请求头部
                 .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
-                  :class="!hasHeader ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
+                  :class="!hasHeader ? 'el-icon-plus' : 'el-icon-delete'"
+                  :title="!hasHeader ? '添加' : '清空' "
                   @click="toggleCustomList('header')")
               ParamsList(v-show="hasHeader", keyName="header", v-model="apiData.header", :editAble="true", @onClearAll="toggleCustomList('header')")
 
-            el-form-item(prop="pathData")
+            el-form-item.form-item-label_w100(prop="pathData")
+              //- path的请求参数根据url自动转换, 不支持手动添加除非有占位
               .d-flex-row-between.align-items-center(slot="label")
-                .label-left 请求参数（Path）
-                .label-right.cursor-pointer.font-size-medium.hover-change-scale.p-l-8(:class="!hasPathData ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'" @click="toggleCustomList('pathData')")
-              ParamsList(v-show="hasPathData", keyName="pathData", v-model="apiData.pathData", :editAble="true", @onClearAll="toggleCustomList('pathData')")
+                .label-left
+                  span 请求参数（Path）
+                  //- el-tooltip(content="根据地址栏/${xxx}自动生成; 请先在请求地址上补充对应的${xxx}占位", placeholder="top")
+                  //-   i.el-icon-info.m-l-8
+                i.label-right.secondary-text 根据地址栏/${xxx}自动生成
+              ParamsList(
+                v-show="hasPathData"
+                keyName="pathData"
+                v-model="apiData.pathData"
+                :operateAble="false"
+                :disableEditFunc="disableEditFunc"
+                @onClearAll="toggleCustomList('pathData')")
 
-            el-form-item(prop="body")
+            el-form-item.form-item-label_w100(prop="body")
               .d-flex-row-between.align-items-center(slot="label")
-                .label-left 请求参数（Query）
-                .label-right
-                  .cursor-pointer.font-size-medium.hover-change-scale.p-l-8(
-                    :class="!hasBody ? 'el-icon-circle-plus-outline' : 'el-icon-remove-outline'"
+                .label-left
+                  span 请求参数（Query）
+                  el-tooltip(placement="top")
+                    template(slot="content")
+                      div 除字典以外的数据，
+                      div “是否将表单数据提交”, 当勾选该选项时，则提交默认数据集和修改的数据，
+                      div 【提交】按钮默认开启 “是否将表单数据提交”, 如不需要则可手动取消勾选
+                    i.icon.el-icon-info.m-l-8
+                .label-right.d-flex-v-center
+                  .cursor-pointer.font-size-medium.hover-change-scale(
+                    :class="!hasBody ? 'el-icon-plus' : 'el-icon-delete'"
+                    :title="!hasBody ? '添加' : '清空' "
                     @click="toggleCustomList('body')")
-                  el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否默认表单全量数据提交
-                    el-tooltip(placement="top")
-                      template(slot="content")
-                        div 除字典以外的数据，
-                        div 表单存在默认请求多个数据源时，则以列表形式传递
-                        div 该选项会影响所有该接口，请求参数的数据范围
-                      i.icon.el-icon-info.m-l-8
+              .row-item
+                //- el-checkbox.m-l-16(v-model="apiData.isSubmit") 是否提交表单
+                el-checkbox.m-l-16(v-model="apiData.isFullDose") 是否将表单数据全量提交（多数据源时，仅提交默认数据集）
               ParamsList(v-show="hasBody", keyName="body", v-model="apiData.body", :editAble="true", @onClearAll="toggleCustomList('body')")
 
             //- el-form-item(label="是否表单初始化发送请求", prop="immediate")
@@ -140,8 +159,11 @@ el-dialog.async-required-dialog(
           el-button-group
             el-button(@click="testLink") 测试链接
             el-button(:disabled="!apiData.name", title="保存至全局，允许下次继续使用", @click="globalSave(apiData)") 保存至全局
-          el-button-group
-            el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
+          .button-group
+            el-checkbox.p-r-8.split-after(v-model="isContinues") 保存后，继续添加下一个
+            el-button-group
+              el-button(@click="$emit('refuse')") 取消
+              el-button(type="primary", title="保存至当前，不影响全局", @click="chooseChange") 确定选中
 </template>
 
 <script>
@@ -161,6 +183,16 @@ export default {
     chosenData: {
       type: Object,
       default: () => ({})
+    },
+    // 是否多选
+    isMulti: {
+      type: Boolean,
+      default: false
+    },
+    // 是否提交按钮
+    isSubmit: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -183,9 +215,10 @@ export default {
   data () {
     return {
       key: new Date().getTime(),
+      originGlobalApi: null, // 记录选中的全局接口对象,用于判断是否有修改变动
       apiData: new ApiData(),
       apiMethods: ['GET', 'POST', 'PATCH', 'SET', 'DELETE'],
-      apiStorageList: this.$store.getters.getResources,
+      apiStorageList: this.$store.getters.getResources, // 缓存全局的数据源列表
       dataHandles: ApiDataHandles,
       dataHandleEditors: {},
       rules: {
@@ -213,7 +246,8 @@ export default {
       /* 筛选内容 */
       isFilterIng: false, // 筛选中
       filterList: [], // 筛选的列表
-      apiSearchVal: '' // 筛选的数据
+      apiSearchVal: '', // 筛选的数据
+      isContinues: false // 是否持续性添加
     }
   },
   watch: {
@@ -228,7 +262,6 @@ export default {
       }
     },
     apiList (list) {
-      /* 受vue2影响，无监听到数组对象内部属性更新，重新再触发一次 */
       this.$store.dispatch('resources/updateList', list)
     },
     'apiData.url': debounce(function (path) {
@@ -238,11 +271,12 @@ export default {
   computed: {
     apiList: {
       get () {
-        return this.$store.getters.getResources
+        // apiStorageList
+        return this.apiStorageList
       },
       set (list) {
-        console.log('set apiList global')
-        this.$store.dispatch('resources/updateList', list)
+        // 当使用array.splice/array.unshift等会影响到array自身的，都不会触发这里
+        this.apiStorageList = list
       }
     },
     apiNames () {
@@ -255,7 +289,9 @@ export default {
       return this.apiData?.body != null
     },
     hasPathData () {
-      return this.apiData?.pathData != null
+      const params = this.apiData?.url?.split('?')?.[0].match(/(\$\{)(\w+)(\})/g)
+      return params && params.length > 0
+      // return this.apiData?.pathData != null
     },
     dialogVisabled: {
       get () {
@@ -273,9 +309,15 @@ export default {
     // // 表单内已选数据源
     // formApiList () {
     //   const
+    },
+    isEdit () {
+      return this.chosenData?.__isEdit
     }
   },
   methods: {
+    disableEditFunc (scope) {
+      return scope.column.property === 'key'
+    },
     /* 筛选api */
     filterApi () {
       if (!this.apiSearchVal) return
@@ -300,7 +342,6 @@ export default {
         group: `新建分组${newLen + 1}`
       })
       this.$nextTick(() => {
-        // this.globalSave(this.apiData)
         this.apiList.unshift(this.apiData)
       })
     },
@@ -313,7 +354,10 @@ export default {
       this.apiData = new ApiData()
     },
     editApi (api, index) {
-      this.apiData = api
+      console.log('editApi:', api)
+      this.originGlobalApi = api
+      // 当为【提交】按钮配置，则设置为true
+      this.apiData = new ApiData({ ...api, isFullDose: this.isSubmit })
     },
     removeApi (api) {
       const index = this.apiList.findIndex(row => row.name === api.name)
@@ -350,13 +394,15 @@ export default {
     /* 全局保存：修改 + 新增 */
     globalSave (data = this.apiData, nIndex = null) {
       const index = this.apiList.findIndex(api => api.name === data.name)
+      const newData = { ...data, __isGlobal: true }
       if (index >= 0) {
-        this.$set(this.apiList, index, data)
+        this.$set(this.apiList, index, newData)
       } else {
-        this.apiList.unshift(data)
+        this.apiList.unshift(newData)
       }
       this.$nextTick(() => {
         this.$message.success('数据源保存成功')
+        this.originGlobalApi = newData
       })
     },
     /* 全局保存数据源分组 */
@@ -370,8 +416,25 @@ export default {
     chooseChange () {
       this.$refs.apiForm.validate(valid => {
         if (valid) {
-          this.$emit('chosen', this.apiData)
-          this.dialogVisabled = false
+          const newData = this.apiData
+          // console.info('originGlobalApi:', this.originGlobalApi)
+          // 通过判断当前是否修改了url或method, 如果是, 则认为非全局性的接口
+          const { method: oMethod, url: oUrl } = this.originGlobalApi || {}
+          const { method: nMethod, url: nUrl } = this.apiData
+          const unChanged = isEqual({ method: oMethod, url: oUrl }, { method: nMethod, url: nUrl })
+          // console.info('unChanged:', unChanged)
+          newData.name = unChanged ? this.apiData.name : new Date().getTime()
+          // console.log('是否改名:', unChanged ? '是' : '否', newData.name)
+          newData.__isGlobal = unChanged
+          newData.__isEdit = this.isEdit
+          newData.isSubmit = this.isSubmit
+          this.$emit('chosen', newData, this.isContinues)
+          if (!this.isContinues) {
+            this.dialogVisabled = false
+          } else {
+            // 继续添加下一个, 初始化接口数据
+            this.apiData = new ApiData()
+          }
         } else {
           this.$message.warning('请选择一个数据源')
         }
@@ -400,20 +463,22 @@ export default {
       }
     },
     getParamByUrl (path, originParams, regex = /(\$\{)(\w+)(\})/g) {
-      let pathParams = Array.from(originParams || [])
-      // const regex = /(\$\{)(\w+)(\})/g
+      const pathParams = Array.from(originParams || [])
       const params = path.match(regex)
       if (params && params.length) {
         const keys = params.map(k => k.match(/\w+/)?.[0])
         const objs = keyBy(pathParams, 'key')
         let i = keys.length - 1
         // 自动生成path参数列表
-        while (!objs[keys[i]] && i >= 0) {
-          const val = new ApiBodyParams({ key: keys[i], __key: new Date().getTime() + i })
-          pathParams = [...pathParams, val]
+        let newParam = []
+        while (i >= 0) {
+          // 是否已配置了该参数
+          const isExist = objs[keys[i]]
+          const paramItem = !isExist ? new ApiBodyParams({ key: keys[i], __key: new Date().getTime() + i }) : isExist
+          newParam = [...newParam, paramItem]
           --i
         }
-        return pathParams
+        return newParam
       }
     },
     // 对请求地址格式化，与请求参数(path\query)的联动关系
@@ -421,7 +486,9 @@ export default {
       if (url) {
         const [part1, part2] = url.split('?')
         if (part1) {
-          this.apiData.pathData = this.getParamByUrl(part1, pathData)
+          // this.apiData.pathData = this.getParamByUrl(part1, pathData)
+          const res = this.getParamByUrl(part1, pathData) // 去掉pathData则表示每次都新增参数
+          this.$set(this.apiData, 'pathData', res)
         }
         if (part2) {
           this.apiData.body = this.getParamByUrl(part2, body, /(\w+)=/g)
@@ -509,5 +576,9 @@ export default {
   position: absolute
   left: 10px
   top: 0
+
+.form-item-label_w100
+  ::v-deep .el-form-item__label
+    width: 100%
 
 </style>

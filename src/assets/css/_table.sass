@@ -1,0 +1,135 @@
+// 自定义表格样式-mini：用于简单、较小纯数据展示的自定义Table标签
+.custom-table__mini
+  margin: 10px 0
+  width: 100%
+  color: $--table-font-color
+  border-spacing: 0
+  .table-header
+    background: $--table-header-background-color
+    color: $--table-header-font-color
+    font-size: 14px
+  th,td
+    line-height: 24px
+    padding: 0 16px
+    border: 1px solid $--table-border-color
+    min-width: 100px
+    text-align: center
+  th
+    // min-width: 4rem
+    font-size: $--th-font-size
+    font-weight: $--th-font-weight
+    // border: 1px solid $--table-border-color
+    // padding: 8px
+    background: $--table-header-background-color
+    color: $--table-header-font-color
+  // .table-body
+  td
+    // border: 1px solid $--table-border-color
+    text-align: center
+    // padding: 6px
+    font-size: $--td-font-size
+
+// 根据设计稿，表格的筛选字段，样式调整(清空表格所有样式，待组件库更新移出)
+.datatable-main
+  .datatablepage-header > .datatablepage-filter-wrapper
+    padding: 0 !important
+    // padding-right: 0 !important
+    // padding-bottom: 0 !important
+    margin-bottom: 0 !important
+  .datatablepage-prep
+    padding-top: 8px
+  .datatable-table-wrapper
+    padding: 0 !important
+    // padding-top: 8px !important // 与icon内边距 = 16px
+    // .datatablepage-prep
+    //   padding-bottom: 0!important
+
+.datatable-page.datatable-main
+  padding: $--table-space-size-default
+  background: #fff
+
+// 部分页面存在表格上面的标题，用下面这个
+.datatable-page-withTitle.datatable-main
+  @extend .datatable-page, .datatable-main
+  padding: 16px $--table-space-size-default $--table-space-size-default
+
+// 单选的表格要求用单选框
+.radio-select-table
+  .el-table__header-wrapper,
+  .el-table__body-wrapper,
+  .el-table__fixed-header-wrapper,
+  .el-table__fixed-body-wrapper
+    .el-checkbox__inner
+      border-radius: 100%
+    /* el-checkbox__inner */
+
+.anso-native-table
+  color: $--table-font-color
+  line-height: 32px
+  border-collapse: collapse
+  border-spacing: 0
+  border-top: 1px solid $--table-border-color
+  border-left: 1px solid $--table-border-color
+  thead
+    color: $--table-header-font-color
+    background-color: $--table-header-background-color
+  th
+    font-size: $--th-font-size
+    font-weight: $--th-font-weight
+    text-align: center
+    border-right: 1px solid $--table-border-color
+    border-bottom: 1px solid $--table-border-color
+  td
+    font-size: $--td-font-size
+    font-weight: $--td-font-weight
+    text-align: center
+    border-right: 1px solid $--table-border-color
+    border-bottom: 1px solid $--table-border-color
+
+/* 不限高度的table */
+.anso-table-unlimit__height
+  min-height: 100px
+  height: 100%
+  .el-table__body-wrapper
+    height: auto!important
+
+/* 单元格要换行的table */
+.anso-table-unlimit__wrap
+  .el-table td .cell
+    word-wrap: break-word
+    word-break: break-all
+    white-space: normal!important
+    line-height: $--font-line-height-primary
+    padding: $--padding-primary
+// 表格搜索项解决长度过长问题
+.datatablepage-filter-info
+  .el-tag
+    max-width: 300px
+    white-space: nowrap
+    text-overflow: ellipsis
+    overflow: hidden
+    vertical-align: middle
+    position: relative
+    padding-right: 20px
+  .el-tag--plain.el-tag--info .el-tag__close
+    position: absolute
+    right: 4px
+    top: 4px
+
+// 报表
+.report_table
+  width: 100%
+  .text-center
+    text-align: center
+  .text-right
+    text-align: right
+  tr.header_title
+    td
+      text-align: center
+  tr
+    display: flex
+    width: 100%
+    flex-direction: row
+  td
+    flex: 1
+    text-align: left

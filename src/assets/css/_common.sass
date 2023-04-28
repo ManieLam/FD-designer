@@ -13,6 +13,12 @@
   flex-direction: row
 .d-flex-1
   flex: 1
+.d-flex-2
+  flex: 2
+.d-flex-3
+  flex: 3
+.d-flex-4
+  flex: 4
 .align-items-center
   align-items: center
 
@@ -339,7 +345,16 @@
   height: inherit
   color: $--border-color-base
   display: inline-block
+.split-before::before
+  content: '|'
+  margin: 0 8px
+  width: 1px
+  height: inherit
+  color: $--border-color-base
+  display: inline-block
 
+
+/* 一些按钮配置 */
 // 聚焦的按钮
 .btn-focus.el-button--primary:focus
   border: 1px dashed
@@ -349,7 +364,7 @@
 // 圆形的小按钮
 .btn-radius-50
   display: inline-block
-  padding: 2px
+  padding: 4px
   border-radius: 50%
   border: 1px solid $--border-color-base
   cursor: pointer
@@ -358,6 +373,30 @@
   + .btn-radius-50
     margin-left: 5px
 
+// 带icon的小按钮
+.btn-icon__small
+  @extend .hover-change-underline
+  padding: 4px 0
+  & + .btn-icon__small
+    margin-left: 8px
+  &[disabled]
+    color: $--color-text-regular
+    cursor: not-allowed
+    // pointer-events: none
+
+// 单独使用i的按钮
+i.btn-icon
+  @extend .hover-change-scale
+  @extend .hover-change-color__primary
+  @extend .cursor-pointer
+  &[disabled]
+    // cursor: not-allowed
+    background-color: $--button-disabled-background-color
+    color: $--button-disabled-font-color !important
+    pointer-events: none
+  
+
+/* 一些内容盒子 */
 .box-content__inside
   position: relative
   height: fit-content
@@ -384,6 +423,15 @@
     top: 50%
     transform: translateY(-10px)
 
+.box-content__title
+  border: 1px solid #dfdfdf
+  padding: 0 8px 8px
+  .title
+    padding: 8px
+    @extend .box-content__tip
+    @extend .primary-text
+
+
 // 一些hover动效
 .hover-change-scale:hover
   transform: scale(1.2)
@@ -402,6 +450,23 @@
   @extend .border-hover
 .hover-change-shadow:hover, .hover-change-shadow:active
   box-shadow: -1px 3px 2px rgb(220 223 230 / 30%), 0px 2px 4px 0px rgb(0 0 0 / 20%)
+.hover-change-underline
+  // outline: 1px solid transparent
+  // padding: 4px
+  position: relative
+  &:hover, &:active
+    &::after
+      content: ''
+      bottom: 0
+      left: 0
+      position: absolute
+      display: inline-block
+      width: 100%
+      line-height: 1.2
+      margin-top: 2px
+      outline: 2px double $--color-primary
+      // border-radius: 50%
+
 
 // 列表展示 - 左右布局
 .list-column__default
@@ -427,6 +492,5 @@
   color: $--color-primary
   margin: 0
   font-size: 16px
-
 
 /** ===== 公用一些自定义样式 END ===== **/

@@ -3,18 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --open",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "anso-ui": "file:.yalc/anso-ui",
+    "@vue/babel-helper-vue-jsx-merge-props": "^1.4.0",
+    "anso-ui": "^1.1.0",
     "axios": "^0.27.2",
     "core-js": "^3.6.5",
+    "dayjs": "^1.11.7",
     "element-ui": "^2.15.9",
+    "jss": "^10.10.0",
+    "jss-preset-default": "^10.10.0",
     "vue": "^2.6.11",
-    "vue-router": "^3.2.0",
+    "vue-router": "^3.5.0",
     "vuedraggable": "^2.24.3",
     "vuex": "^3.4.0"
   },
