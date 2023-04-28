@@ -457,6 +457,15 @@ export const fileComp = {
       label: '备注说明',
       key: 'tip',
       tag: 'el-input'
+    },
+    {
+      label: '限制可上传类型',
+      key: 'accept',
+      tag: 'el-input',
+      type: 'textarea',
+      placeholder: '多个类型以英文格式","间隔',
+      tip: '如: image/*, image/png'
+      // validate: () => {}
     }
 
   ],
