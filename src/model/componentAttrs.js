@@ -158,22 +158,11 @@ export const input = {
     FormtagAttrs.placeholder,
     FormtagAttrs.disabled,
     FormtagAttrs.validate,
-    FormtagAttrs.defaultValue,
     {
       label: '输入框类型',
       key: 'inputType',
-      tag: 'ansoDataformRadio',
+      tag: 'ansoDataformSelect',
       options: [{ label: '输入框', value: 'text' }, { label: '文本域', value: 'textarea' }]
-    },
-    {
-      label: '文本域行数',
-      key: 'autosize',
-      tag: 'form-object-attr',
-      labelHidden: true,
-      attrs: [
-        { label: '文本域最小行数', tag: 'el-input-number', key: 'minRows' },
-        { label: '文本域最大行数', tag: 'el-input-number', key: 'maxRows' }
-      ]
     },
     {
       label: '最大长度限制',
@@ -206,7 +195,8 @@ export const input = {
       key: 'append',
       affixesType: 'append',
       preventInSlot: true
-    }
+    },
+    FormtagAttrs.defaultValue
   ],
   actions: [
     { type: 'blur', desc: '失去焦点时触发' },
@@ -214,72 +204,6 @@ export const input = {
     { type: 'change', desc: '输入框失去焦点或用户按下回车时触发' },
     { type: 'input', desc: '值改变时触发' },
     { type: 'clear', desc: '清空按钮时触发' }
-  ]
-}
-
-export const radioComp = {
-  attrs: [
-    FormtagAttrs.name,
-    FormtagAttrs.label,
-    FormtagAttrs.labelHidden,
-    FormtagAttrs.placeholder,
-    FormtagAttrs.disabled,
-    FormtagAttrs.validate,
-    {
-      label: '选项',
-      group: [
-        {
-          label: '配置',
-          key: 'options',
-          tag: 'form-option',
-          tip: '选项配置的方式只允许一种'
-        },
-        {
-          label: '是否分组（TODO）',
-          key: 'isGroup',
-          tag: 'el-checkbox',
-          labelHidden: true,
-          options: [{ label: '分组', value: true }, { label: '不分', value: false }],
-          chains: () => { }
-        }
-      ]
-    },
-    {
-      label: '按钮组方式呈现',
-      key: 'isButton',
-      tag: 'el-checkbox',
-      labelHidden: true,
-      options: switchDefaultOptions
-    },
-    {
-      label: '垂直显示',
-      key: 'isVertical',
-      tag: 'el-checkbox',
-      labelHidden: true,
-      options: switchDefaultOptions
-    },
-    {
-      label: '显示边框',
-      key: 'isBorder',
-      tag: 'el-checkbox',
-      labelHidden: true,
-      options: switchDefaultOptions
-    },
-    {
-      label: '尺寸',
-      key: 'size',
-      tag: 'ansoDataformSelect',
-      isGroup: true,
-      // 根据anso-ui可选项写死
-      options: [
-        { label: '中', value: 'medium' },
-        { label: '小', value: 'small' },
-        { label: '迷你', value: 'mini' }
-      ]
-    }
-  ],
-  actions: [
-    { type: 'change', desc: '输入框失去焦点或用户按下回车时触发' }
   ]
 }
 
@@ -533,6 +457,15 @@ export const fileComp = {
       label: '备注说明',
       key: 'tip',
       tag: 'el-input'
+    },
+    {
+      label: '限制可上传类型',
+      key: 'accept',
+      tag: 'el-input',
+      type: 'textarea',
+      placeholder: '多个类型以英文格式","间隔',
+      tip: '如: image/*, image/png'
+      // validate: () => {}
     }
 
   ],
@@ -623,7 +556,6 @@ export default {
   select,
   text,
   input,
-  radio: radioComp,
   cascader,
   switch: switchComp,
   date: dateComp,
