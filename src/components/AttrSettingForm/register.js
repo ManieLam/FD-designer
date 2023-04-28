@@ -6,5 +6,10 @@ export default {
   'form-list': () => import('./FormList.vue'),
   'form-defaultValue': () => import('./FormDefaultValue.vue'),
   'form-remote': () => import('./FormRemote.vue'),
-  'form-affixes': () => import('./FormAffixes.vue')
+  'form-remote-list': () => import('./FormRemoteList.vue'),
+  'form-affixes': () => import('./FormAffixes.vue'),
+  'form-attr-passthrough': () => import('./FormAttrPassthrough.vue'),
+  'form-date-disabledDate': () => import('./FormDateDisabledDate.vue'),
+  'form-date-shortcut': () => import('./FormDateShortcut.vue'),
+  'form-layout': () => import('./FormLayout.vue')
 }

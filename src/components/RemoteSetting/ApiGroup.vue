@@ -30,15 +30,17 @@
       i.hover-change-scale(:class="collapse ? 'el-icon-arrow-down' : 'el-icon-arrow-right'", @click.prevent="collapse=!collapse")
 
   .list-content.m-t-8.m-b-8(v-show="collapse")
+    //- 存在全局的数据接口列表
     .list-row.d-flex-row-between.align-items-center.hover-change-bgColor(
       v-for="(apiItem) in resourceList"
       :key="apiItem.name"
       :data-name="apiItem.name"
-      :is-active="apiData && apiItem.name === apiData.name"
+      :is-active="selectedApi && apiItem.name === selectedApi.name"
       @click.stop="$emit('editApi', apiItem)")
       .left
         .d-flex-v-center
-          i.el-icon-check.color-primary.m-r-8(v-show="apiData && apiItem.name === apiData.name")
+          //- 选中的标识 (selectedApi && apiItem.name === selectedApi.name) ||
+          i.el-icon-check.color-primary.m-r-8(v-show="multiSelectAble ? isSelected.includes(apiItem.name) : selectedApi && apiItem.name === selectedApi.name")
           .color-warning {{apiItem.method}}
           .secondary-text.m-l-8.d-flex-1 {{apiItem.url}}
         .color-text-secondary.font-size-small.m-l-8 {{ apiItem.demo || ''}}
@@ -58,8 +60,12 @@ export default {
     //   type: Object,
     //   default: () => ({})
     // },
+    isSelected: {
+      type: Array,
+      default: () => ([])
+    },
     /* 当前选中的数据源 */
-    apiData: {
+    selectedApi: {
       type: Object,
       default: () => ({})
     },
@@ -82,6 +88,11 @@ export default {
     collapseDefault: {
       type: Boolean,
       default: true
+    },
+    // 允许多选
+    multiSelectAble: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

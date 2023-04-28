@@ -1,30 +1,30 @@
 <template lang='pug'>
-.form-remote
-  el-button(v-show="!remoteData || !remoteData.url", @click="setAsyncVisible = !setAsyncVisible") {{ remoteData.url ? '重新选择数据源' : '配置数据源' }}
-  .list-column__default.m-t-4(v-show="remoteData.url", :key="remoteData.name", @click="setAsyncVisible = !setAsyncVisible")
-    .left-wrap.d-flex-1(style="overflow: hidden;")
-      .d-flex-v-center
-        i.el-icon-paperclip.color-primary.m-r-8(title="数据源")
-        .color-warning {{remoteData.method}}
-        .secondary-text.m-l-8(style="text-overflow: ellipsis;overflow: hidden;") {{remoteData.url}}
-      .color-text-secondary.font-size-small.m-l-8 {{ remoteData.demo || ''}}
-    .right-wrap
-      i.el-icon-edit(title="重新选择数据源")
-      i.el-icon-delete.m-l-8(title="移除当前", @click.prevent="remove")
+.form-remote(style="overflow-x: auto;")
+  el-button(v-show="!remoteData || !remoteData.url", @click="setAsyncVisible = !setAsyncVisible") {{ remoteData.url ? '重新选择数据接口' : '配置数据接口' }}
+  RemoteInfo.form-remote-item(
+    :value="remoteData"
+    @edit="handleEdit"
+    @remove="handleRemove")
   RemoteSettingRequire(
+    v-if="setAsyncVisible"
     v-model="setAsyncVisible"
+    v-bind="$attrs"
     :title="title"
     :chosenData="remoteData"
-    @chosen="getAsyncSeting")
+    @chosen="chosenResource"
+    @refuse="handleRefuse")
 </template>
 
 <script>
 /** 远程请求配置 */
 import RemoteSettingRequire from '../RemoteSetting/Require'
+import RemoteInfo from '../RemoteSetting/RemoteInfo'
+// import { isEqual } from 'lodash'
 export default {
   name: 'FormRemote',
   components: {
-    RemoteSettingRequire
+    RemoteSettingRequire,
+    RemoteInfo
   },
   props: {
     value: {
@@ -34,15 +34,12 @@ export default {
     title: {
       type: String,
       default: '数据源配置'
-    },
-    isMulti: {
-      type: Boolean,
-      default: false
     }
   },
   data () {
     return {
-      setAsyncVisible: false
+      setAsyncVisible: false,
+      reCheckRemove: false
     }
   },
   computed: {
@@ -56,11 +53,23 @@ export default {
     }
   },
   methods: {
-    getAsyncSeting (data) {
-      this.remoteData = data
+    chosenResource (api) {
+      if (!api) return
+      this.remoteData = api
     },
-    remove () {
+    // 手动编辑
+    handleEdit () {
+      this.remoteData = { ...this.remoteData, _isEdit: true }
+      this.setAsyncVisible = true
+    },
+    handleRemove () {
       this.remoteData = {}
+      this.$nextTick(() => {
+        this.$emit('remove')
+      })
+    },
+    handleRefuse () {
+      this.setAsyncVisible = false
     }
   }
 }

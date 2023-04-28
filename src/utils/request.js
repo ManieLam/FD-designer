@@ -1,10 +1,12 @@
 /* eslint-disable no-eval */
 import axios from 'axios'
 import { Message } from 'element-ui'
+import { cloneDeep } from 'lodash'
 
+export const httpBaseURL = ''
 export const httpHeader = (props, timeStamp) => {
   return {
-    ...props.headers,
+    ...props.header
     // 'Anso-Sign': signFormat({
     //   ...sign,
     //   ...props.params,
@@ -12,7 +14,7 @@ export const httpHeader = (props, timeStamp) => {
     //   'Anso-TimeStamp': timeStamp
     // }),
     // 'Anso-TimeStamp': timeStamp,
-    'x-csrf-token': 'test'
+    // 'x-csrf-token': 'test'
   }
 }
 
@@ -37,16 +39,16 @@ export function formatParams ({ body = {}, beforeRequired } = {}) {
   return body
 }
 
-export const httpOptions = (props) => {
+export const httpOptions = (props, transAble = true) => {
   const timeStamp = new Date().getTime()
-  const params = formatParams(props)
+  const params = transAble ? formatParams(props) : {}
   const data = props.method === 'GET' ? {
-    params: {
+    params: transAble ? {
       ...params,
       timeStamp: timeStamp
-    }
+    } : props.params
   } : {
-    data: params
+    data: transAble ? params : props.data
   }
   return {
     withCredentials: false,
@@ -72,8 +74,19 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   response => {
-    // console.log('.....', response)
-    return response.data
+    if (response.status === 200) {
+      // switch (response.data.code) {
+      //   // case 0: return Promise.resolve(response.data)
+      //   case -1: return Promise.resolve(false)
+      //   case 0:
+      //   default:
+      //     return Promise.resolve(response.data.data)
+      // }
+      return Promise.resolve(response.data)
+    } else {
+      return Promise.reject(response)
+    }
+    // return response.data
   },
   error => {
     // console.log('error', error)
@@ -83,29 +96,57 @@ axios.interceptors.response.use(
 )
 
 export function fetch (props) {
-  return axios(httpOptions(props))
-    .then(
-      async (response) => {
-        const { __isChange, funcInput, funcDefault } = props.afterRequired || {}
-        let res = {}
-        await useEval(__isChange ? funcInput : funcDefault, function (func) {
-          res = func(response)
-        })
-        return res
-      },
-      (reject) => {
-        if (props.error?.__isChange) {
-          return useEval(props.error.funcInput, (func) => func(reject))
+  return new Promise((resolve, reject) => {
+    return axios(httpOptions(props))
+      .then(
+        async (response) => {
+          const { __isChange, funcInput, funcDefault } = props.afterRequired || {}
+          let res = {}
+          await useEval(__isChange ? funcInput : funcDefault, function (func) {
+            res = func(cloneDeep(response))
+          })
+          // console.info('resolve-----', res)
+          resolve(res)
+          // return res
+        },
+        (rej) => {
+          // console.info('is reject', rej)
+          if (props.error?.__isChange) {
+            return useEval(props.error.funcInput, (func) => func(rej))
+          }
+          reject(rej.response.data)
+          // return rej.response?.data
         }
+      )
+      .catch((error) => {
+        console.info('被错误捕获了')
+        if (error.response) {
+          Message.error(error.response.statusText)
+        }
+        reject(error.response)
+        // return false
+      })
+  })
+}
+
+export function normalRequire (props) {
+  return new Promise((resolve, reject) => {
+    return axios(httpOptions(props, false))
+      .then(
+        resp => {
+          resolve(resp)
+          return resp
+        },
+        rej => {
+          reject(rej)
+          return false
+        }
+      )
+      .catch(err => {
+        reject(err)
         return false
-      }
-    )
-    .catch((error) => {
-      if (error.response) {
-        Message.error(error.response.statusText)
-      }
-      return false
-    })
+      })
+  })
 }
 
 export default fetch

@@ -8,44 +8,46 @@
     row-key="__key"
     v-on="$listeners"
     @selection-change="handleSelectionChange")
-    //- el-table-column(v-if="isSelection", type="selection", width="38", :selectable="selectAble")
     el-table-column(label="参数key", prop="key", width="180")
       template(slot-scope="scope")
         .edit-input(v-if="editAble")
           slot(v-bind.column-name="scope")
             el-input(
-              :disabled="scope|disabledRow(editRowAble)"
+              :disabled="scope|disabledRow(disableEditFunc)"
               placeholder="Key"
               v-model.lazy="scope.row.key"
               @input="changeInput($event, 'key', scope.$index)")
-              //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.key }}
     el-table-column(label="取值范围 + 数值key", prop="value")
       template(slot-scope="scope")
-        .column-item.d-flex-v-center(v-if="editAble")
+        .column-item.d-flex-v-center.p-l-8.p-r-8(v-if="editAble")
           slot(v-bind.column-value="scope")
-            el-select(v-model="scope.row.varType", slot="prepend", style="min-width: 90px")
-              el-option(v-for="opt in valueTypeOptions", :key="opt.value", v-bind="opt")
-            components(
-              v-if="varTags[scope.row.varType].tag"
+            el-cascader.d-flex-1(
+              v-model="scope.row.varType"
+              slot="prepend"
+              style="min-width: 90px"
+              :show-all-levels="false"
+              :options="valueTypeOptions")
+              //- el-option(v-for="opt in valueTypeOptions", :key="opt.value", v-bind="opt")
+            //- components(
+            //-   v-if="varTags[scope.row.varType].tag"
+            //-   v-model.lazy="scope.row.value"
+            //-   :is="varTags[scope.row.varType].tag"
+            //-   :clearable="true"
+            //-   style="margin-top: 1px;"
+            //-   placeholder="请输入数值的key"
+            //-   @input="changeInput($event, 'value', scope.$index)")
+            el-input.d-flex-1(
               v-model.lazy="scope.row.value"
-              :is="varTags[scope.row.varType].tag"
+              style="margin-top:1px"
+              :disabled="scope|disabledRow(disableEditFunc)"
               :clearable="true"
-              style="margin-top: 1px;"
               placeholder="请输入数值的key"
               @input="changeInput($event, 'value', scope.$index)")
-            //- el-input(
-            //-   v-show="!scope.row.varType || scope.row.varType==='const' || scope.row.varType === 'field'"
-            //-   v-model.lazy="scope.row.value"
-            //-   style="margin-top:1px"
-            //-   :disabled="scope|disabledRow(editRowAble)"
-            //-   :clearable="true"
-            //-   placeholder="Value"
-            //-   @input="changeInput($event, 'value', scope.$index)")
             //- el-select(
             //-   v-show="scope.row.varType==='var'"
             //-   v-model="scope.row.value"
-            //-   :disabled="scope|disabledRow(editRowAble)"
+            //-   :disabled="scope|disabledRow(disableEditFunc)"
             //-   no-data-text="暂无可选"
             //-   :clearable="true"
             //-   @input="changeInput($event, 'value', scope.$index)")
@@ -53,7 +55,7 @@
           //- @input="changeInput($event, 'value', scope.$index)"
         .secondary-text(v-else) {{ scope.row.value }}
     slot(name="custom-columns")
-    el-table-column(label="操作", width="80")
+    el-table-column(v-if="operateAble", label="操作", width="80")
       template(slot-scope="scope")
         .icon.el-icon-plus.m-r-8.cursor-pointer.hover-change-scale(:key="`add_${scope.$index}`", @click="addItem(scope)")
         .icon.el-icon-minus.cursor-pointer.hover-change-scale(:key="`remove_${scope.$index}`", @click="removeItem(scope)")
@@ -77,12 +79,11 @@ export default {
       type: Boolean,
       default: true
     },
-    editRowAble: Function,
-    // isSelection: {
-    //   type: Boolean,
-    //   default: false
-    // },
-    selectAble: Function,
+    disableEditFunc: Function,
+    operateAble: {
+      type: Boolean,
+      default: true
+    }, // 是否允许操作
     keyName: {
       type: String,
       default: ''
@@ -93,7 +94,7 @@ export default {
       valueTypeOptions: [
         { label: '定值', value: 'const', tag: 'el-input' },
         { label: '表单录入数据', value: 'formData', tag: 'el-input' },
-        { label: '表单全量数据', value: 'fullData', tag: 'el-input' },
+        { label: '指定数据源', value: 'collectData', tag: 'el-input' },
         { label: '路由数据', value: 'router', tag: 'el-input' },
         { label: '本地缓存', value: 'localstorage', tag: 'el-input' }
       ]
@@ -118,9 +119,20 @@ export default {
     },
     listLen () {
       return this.list?.length
+    },
+    formDataCollect () {
+      return this.$store.getters.formDataCollect
     }
   },
   watch: {
+    formDataCollect: {
+      immediate: true,
+      // deep: true,
+      handler (collects) {
+        // console.info('获取到的数据集', collects, this.valueTypeOptions)
+        this.valueTypeOptions[2].children = collects || []
+      }
+    }
     // list: {
     //   deep: true,
     //   immediate: true,
