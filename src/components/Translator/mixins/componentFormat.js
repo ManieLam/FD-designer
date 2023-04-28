@@ -16,7 +16,7 @@ export default {
   methods: {
     /* @return 最终将配置的属性内容返回成引用组件接受的对象类型 */
     formatFormItem ({ tag, suffixSlotRender, preSlotRender }) {
-      // console.info('tag是：', tag)
+      console.info('tag是：', tag)
       // 对字段tag类型的方法处理
       const func = this[`format${upperFirst(tag)}Attrs`]
       // 对字段辅助配置的格式化
@@ -88,6 +88,16 @@ export default {
         // buttonList: newBtns
       }
     },
+    /* 转换上传组件属性/行为 */
+    formatFileAttrs ({ accept }) {
+      // 转换上传组件的支持类型为anso-ui接受的格式
+      const typeLimit = typeof accept === 'string' ? accept.split(',').map(s => s.trim()) : []
+      return {
+        typeLimit,
+        tip: typeLimit.length ? `支持扩展类型:${accept}` : null
+      }
+    },
+    /* 绑定PostMessage */
     handleEvent: function (action) {
       console.log('点击到了:', action)
       if (action?.eventName === 'notifyWindowEvent') {
