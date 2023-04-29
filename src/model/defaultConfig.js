@@ -160,7 +160,8 @@ export const dateConf = {
 export const fileConf = {
   resource: 'https://gddxit.cn/wangch_obh/api/fileserver/upload',
   showResource: 'https://gddxit.cn/wangch_obh/api/fileserver/download/id',
-  showResourceType: 'id'
+  showResourceType: 'id',
+  tip: ''
 }
 
 // 默认值预设可选项

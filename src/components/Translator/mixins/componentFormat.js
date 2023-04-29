@@ -16,7 +16,7 @@ export default {
   methods: {
     /* @return 最终将配置的属性内容返回成引用组件接受的对象类型 */
     formatFormItem ({ tag, suffixSlotRender, preSlotRender }) {
-      console.info('tag是：', tag)
+      // console.info('tag是：', tag)
       // 对字段tag类型的方法处理
       const func = this[`format${upperFirst(tag)}Attrs`]
       // 对字段辅助配置的格式化
@@ -24,7 +24,7 @@ export default {
       const preSlotRenderFunc = preSlotRender && preSlotRender.tag ? this.formatFormItem(preSlotRender) : {}
       const formatRes = Object.assign({}, suffixRenderFunc, preSlotRenderFunc)
       if (func) {
-        const resAttrs = func(...arguments)
+        const resAttrs = func.call(this, ...arguments)
         // console.log('格式化字段后结果:', resAttrs)
         // 请返回对象([属性key]: 属性value)，不返回则阻断
         return typeof resAttrs === 'object' ? { ...formatRes, ...resAttrs } : formatRes
@@ -91,7 +91,8 @@ export default {
     /* 转换上传组件属性/行为 */
     formatFileAttrs ({ accept }) {
       // 转换上传组件的支持类型为anso-ui接受的格式
-      const typeLimit = typeof accept === 'string' ? accept.split(',').map(s => s.trim()) : []
+      const typeLimit = typeof accept === 'string' && accept ? accept.split(',').map(s => s.trim()) : []
+      // console.info('typeLimit:', typeLimit)
       return {
         typeLimit,
         tip: typeLimit.length ? `支持扩展类型:${accept}` : null

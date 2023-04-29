@@ -3,6 +3,8 @@
 import Draggable from 'vuedraggable'
 import { isEqual } from 'lodash'
 import { formatField } from '@/utils/format.js'
+import componentFormat from '@/components/Translator/mixins/componentFormat.js'
+// console.info('componentAttrTrns:', componentFormat.methods)
 export default {
   name: 'WidgetFormItem',
   props: [
@@ -62,6 +64,7 @@ export default {
     }
   },
   methods: {
+    ...componentFormat.methods,
     dragAdd (evt) {
       const tag = evt.clone?.dataset?.name
       const newIndex = evt.newIndex === 1 ? evt.newIndex + 1 : evt.newIndex // 保证位置只有0，2; 1永远为主位，当nexIndex位1时，自动补充位2，视为后辅助
@@ -114,6 +117,9 @@ export default {
     const { label, name, tag, labelHidden, labelWidth, errorToptip, labelTip } = this.currentConfig || {}
     // 前后缀暂时只支持各1位
     // const domList = [preSlotRender, this.scopedSlots[name] || this.compTag, suffixSlotRender]
+    // console.log('config:', this.currentConfig)
+    // 格式化所有组件私有属性
+    const privateAttrs = this.formatFormItem(this.currentConfig) || {}
     return (
       <el-form-item
         ref={`formitem_${name}`}
@@ -181,7 +187,8 @@ export default {
                           class: 'form-item_component',
                           props: {
                             field: config,
-                            ...config
+                            ...config,
+                            ...privateAttrs
                           },
                           attrs: {
                             ...config,
