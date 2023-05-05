@@ -9,15 +9,15 @@
     @input="handleInput")
     template(slot="prepend")
       .apiurl-prepend(@click="toggleChooseServer")
-          span.prepend-server(v-if="!isFullInput", :hidden="isFullInput") {{curServerURL || ''}}
-          span.apiurl-prepend-icon.el-icon-plus(v-else)
-          el-cascader-panel.prepend-server-cascader(
-            v-if="chooseServerVisable"
-            slot="dropdown"
-            :value="serverName"
-            :options="allServer"
-            :props="chooseServerPanel"
-            @change="chooseServer")
+        span.prepend-server(v-if="!isFullInput", :hidden="isFullInput") {{curServerURL || ''}}
+        span.apiurl-prepend-icon.el-icon-plus(v-else)
+        el-cascader-panel.prepend-server-cascader(
+          v-if="chooseServerVisable"
+          slot="dropdown"
+          :value="serverName"
+          :options="allServer"
+          :props="chooseServerPanel"
+          @change="chooseServer")
   //- template(slot="append")
   //-   .apiurl-append
   //-     el-checkbox(v-model="isFollowParent") 跟随画布设置
@@ -78,12 +78,12 @@ export default {
     },
     apiurlMix: {
       get () {
-        console.log('get apiurl')
+        // console.log('get apiurl')
         return this.strToArr(this.urlStr)
       },
       set (value) {
-        console.log('set apiurl', value)
         this.urlStr = this.arrToStr(value)
+        // console.log('set apiurl', this.urlStr)
         this.$emit('input', this.urlStr)
       }
     // },
@@ -145,9 +145,10 @@ export default {
           } else {
             // 不带地址，使用默认服务
             // console.info(this.$store.getters.getServerInuse)
-            // const [ipName, serviceName] = this.$store.getters.getServerInuse
-            // arr = [`<${ipName}>`, `<${serviceName}>`, data]
-            arr = ['__parent.ip__', '__parent.default__', data]
+            const [ipName, serviceName] = this.$store.getters.getServerInuse.inuseNode
+            // console.log('store:', ipName, serviceName)
+            arr = [`<${ipName}>`, `<${serviceName}>`, data]
+            // arr = ['<__parent.ip__>', '<__parent.default__>', data]
           }
         }
       }
@@ -157,8 +158,8 @@ export default {
       this.chooseServerVisable = !this.chooseServerVisable
     },
     chooseServer (value) {
-      console.log('选择服务:', value)
-      const inuseEnv = this.$store.getters.getServerInuse
+      // console.log('选择服务:', value)
+      const inuseEnv = this.$store.getters.getServerInuse?.env
       this.apiurlMix = [
         `<${value[0]}>`,
         `<${value[1]}>`,

@@ -30,6 +30,7 @@
 //     }
 //   }, {})
 // }
+import { getDefaultService } from '@/model/service.js'
 
 /* 格式化接口参数选项 */
 function formatApiOption (list = [], type) {
@@ -49,7 +50,7 @@ const getters = {
   /* 获取当前画布配置 */
   getCurView: state => {
     const curName = state.canvas.editingName || 'canvas_0'
-    console.info('画布名:', curName)
+    // console.info('画布名:', curName)
     if (curName) {
       // console.info('获取当前画布')
       const data = state.canvas.canvas[curName]
@@ -127,14 +128,17 @@ const getters = {
       return null
     }
   },
-  /** 获取当前画布使用的环境
-   * @return Object
+  /** 获取当前画布使用的环境相关数据
    **/
   getServerInuse: (state, getters) => {
-    console.info('getter:', getters.getCurView)
     const env = getters.getCurView?.env || {}
-    const inuse = env.inuse || 'LOCAL'
-    return env.list?.find(e => e.name === inuse) || {}
+    const inuseNode = env.inuse || getDefaultService()
+    // const inuseObj.urls.find(u => u.name === 'BASE').url // 所有环境都有一个BASE的默认服务
+    return {
+      env: env.list?.find(item => item.name === inuseNode[0]) || {}, // 当前使用的环境对象
+      inuseNode // 当前使用的[环境名称、服务名称、地址]
+    }
+    // return env.list?.find(item => item.name === inuseNode[0]) || {}
   }
 }
 

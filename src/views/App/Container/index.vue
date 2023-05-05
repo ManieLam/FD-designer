@@ -45,7 +45,7 @@
             el-dropdown-item
               //- 环境
               span.secondary-text 当前画布服务环境：
-              span.color-primary.font-secondary {{actCanvas && actCanvas.env ? (actCanvas.env.inuse.title) : '无环境'}}
+              span.color-primary.font-secondary {{actCanvas && actCanvas.env ? (curCanvasEnv.env.title) : '无环境'}}
                 i.m-l-8.el-icon-edit.cursor-pointer(key="canvasENV", title="切换环境", @click="handleCheckEnv")
             el-dropdown-item(command="onPreview") 预览
             el-dropdown-item(:disabled="!actCanvas.configId", command="handleOnlinePreview") 在线预览
@@ -53,7 +53,7 @@
     //- .tool-panel.d-flex-v-center.m-t-8
     //-   //- 环境
     //-   span.secondary-text 当前api请求环境：
-    //-   span.color-primary.font-secondary {{actCanvas && actCanvas.env ? (actCanvas.env.inuse.title) : '无环境'}}
+    //-   span.color-primary.font-secondary {{actCanvas && actCanvas.env ? (curCanvasEnv.env.title) : '无环境'}}
     //-     i.m-l-8.el-icon-edit.cursor-pointer(key="canvasENV", title="切换环境", @click="handleCheckEnv")
     DragPage.drag-page-container(
       ref="dragPanel"
@@ -246,6 +246,9 @@ export default {
     // 获取actCanvas会有延迟，不生效
     // formLabelHidden () {
     //   return this.afterLoading ? this.actCanvas?.attrs?.labelHidden : false
+    },
+    curCanvasEnv () {
+      return this.$store.getters.getServerInuse
     }
   },
   watch: {

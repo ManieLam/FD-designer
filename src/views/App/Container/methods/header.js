@@ -1,5 +1,6 @@
 import { max } from 'lodash'
 import { templateRegister } from '@/components/Translator/index.js'
+import { getDefaultService } from '@/model/service.js'
 export default {
   data () {
     return {
@@ -37,11 +38,12 @@ export default {
         name: this.canvasName,
         assignObj: {
           env: {
-            inuse: selected,
+            inuse: getDefaultService(selected), // 只需要记住环境，都是默认服务，服务是不需要保存切换的，只有到具体接口才需要切换服务
             list: envs
           }
         }
       })
+      this.webserverSetting = false
     },
     // 查看配置文件
     toggleSettingJson () {

@@ -530,6 +530,7 @@ export default {
       }
     }, 800),
     changeInPrivate (flag) {
+      // 设置当前接口的配置是主动行为
       this.$set(this.apiData, '__private', flag)
     }
   },

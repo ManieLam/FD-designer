@@ -5,7 +5,7 @@
 import { formAttrs as defaultFormAttrs } from '@/model/defaultConfig'
 import { CanvasModel } from '@/model/canvas' // 定义画布数据
 import { gbServer } from '@/utils/import'
-import { ENV_VAR, ServiceModel, EnvRecordModel } from '@/model/service'
+import { ServiceModel, EnvRecordModel, getDefaultService } from '@/model/service'
 import { MessageBox } from 'element-ui'
 import { isEmpty, isEqual, pick } from 'lodash'
 
@@ -129,7 +129,8 @@ const mutations = {
         // states.canvas[name] = Object.assign(states.canvas[name], assignObj)
         const newName = assignObj.routerName || name
         states.canvas[newName] = { ...states.canvas[name], ...assignObj }
-        if (assignObj.routerName !== name) {
+        if (assignObj.routerName && assignObj.routerName !== name) {
+          // 更新名称，对旧画布删除，将更名后的画布修改为新画布
           states.canvas[name] = {}
           delete states.canvas[name]
         }
@@ -177,7 +178,9 @@ const mutations = {
         curCanvas.env.list = server.map(item => item.urls)
       }
       if (!curCanvas.env.inuse.name) {
-        curCanvas.env.inuse = server.find(list => list.name === ENV_VAR?.default)
+        // inuse存当前使用的环境对象
+        // curCanvas.env.inuse = server.find(list => list.name === ENV_VAR?.default)
+        curCanvas.env.inuse = getDefaultService()
       }
       if (!curCanvas.env.serviceOptions?.length) {
         curCanvas.env.serviceOptions = [new ServiceModel()]
@@ -189,6 +192,7 @@ const mutations = {
     // const curEnv = states.canvas[name].env
     switch (type) {
       case 'env': {
+        // 更新整个环境数据
         if (Array.isArray(data)) {
           console.log('更新env:', data)
           states.canvas[name].env = data
@@ -196,14 +200,18 @@ const mutations = {
         break
       }
       case 'list': {
+        // 更新canvas所有环境列表
         if (Array.isArray(data)) { states.canvas[name].env.list = data }
         break
       }
       case 'insue': {
-        if (data instanceof Object) { states.canvas[name].env.inuse = data }
+        // 更新canvas在用环境
+        if (Array.isArray(data)) { states.canvas[name].env.inuse = data }
+        // if (data instanceof Object) { states.canvas[name].env.inuse = data }
         break
       }
       case 'serviceOptions': {
+        // 更新环境选项
         if (Array.isArray(data)) {
           states.canvas[name].env.serviceOptions = data
         }

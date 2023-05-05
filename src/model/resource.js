@@ -33,7 +33,7 @@ export const ApiDataHandles = {
 export function ApiData (config = {}) {
   return {
     method: 'GET',
-    url: '<__parent.id__>/<__parent.service__>/',
+    url: '/',
     header: null,
     body: null, // query参数
     pathData: null, // path参数

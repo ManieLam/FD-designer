@@ -96,7 +96,7 @@ export default {
   computed: {
     lastInuseENV () {
       // 隔绝envData, 记录上次更改的环境数据
-      return this.canvas ? this.$store.getters.getServerInuse : {}
+      return this.canvas ? this.$store.getters.getServerInuse?.env || {} : {}
     },
     funcProps () {
       return {
@@ -157,7 +157,7 @@ export default {
       this.$nextTick(() => {
         this.envList = this.canvas?.env?.list || this.$gbServer || []
         // const inuse = this.canvas?.env?.inuse
-        this.envData = this.$store.getters.getServerInuse
+        this.envData = this.$store.getters.getServerInuse?.env || {}
       })
       // this.$store.commit('server/syncServices')
       // // this.envData = this.$gbServer?.[0]
@@ -168,7 +168,7 @@ export default {
     },
     // 同步更新画布中的默认服务地址
     syncServer (newUrls = []) {
-      this.$set(this.envList, 'urls', newUrls)
+      this.$set(this.envData, 'urls', newUrls)
       // this.$store.commit('canvas/UPDATE_SERVER', {
       //   name: this.canvas.routerName,
       //   data: newUrls,

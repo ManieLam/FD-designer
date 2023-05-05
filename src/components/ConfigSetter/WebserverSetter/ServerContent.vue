@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { debounce } from 'lodash'
+// import { debounce } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 export default {
   name: 'ServerContent',
@@ -46,13 +46,13 @@ export default {
     }
   },
   watch: {
-    'computedData.urls': {
-      deep: true,
-      handler: debounce(function (urls, oldUrls) {
-        // console.log('匹配到的改变:', urls, oldUrls)
-        this.$emit('syncServer', urls)
-      }, 800)
-    }
+    // 'computedData.urls': {
+    //   deep: true,
+    //   handler: debounce(function (urls, oldUrls) {
+    //     console.log('匹配到的改变:', urls, oldUrls)
+    //     this.$emit('syncServer', urls)
+    //   }, 800)
+    // }
   },
   methods: {
     initServiceRowfunc (obj, key) {

@@ -33,6 +33,10 @@ export const formAttrs = {
   isGroup: false // 是否组合
 }
 
+// 默认环境配置
+export const envAttrs = {
+}
+
 // 根据表单layout类型设置默认值
 export const formLayoutDefAttrs = {
   grid: {
