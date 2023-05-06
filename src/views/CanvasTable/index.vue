@@ -64,7 +64,8 @@ export default {
       columns,
       tableConfig: {
         keyName: 'multiCanvas',
-        resource: '/fileserver/ui/config',
+        resource: this.$api.canvas.getList,
+        // resource: '/fileserver/ui/config',
         serverSide: true,
         filterFields: ['canvasTitle', 'canvasName'].map(k => keyBy(columns, 'name')[k]),
         operationWidth: '155',
