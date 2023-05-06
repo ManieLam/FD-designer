@@ -386,7 +386,8 @@ export default {
       let resData = {}
       if (rName && id) {
         await this.$normalRequire({
-          url: `/fileserver/ui/config/get/${id}`
+          url: this.$api.canvas.getDetail(id)
+          // url: `/fileserver/ui/config/get/${id}`
         }).then(res => {
           if (res?.data) {
             resData = {
@@ -579,7 +580,8 @@ export default {
         }).then(({ value }) => {
           // 上传服务端
           this.$normalRequire({
-            url: '/fileserver/ui/config/save',
+            // url: '/fileserver/ui/config/save',
+            url: this.$api.canvas.save,
             method: 'post',
             data: {
               config: JSON.stringify({
@@ -608,7 +610,8 @@ export default {
       // console.log('更新发布:', canvas)
       const { configId, routerName, canvasTitle } = canvas
       this.$normalRequire({
-        url: `/fileserver/ui/config/edit/${configId}`,
+        // url: `/fileserver/ui/config/edit/${configId}`,
+        url: this.$api.canvas.edit(configId),
         method: 'POST',
         data: {
           config: JSON.stringify(canvas),
