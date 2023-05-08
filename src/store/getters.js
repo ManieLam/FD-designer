@@ -119,9 +119,9 @@ const getters = {
     }
   },
   /* 获取某个环境数据 */
-  getEnvByName: (state, getters) => async (envName) => {
+  getEnvByName: (state, getters) => (envName) => {
     if (envName) {
-      const list = await getters.getCurView.env.list
+      const list = getters.getCurView.env.list
       const index = list.findIndex(item => item.name === envName)
       return index > -1 ? list[index] : {}
     } else {
@@ -130,7 +130,7 @@ const getters = {
   },
   /** 获取当前画布使用的环境相关数据
    **/
-  getServerInuse: (state, getters) => {
+  getServerInuse (state, getters) {
     const env = getters.getCurView?.env || {}
     const inuseNode = env.inuse || getDefaultService()
     // const inuseObj.urls.find(u => u.name === 'BASE').url // 所有环境都有一个BASE的默认服务

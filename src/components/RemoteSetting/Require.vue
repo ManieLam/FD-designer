@@ -261,7 +261,6 @@ export default {
       /* 查看所有已选api */
       allSelectedVisable: false,
       canvasResources: [],
-      apiurlMix: Array.from({ length: 3 }),
       /* 筛选内容 */
       isFilterIng: false, // 筛选中
       filterList: [], // 筛选的列表
@@ -524,13 +523,15 @@ export default {
     },
     // 手动修改url
     handleApiUrl: debounce(function (url) {
+      // console.log('handleApiUrl手动修改url:', url)
       if (!isEqual(this.apiData.url, url)) {
         this.$set(this.apiData, 'url', url)
         this.$refs.apiForm.validateField('url')
       }
     }, 800),
     changeInPrivate (flag) {
-      // 设置当前接口的配置是主动行为
+      console.log('主动修改apiUrl')
+      // 设置当前接口的配置是主动行为（相同值则认为还是跟随父类，不同值认为手动修改，不在全局修改的影响范围）
       this.$set(this.apiData, '__private', flag)
     }
   },

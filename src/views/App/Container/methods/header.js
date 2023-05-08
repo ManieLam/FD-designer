@@ -34,6 +34,7 @@ export default {
         )
         return
       }
+      // 不用在这里更新所有画布中的接口前缀，只更新画布中的env.inuse数据，在所有显示的地址，写了相对地址的替换即可。在渲染预览中，一次性格式化
       this.$store.commit('canvas/ASSIGN_CONFIG', {
         name: this.canvasName,
         assignObj: {
@@ -43,6 +44,7 @@ export default {
           }
         }
       })
+      // 关闭弹窗
       this.webserverSetting = false
     },
     // 查看配置文件
