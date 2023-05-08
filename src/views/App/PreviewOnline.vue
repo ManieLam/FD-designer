@@ -55,7 +55,8 @@ export default {
     this.onReady = false
     if (name && id) {
       this.$normalRequire({
-        url: `/fileserver/ui/config/get/${id}`
+        // url: `/fileserver/ui/config/get/${id}`
+        url: this.$api.canvas.getDetail(id)
       }).then(res => {
         // console.log('res:', res)
         if (res?.data) {

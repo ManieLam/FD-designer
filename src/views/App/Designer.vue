@@ -13,7 +13,7 @@
         el-dropdown-menu(slot="dropdown")
           el-dropdown-item(v-for="(expText, expName) in exampleList", :key="expName", :command="expName") {{ expText }}
   AppContainer.app-content
-  WebserverSetter(ref="webserverSetter", v-model="webserverSetting")
+  //- WebserverSetter(ref="webserverSetter", v-model="webserverSetting")
 </template>
 
 <script>

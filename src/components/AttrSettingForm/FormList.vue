@@ -70,7 +70,9 @@ export default {
     handlAble: {
       type: Boolean,
       default: true
-    }
+    },
+    // 列表数据新增时候的初始化
+    initListDatafunc: Function
   },
   data () {
     return {
@@ -89,7 +91,7 @@ export default {
       return Object.keys(keyBy(this.columnProps, 'prop'))
     },
     addAble () {
-      return this.handlAble && this.maxLen && this.actList.length < this.maxLen
+      return this.handlAble && (this.maxLen ? this.actList.length < this.maxLen : true)
     },
     removeAble () {
       return this.handlAble && this.actList.length > 1
@@ -110,14 +112,17 @@ export default {
   methods: {
     initPropValue () {
       return this.listPropValue.reduce((obj, name) => {
-        obj[name] = ''
-        return obj
+        return this.initListDatafunc && typeof this.initListDatafunc === 'function'
+          ? this.initListDatafunc(obj, name)
+          : (function () {
+            obj[name] = ''
+            return obj
+          })()
       }, {})
     },
     add () {
-      if (this.maxLen && this.actList.length <= this.maxLen) {
-        this.actList.push(this.initPropValue())
-      }
+      if (this.maxLen && this.actList.length > this.maxLen) return
+      this.actList.push(this.initPropValue())
     },
     remove (ele, index) {
       if (this.actList.length) {

@@ -27,7 +27,7 @@ const state = {
   groups: {}
 }
 const mutations = {
-  init (states) {
+  INIT (states) {
     const storages = localStorage.getItem('Resource-all') // 默认读取本地缓存，TODO 补充公共导入的配置
     if (storages) {
       states.list = JSON.parse(storages) || []
@@ -35,41 +35,41 @@ const mutations = {
       states.list = formatResource || []
     }
   },
-  addOne (states, source) {
+  ADD_ONE (states, source) {
     // states.list.push(source)
     states.list.splice(0, 0, { ...source, __isGlobal: true })
   },
-  removeOne (states, dIndex) {
+  REMOVE_ONE (states, dIndex) {
     states.list.splice(dIndex, 1)
   },
-  updateOne (states, { name, source = {}, index = undefined }) {
+  UPDATE_ONE (states, { name, source = {}, index = undefined }) {
     const eIndex = isNaN(index) ? states.list.find(item => item.name === source.name) : index
     if (eIndex !== -1) {
       states.list[eIndex] = source
     }
   },
-  saveStorage (states) {
+  SAVE_STORAGE (states) {
     localStorage.setItem('Resource-all', JSON.stringify(states.list))
   },
   /* 格式化分组 */
-  initGroup (states) {
+  INIT_GROUP (states) {
     states.groups = groupBy(states.list, (api) => api.group || 'global')
   },
-  addGroup (states, name) {
+  ADD_GROUP (states, name) {
     if (!states.groups[name]) {
       states.groups[name] = []
     }
   },
-  updateGroup (states, name, list) {
+  UPDATE_GROUP (states, name, list) {
 
   }
 }
 
 const actions = {
   updateList ({ commit, state }, sources = []) {
-    console.info('sources:', sources)
+    // console.info('sources:', sources)
     state.list = sources.map(s => { return { ...s, __isGlobal: true } })
-    commit('saveStorage', sources)
+    commit('SAVE_STORAGE', sources)
   }
 }
 

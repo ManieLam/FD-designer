@@ -33,6 +33,10 @@ export const formAttrs = {
   isGroup: false // 是否组合
 }
 
+// 默认环境配置
+export const envAttrs = {
+}
+
 // 根据表单layout类型设置默认值
 export const formLayoutDefAttrs = {
   grid: {
@@ -100,17 +104,23 @@ export const select = {
   options: defaultOptions
 }
 export const input = {
+  clearable: true,
   placeholder: '请输入',
   defaultValue: {
     customFunc: '(data, fields, field) => {\n return data[field.name]}',
     valueType: 'isDefault'
-  }
+  },
+  inputType: 'text'
 }
 export const text = {
   defaultValue: {
     customFunc: '(data, fields, field) => {\n return data[field.name]}',
     valueType: 'isDefault'
   }
+}
+export const radio = {
+  size: 'small',
+  options: defaultOptions
 }
 export const cascader = {
   valueKey: 'value',
@@ -149,6 +159,13 @@ export const switchConf = {
 
 export const dateConf = {
   dateType: 'date' // 默认是日期选择器
+}
+
+export const fileConf = {
+  resource: 'https://gddxit.cn/wangch_obh/api/fileserver/upload',
+  showResource: 'https://gddxit.cn/wangch_obh/api/fileserver/download/id',
+  showResourceType: 'id',
+  tip: ''
 }
 
 // 默认值预设可选项
@@ -271,9 +288,11 @@ export default {
   presetOptions,
   select,
   input,
+  radio,
   cascader,
   switch: switchConf,
   date: dateConf,
+  file: fileConf,
   switchOption: switchOption,
   button: buttonConf()
 }

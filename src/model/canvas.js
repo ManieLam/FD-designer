@@ -1,5 +1,7 @@
 import { formButtons } from '@/model/defaultConfig'
 import { MultiApi } from '@/model/resource'
+import { EnvRecordModel } from '@/model/service'
+// import { gbServer } from '@/utils/import'
 /* 以"xxxApi"命名的格式, 认为是异步动态接口对象, 在运行时会按照内置规则运行请求  */
 export const CanvasModel = function ({ body = [], attrs = {}, actions = {}, template = 'Form' }, defaultFormAttrs = {}) {
   return {
@@ -17,7 +19,8 @@ export const CanvasModel = function ({ body = [], attrs = {}, actions = {}, temp
     },
     buttons: Object.values(formButtons).sort((a, b) => a?.sort - b?.sort),
     groups: {},
-    resources: {},
+    resources: {}, // 当前使用的所有接口（分析）
+    env: new EnvRecordModel(),
     template,
     canvasTitle: '',
     ...arguments[0]

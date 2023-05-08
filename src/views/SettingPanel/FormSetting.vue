@@ -157,9 +157,9 @@ export default {
     },
     /* 部分配置无法双向修改到，需要更新store/canvas */
     setFormState ({ attrs = null, actions = null, buttons = null }) {
-      // 由内部更新到store
+      // 由内部更新到store assignConfig
       // console.info('formSetting 更新', attrs)
-      this.$store.commit('canvas/assignConfig', {
+      this.$store.commit('canvas/ASSIGN_CONFIG', {
         name: this.canvasName,
         attrs,
         actions,

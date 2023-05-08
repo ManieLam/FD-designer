@@ -24,7 +24,7 @@ export default {
       const preSlotRenderFunc = preSlotRender && preSlotRender.tag ? this.formatFormItem(preSlotRender) : {}
       const formatRes = Object.assign({}, suffixRenderFunc, preSlotRenderFunc)
       if (func) {
-        const resAttrs = func(...arguments)
+        const resAttrs = func.call(this, ...arguments)
         // console.log('格式化字段后结果:', resAttrs)
         // 请返回对象([属性key]: 属性value)，不返回则阻断
         return typeof resAttrs === 'object' ? { ...formatRes, ...resAttrs } : formatRes
@@ -88,6 +88,17 @@ export default {
         // buttonList: newBtns
       }
     },
+    /* 转换上传组件属性/行为 */
+    formatFileAttrs ({ accept }) {
+      // 转换上传组件的支持类型为anso-ui接受的格式
+      const typeLimit = typeof accept === 'string' && accept ? accept.split(',').map(s => s.trim()) : []
+      // console.info('typeLimit:', typeLimit)
+      return {
+        typeLimit,
+        tip: typeLimit.length ? `支持扩展类型:${accept}` : null
+      }
+    },
+    /* 绑定PostMessage */
     handleEvent: function (action) {
       console.log('点击到了:', action)
       if (action?.eventName === 'notifyWindowEvent') {

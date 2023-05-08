@@ -15,7 +15,7 @@ import 'anso-ui/lib/anso-ui.css'
 
 import Widgets from '@/model/widgets'
 import defaultValueSet from '@/model/defaultConfig'
-import gbImport from '@/utils/import'
+import gbImport, { gbServer } from '@/utils/import'
 import require, { normalRequire } from '@/utils/request'
 import canvasAPI from '@/Api/canvas'
 import AnsoUI from 'anso-ui'
@@ -58,11 +58,12 @@ Vue.use(CodeEditorConstruct) // 注册代码编辑器插件
 Vue.component('SmartDialog', SmartDialog)
 Vue.component('SmartDrawer', SmartDrawer)
 
-Vue.prototype.$Widget = Widgets
-Vue.prototype.$defValue = defaultValueSet
-Vue.prototype.$gbImport = gbImport
-Vue.prototype.$require = require
-Vue.prototype.$normalRequire = normalRequire
+Vue.prototype.$Widget = Widgets // 全局所有控件
+Vue.prototype.$defValue = defaultValueSet // 默认值配置
+Vue.prototype.$gbImport = gbImport // 全局导入的选项
+Vue.prototype.$gbServer = gbServer // 全局环境可选范围
+Vue.prototype.$require = require // 专为api接口请求做的格式转换
+Vue.prototype.$normalRequire = normalRequire // 正常不带格式转换的接口请求
 Vue.prototype.$api = {
   canvas: canvasAPI
 }

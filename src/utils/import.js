@@ -19,10 +19,20 @@ export const gbApiRequires = [
   { method: 'POST', url: '/api/actRelation', demo: '测试动态relation接口', name: '/api/actRelation_POST' }
 ]
 
-// 公共请求头、请求配置(axios的配置) - TODO
-export const gbRequireOptions = {
-  header: {}
-}
+// 公共请求头、请求配置(axios的配置) - TODO导入, 默认4个环境，不允许删除，除非自定义的环境
+export const gbServer = Array.from([
+  { name: 'LOCAL', title: '本地环境', default: true, vars: [], urls: [{ title: '默认服务', url: 'http://0.0.0.0:4523/m1/1812979-0-default', name: 'BASE' }] },
+  { name: 'TESK', title: '测试环境', default: true, vars: [], urls: [] },
+  { name: 'PRE_PUBLISH', title: '预发布环境', default: true, vars: [], urls: [] },
+  { name: 'PUBLIC', title: '正式环境', default: true, vars: [], urls: [] }
+], env => {
+  const hasBase = env.urls.some(url => url.name === 'BASE')
+  if (!hasBase) {
+    env.urls.unshift({ url: '', name: 'BASE', title: '默认服务' })
+  }
+  return env
+})
+// console.log('gbServer:', gbServer)
 
 // 公共事件 - TODO
 export const gbFunc = {
@@ -36,7 +46,7 @@ export const gbIcons = {}
 
 export default {
   gbApiRequires,
-  gbRequireOptions,
+  gbServer,
   gbFunc,
   gbIcons
 }
