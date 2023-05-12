@@ -105,6 +105,21 @@ export function getURLAll (key) {
   }
 }
 
+/* 获取某个环境数据 */
+function getEnvByName (envName, serviceName, canvas = {}) {
+  if (envName) {
+    const list = canvas.env?.list || []
+    const index = list.findIndex(item => item.name === envName)
+    const envObj = index > -1 ? list[index] : {}
+    return {
+      env: envObj,
+      service: serviceName ? envObj.urls.find(url => url.name === serviceName) : {}
+    }
+  } else {
+    return null
+  }
+}
+
 /** 格式化<>/<>/url为可读url
  * @return <String>
  * @param url <String>
@@ -112,18 +127,20 @@ export function getURLAll (key) {
  * renderDefaultService: <boolean> 当url属于跟随默认配置，是否需要转出来，如true则转为完整的http的，否则，则是相对地址，需要在服务器配置相应的接口转换
  * }
  * */
-export function transUrlReadable (url, { renderDefaultService = false } = {}) {
+export function transUrlReadable (url, { renderDefaultService = false, canvas = null } = {}) {
   if (!url) return ''
   let replaceStr = ''
   if (/^https?:\/\/|http?:\/\//ig.test(url)) return url // 完整的http则不需要走下去
   const serviceBefore = url.match(/<([\w-]+)>/gi)?.map(e => e.replace(/<([\w-]+)>/gi, '$1'))
   if (serviceBefore && serviceBefore.length) {
+    // 自定义
     const [ip, service] = serviceBefore
-    const { env } = this.$store.getters.getEnvByName(ip)
+    const { env } = canvas ? getEnvByName(ip, '', canvas) : this.$store.getters.getEnvByName(ip)
     replaceStr = env?.urls?.find(url => url.name === service)?.url
   } else if (renderDefaultService) {
     // 跟随默认
-    const { inuseNode } = this.$store.getters.getServerInuse
+    const inuseNode = canvas ? canvas.env.inuse : this.$store.getters.getServerInuse?.inuseNode
+    // const { inuseNode } = this.$store.getters.getServerInuse
     const appendUrl = inuseNode[2] || ''
     return appendUrl.charAt(appendUrl.length - 1) !== '/' && url.charAt(0) !== '/' ? `${appendUrl}/${url}` : appendUrl + url
   }

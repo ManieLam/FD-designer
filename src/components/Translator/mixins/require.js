@@ -58,7 +58,7 @@ export default {
     * @return 格式化后的请求地址
     */
     formatPath ({ url = '', pathData = [], body = [] }) {
-      const urlAfterTrans = transUrlReadable.call(this, url, { renderDefaultService: true })
+      const urlAfterTrans = transUrlReadable.call(this, url, { renderDefaultService: true, canvas: this.config })
       // console.log('formatPath:', urlAfterTrans)
       if (urlAfterTrans && pathData?.length) {
         const paramsVal = this.formatVarParams(pathData)
