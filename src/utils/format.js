@@ -105,6 +105,22 @@ export function getURLAll (key) {
   }
 }
 
+/** 格式化<>/<>/url为可读url
+ * @return <String>
+ * @param url <String>
+ * */
+export function transUrlReadable (url) {
+  if (!url) return ''
+  let replaceStr = ''
+  const serviceBefore = url.match(/<([\w-]+)>/gi)?.map(e => e.replace(/<([\w-]+)>/gi, '$1'))
+  if (serviceBefore) {
+    const [ip, service] = serviceBefore
+    const { env } = this.$store.getters.getEnvByName(ip)
+    replaceStr = env?.urls?.find(url => url.name === service)?.url
+  }
+  return url.replace(/<([\w-]+)>\/<([\w-]+)>/gi, replaceStr)
+}
+
 export default {
   formatFormRules,
   formatDefValFunc

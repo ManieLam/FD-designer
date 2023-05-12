@@ -4,7 +4,7 @@
     .d-flex-v-center
       i.el-icon-paperclip.color-primary.m-r-8(title="数据接口")
       .color-warning {{remoteData.method}}
-      .secondary-text.m-l-8(style="text-overflow: ellipsis;overflow: hidden;", :title="remoteData.url") {{remoteData.url}}
+      .secondary-text.m-l-8(style="text-overflow: ellipsis;overflow: hidden;", :title="urlReadable") {{urlReadable}}
     .color-text-secondary.font-size-small.m-l-8 {{ remoteData.demo || '<无备注>'}}
   slot.right-wrap(name="operation")
     i.el-icon-edit.btn-icon__small(title="编辑", @click="$emit('edit')")
@@ -19,6 +19,7 @@
 
 <script>
 /** 异步请求信息展示 */
+import { transUrlReadable } from '@/utils/format'
 export default {
   name: 'RemoteInfo',
   props: {
@@ -33,6 +34,9 @@ export default {
     }
   },
   computed: {
+    urlReadable () {
+      return transUrlReadable.call(this, this.remoteData.url)
+    },
     remoteData: {
       get () {
         return this.value

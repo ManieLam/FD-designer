@@ -54,7 +54,7 @@ export default {
       // isFollowParentService: true,
       urlStr: '',
       /* cascader数据对当前url数值的格式转换回显 */
-      serverName: ''
+      serverName: [] // [ip, service], 不带<>
     }
   },
   computed: {
@@ -86,7 +86,7 @@ export default {
     curServerURL () {
       // const { env, inuseNode } = this.curCanvasInuse
       // console.info('获取当前环境:')
-      return this.checkIsFollowParent(`${this.apiurlMix[0]}/${this.apiurlMix[1]}`, true) ? this.curCanvasInuse.inuseNode[2] : this.getOthersEnv() || '默认服务'
+      return this.checkIsFollowParent(`${this.apiurlMix[0]}/${this.apiurlMix[1]}`, true, 'cruServerURL') ? this.curCanvasInuse.inuseNode[2] : this.getOthersEnv() || '默认服务'
     },
     /* 完整输入了http://|https://开头的地址 */
     isFullInput () {
@@ -98,6 +98,7 @@ export default {
       },
       set (value) {
         this.urlStr = this.arrToStr(value)
+        // console.log('给apiurlMix赋值:', this.urlStr)
         this.$emit('input', this.urlStr)
       }
     }
@@ -111,31 +112,31 @@ export default {
       }
     },
     apiurlMix (list) {
-      // console.info('apiurlMix 修改到了:', list)
+      // console.info('监听apiurlMix的修改:', list)
       const serviceList = list.slice(0, 2).map((val, index) => {
         // const valStr = val.replace(/<|>/g, '')
-        if (this.checkIsFollowParent(val)) {
-          console.log('1', this.curCanvasInuse.inuseNode)
+        // console.log('判断val是否跟随父类', val)
+        if (this.checkIsFollowParent(val, false, 'watch')) {
+          // console.log('1', this.curCanvasInuse.inuseNode)
           return this.curCanvasInuse.inuseNode[index]
         } else {
-          console.log('2')
+          // console.log('2')
           return val.replace(/<|>/g, '')
         }
       })
-      console.info('apiurlMix 修改到了 serviceList:', serviceList)
+      // console.info('apiurlMix更新带动serviceList更新:', serviceList)
       this.serverName = ''
       this.serverName = serviceList
     }
   },
   methods: {
     /* 判断是否跟随父级环境，不存在"<>"和http://|https://开头的，则属于跟随父级Ip和服务(只要修改了服务即可认为不同父类服务) */
-    checkIsFollowParent (str, isFullTest) {
-      // console.log('判断是不是跟随', str)
-      // return !/^<(\w+)>\/<(\w.+)>/gi.test(str)
-      return !((isFullTest ? /^<(\w+)>\/<(\w.+)>/gi.test(str) : /<(\w+)>/gi.test(str)) || /https?:\/\/|http?:\/\//ig.test(str))
+    checkIsFollowParent (str, isFullTest, from) {
+      // console.log('判断是不是跟随', str, 'from:', from)
+      // return !/^<[\w-]+>\/<[\w-]+>/gi.test(str)
+      return !((isFullTest ? /^<[\w-]+>\/<[\w-]+>/gi.test(str) : /^<[\w-]+>$/gi.test(str)) || /https?:\/\/|http?:\/\//ig.test(str))
     },
     arrToStr (list = []) {
-      // console.log('arrToStr:', list)
       if (!list || !Array.isArray(list)) return list
       return list.reduce((str, val, index) => {
         if (val) {
@@ -149,13 +150,13 @@ export default {
       let arr = Array.from({ length: 3 })
       // console.log('strToArr data:', data)
       if (typeof data === 'string') {
-        const matchs = data.match(/^<(\w+)>\/<(\w.+)>/)
+        const matchs = data.match(/^<([\w-]+)>\/<([\w-]+)>/)
         // console.log('matchs:', matchs)
         if (this.regex.isHttp.test(data) && !matchs) {
           // 自输入的链接，不做分割
           arr = ['', '', data]
         } else {
-          if (matchs && !this.checkIsFollowParent(matchs[0])) {
+          if (matchs && !this.checkIsFollowParent(matchs[0], true, 'strToArr')) {
             // console.log('1', data)
             // 带动态服务地址
             const last = data.replace(matchs[0], '')
@@ -178,13 +179,14 @@ export default {
       this.chooseServerVisable = !this.chooseServerVisable
     },
     chooseServer (value) {
-      console.log('选择服务:', value)
+      // console.log('选择服务:', value)
       const inuseEnv = this.curCanvasInuse.inuseNode[0]
       this.apiurlMix = [
         `<${value[0]}>`,
         `<${value[1]}>`,
         this.apiurlMix[2]
       ]
+      this.serverName = [value[0], value[1]]
       // 通知修改为非跟随父类默认值
       this.$emit('changeInPrivate', inuseEnv && inuseEnv !== value[0])
     },
@@ -199,7 +201,7 @@ export default {
       // console.log('获取其他服务信息-----')
       const [ip, service] = this.serverName
       if (!ip || !service) return ''
-      const env = this.$store.getters.getEnvByName(ip)
+      const { env } = this.$store.getters.getEnvByName(ip)
       return env?.urls?.find(url => url.name === service)?.url
     }
   },

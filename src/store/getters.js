@@ -118,18 +118,24 @@ const getters = {
       })
     }
   },
-  /* 获取某个环境数据 */
-  getEnvByName: (state, getters) => (envName) => {
+  /**
+   * 获取某个环境数据
+   * @return Object: { env: 环境对象, service: 服务对象 }
+   * */
+  getEnvByName: (state, getters) => (envName, serviceName) => {
     if (envName) {
       const list = getters.getCurView.env.list
       const index = list.findIndex(item => item.name === envName)
-      return index > -1 ? list[index] : {}
+      const envObj = index > -1 ? list[index] : {}
+      return {
+        env: envObj,
+        service: serviceName ? envObj.urls.find(url => url.name === serviceName) : {}
+      }
     } else {
       return null
     }
   },
-  /** 获取当前画布使用的环境相关数据
-   **/
+  /** 获取当前画布使用的环境相关数据 **/
   getServerInuse (state, getters) {
     const env = getters.getCurView?.env || {}
     const inuseNode = env.inuse || getDefaultService()

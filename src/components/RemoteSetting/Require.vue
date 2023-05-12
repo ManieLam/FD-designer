@@ -13,7 +13,7 @@ el-dialog.async-required-dialog(
       .left-wrap__top {{apiData.name ? '已选中:' : '请选择一个数据源'}}
         small.color-primary.left-top__tip(v-show="apiData.name")
           span 【{{apiData.method}}】
-          span {{apiData.url}}
+          span {{apiUrlReadable}}
           span(v-show="apiData.demo") {{apiData.demo}}
       el-button-group.right-wrap__top
         el-button(icon="el-icon-plus", @click="addApi") 新增数据源
@@ -86,7 +86,7 @@ el-dialog.async-required-dialog(
               //- el-input(v-model="apiurlMix[2]", placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置")
               //-   template(slot="prepend")
               //-     AnsoDataformSelect(v-model="apiurlMix[0]", :options="$gbServer")
-              ApiUrl(:value="apiData.url", @input="handleApiUrl", @changeInPrivate="changeInPrivate")
+              ApiUrl(ref="apiUrlInput", :value="apiData.url", @input="handleApiUrl", @changeInPrivate="changeInPrivate")
 
             el-form-item(label="请求方式", prop="method")
               el-radio-group(v-model="apiData.method" size="mini")
@@ -176,6 +176,7 @@ import ApiGroup from './ApiGroup.vue'
 import ApiUrl from './ApiUrl.vue'
 import { keyBy, isEqual, debounce, groupBy } from 'lodash'
 import CodeEditor from '@/components/CodeEditor/index'
+import { transUrlReadable } from '@/utils/format.js'
 import { ApiData, ApiDataHandles, ApiBodyParams } from '@/model/resource.js'
 export default {
   name: 'RemoteSettingRequire',
@@ -246,7 +247,7 @@ export default {
           { required: true, message: '必填', trigger: 'change' },
           {
             validator: (rule, value, callback) => {
-              const check = value.match(/^<(\w+)>\/<(\w+)>|https?:\/\/|http?:\/\//ig)
+              const check = value.match(/^<[\w-]+>\/<[\w-]+>|https?:\/\/|http?:\/\//ig)
               if (check && check.length >= 2) {
                 callback(new Error('地址配置错误：如已配置环境，请使用相对地址'))
               } else {
@@ -307,7 +308,7 @@ export default {
       return this.apiData?.body != null
     },
     hasPathData () {
-      const params = this.apiData?.url?.split('?')?.[0].match(/(\$\{)(\w+)(\})/g)
+      const params = this.apiData?.url?.split('?')?.[0].match(/(\$\{)([\w-]+)(\})/g)
       return params && params.length > 0
       // return this.apiData?.pathData != null
     },
@@ -326,6 +327,17 @@ export default {
     },
     isEdit () {
       return this.chosenData?.__isEdit
+    },
+    /* 可读的已选地址 */
+    apiUrlReadable () {
+      // console.log('ref:', this.$refs.apiUrlInput)
+      let replaceStr = ''
+      if (this.$refs.apiUrlInput) {
+        replaceStr = this.$refs.apiUrlInput.curServerURL
+        return this.apiData.url.replace(/<([\w-]+)>\/<([\w-]+)>/gi, replaceStr)
+      } else {
+        return transUrlReadable.call(this, this.apiData.url)
+      }
     }
   },
   methods: {
@@ -476,7 +488,7 @@ export default {
         this.$set(this.apiData, type, [])
       }
     },
-    getParamByUrl (path, originParams, regex = /(\$\{)(\w+)(\})/g) {
+    getParamByUrl (path, originParams, regex = /(\$\{)([\w-]+)(\})/g) {
       const pathParams = Array.from(originParams || [])
       const params = path.match(regex)
       if (params && params.length) {
@@ -505,7 +517,7 @@ export default {
           this.$set(this.apiData, 'pathData', res)
         }
         if (part2) {
-          this.apiData.body = this.getParamByUrl(part2, body, /(\w+)=/g)
+          this.apiData.body = this.getParamByUrl(part2, body, /([\w-]+)=/g)
         }
       } else {
         return []
@@ -531,8 +543,8 @@ export default {
     }, 800),
     changeInPrivate (flag) {
       console.log('主动修改apiUrl')
-      // 设置当前接口的配置是主动行为（相同值则认为还是跟随父类，不同值认为手动修改，不在全局修改的影响范围）
-      this.$set(this.apiData, '__private', flag)
+      // 暂时不用。（原：设置当前接口的配置是主动行为（相同值则认为还是跟随父类，不同值认为手动修改，不在全局修改的影响范围））
+      // this.$set(this.apiData, '__private', flag)
     }
   },
   mounted () {
