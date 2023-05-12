@@ -3,7 +3,7 @@
  * formData: 表单录入数据
  * collectData: 表单所有数据集合 + 所有数据源数据
  * */
-import { getURLAll, formatDefValFunc } from '@/utils/format.js'
+import { getURLAll, formatDefValFunc, transUrlReadable } from '@/utils/format.js'
 import { cloneDeep } from 'lodash'
 
 export default {
@@ -58,10 +58,12 @@ export default {
     * @return 格式化后的请求地址
     */
     formatPath ({ url = '', pathData = [], body = [] }) {
-      if (url && pathData?.length) {
+      const urlAfterTrans = transUrlReadable.call(this, url, { renderDefaultService: true })
+      // console.log('formatPath:', urlAfterTrans)
+      if (urlAfterTrans && pathData?.length) {
         const paramsVal = this.formatVarParams(pathData)
         // console.info('paramsVal:', paramsVal)
-        const newPath = url.split('?')?.[0].replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
+        const newPath = urlAfterTrans.split('?')?.[0].replace(/(\$\{)(\w+)(\})/g, (match, p1, p2, p3) => {
           return paramsVal[p2] || ''
         })
         // console.info('newPath1:', newPath)
@@ -69,11 +71,11 @@ export default {
       } else {
         if (body?.length) {
           // 如果只有地址+body的参数, 不在这里转换body参数, body参数只在另一个参数转换
-          const newPath = url.split('?')?.[0]
+          const newPath = urlAfterTrans.split('?')?.[0]
           // console.info('newPath2:', newPath)
           return newPath
         }
-        return url
+        return urlAfterTrans
       }
     },
     formatHeader ({ header }) {
@@ -240,7 +242,7 @@ export default {
         reqRes = await this.doInParallel(_requires)
         // console.log('并联执行结束:', res)
       }
-      console.log('执行结束:', reqRes)
+      // console.log('执行结束:', reqRes)
       // 执行结束通知
       this.$emit('onMultiRequireEnd', reqRes)
       window.parent.postMessage({ onMultiRequireEnd: reqRes }, '*')

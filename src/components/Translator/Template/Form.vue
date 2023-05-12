@@ -1,13 +1,12 @@
-<template>
-  <AnsoDataform
-    ref="form"
-    id="customForm"
-    v-model="fullData"
-    v-bind="formAttrs"
-    :class="[{'form-withFixed': formAttrs.buttonFixed}, formStyleValue]"
-    :formFields="formFields"
-    :buttonList="actButtons"
-  ></AnsoDataform>
+<template lang="pug">
+AnsoDataform(
+  ref="form"
+  id="customForm"
+  v-model="fullData"
+  v-bind="formAttrs"
+  :formFields="formFields"
+  :buttonList="actButtons"
+  :class="[{'form-withFixed': formAttrs.buttonFixed}, formStyleValue]")
 </template>
 
 <script>
