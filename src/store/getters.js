@@ -109,11 +109,13 @@ const getters = {
   getCanvasEnv: (state, getters) => cname => {
     const canvasName = cname || state.canvas.editingName
     if (canvasName) {
-      const envList = getters.getCanvasView(canvasName).env.list
+      const curEnv = getters.getCanvasView(canvasName).env || {}
+      const envList = curEnv.list
       return envList.map(env => {
         return {
           ...env,
-          value: env.name
+          value: env.name,
+          title: env.title + (curEnv.inuse?.[0] === env.name ? '(当前环境)' : '')
         }
       })
     }

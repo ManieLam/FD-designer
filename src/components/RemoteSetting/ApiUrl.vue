@@ -4,6 +4,7 @@
   //- el-checkbox(v-model="isFollowParent")
   //-   span.secondary-text 跟随画布设置
   el-input.api-input(
+    ref="chooseServerPrepend",
     :value="apiurlMix[2]"
     placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置"
     @input="handleInput")
@@ -13,10 +14,11 @@
         span.apiurl-prepend-icon.el-icon-plus(v-else)
         el-cascader-panel.prepend-server-cascader(
           v-if="chooseServerVisable"
+          ref="chooseServerPanel"
           slot="dropdown"
           :value="serverName"
           :options="allServer"
-          :props="chooseServerPanel"
+          :props="chooseServerPanelProp"
           @change="chooseServer")
   //- template(slot="append")
   //-   .apiurl-append
@@ -41,7 +43,7 @@ export default {
   data () {
     return {
       chooseServerVisable: false,
-      chooseServerPanel: {
+      chooseServerPanelProp: {
         children: 'urls',
         label: 'title',
         value: 'name',
@@ -64,23 +66,6 @@ export default {
     /* 当前画布正在使用的环境 */
     curCanvasInuse () {
       return this.$store.getters.getServerInuse || {}
-    // },
-    // /* cascader数据对当前url数值的格式转换回显 */
-    // serverName () {
-    //   // console.log('serverName 监听的 apiurlMix:', this.apiurlMix)
-    //   // const slideArr =
-    //   return this.apiurlMix.slice(0, 2).map((val, index) => {
-    //     const valStr = val.replace(/<|>/g, '')
-    //     if (this.checkIsFollowParent(valStr)) {
-    //       return this.curCanvasInuse.inuseNode[index]
-    //     } else {
-    //       return val
-    //     }
-    //   })
-      // return [
-      //   this.apiurlMix[0]?.replace(/<|>/g, ''),
-      //   this.apiurlMix[1]?.replace(/<|>/g, '')
-      // ]
     },
     /* 显示当前使用环境服务的url，当跟随canvas时，显示canvas的inuse的url，将arr格式转为str */
     curServerURL () {
@@ -101,6 +86,9 @@ export default {
         // console.log('给apiurlMix赋值:', this.urlStr)
         this.$emit('input', this.urlStr)
       }
+    },
+    chooseServerPrependEl () {
+      return this.$parent?.$parent?.$el
     }
   },
   watch: {
@@ -133,7 +121,6 @@ export default {
     /* 判断是否跟随父级环境，不存在"<>"和http://|https://开头的，则属于跟随父级Ip和服务(只要修改了服务即可认为不同父类服务) */
     checkIsFollowParent (str, isFullTest, from) {
       // console.log('判断是不是跟随', str, 'from:', from)
-      // return !/^<[\w-]+>\/<[\w-]+>/gi.test(str)
       return !((isFullTest ? /^<[\w-]+>\/<[\w-]+>/gi.test(str) : /^<[\w-]+>$/gi.test(str)) || /https?:\/\/|http?:\/\//ig.test(str))
     },
     arrToStr (list = []) {
@@ -154,7 +141,7 @@ export default {
         // console.log('matchs:', matchs)
         if (this.regex.isHttp.test(data) && !matchs) {
           // 自输入的链接，不做分割
-          arr = ['', '', data]
+          arr = [null, null, data]
         } else {
           if (matchs && !this.checkIsFollowParent(matchs[0], true, 'strToArr')) {
             // console.log('1', data)
@@ -163,32 +150,28 @@ export default {
             arr = [`<${matchs[1]}>`, `<${matchs[2]}>`, last]
           } else {
             // console.log('2')
-            // 不带地址，使用默认服务（无标识的）
-            // console.info(this.$store.getters.getServerInuse)
-            // const [ipName, serviceName] = this.$store.getters.getServerInuse.inuseNode
-            // console.log('store:', ipName, serviceName)
-            // arr = [`<${ipName}>`, `<${serviceName}>`, data]
-            // arr = ['<__parentIp__>', '<__parentService__>', data]
+            // 不带服务标识，使用默认服务（无标识的）
             arr = ['', '', data]
           }
         }
       }
       return arr
     },
-    toggleChooseServer () {
+    toggleChooseServer (event) {
       this.chooseServerVisable = !this.chooseServerVisable
+      this.clickOutside(event)
     },
     chooseServer (value) {
-      // console.log('选择服务:', value)
-      const inuseEnv = this.curCanvasInuse.inuseNode[0]
+      const inuseEnv = this.curCanvasInuse.inuseNode
+      // console.log('选择服务:', value, inuseEnv)
       this.apiurlMix = [
-        `<${value[0]}>`,
-        `<${value[1]}>`,
+        value[0] === inuseEnv[0] ? '' : `<${value[0]}>`,
+        value[1] === inuseEnv[1] ? '' : `<${value[1]}>`,
         this.apiurlMix[2]
       ]
       this.serverName = [value[0], value[1]]
       // 通知修改为非跟随父类默认值
-      this.$emit('changeInPrivate', inuseEnv && inuseEnv !== value[0])
+      // this.$emit('changeInPrivate', inuseEnv && inuseEnv !== value[0])
     },
     handleInput: function (value) {
       // console.log('监听到apiurlMix:', value)
@@ -203,11 +186,31 @@ export default {
       if (!ip || !service) return ''
       const { env } = this.$store.getters.getEnvByName(ip)
       return env?.urls?.find(url => url.name === service)?.url
+    },
+    clickOutside (event) {
+      if (this.chooseServerVisable) {
+        this.$nextTick(() => {
+          this.chooseServerPrependEl.addEventListener('click', (e) => {
+            if (event.target !== e.target && !this.$refs.chooseServerPanel?.$el.contains(e.target)) {
+              this.chooseServerVisable = false
+            }
+          }, true)
+        })
+      } else {
+        this.chooseServerPrependEl.removeEventListener('click', () => {
+          this.chooseServerVisable = false
+        }, true)
+      }
     }
   },
   created () {
     this.apiurlMix = this.strToArr(this.value)
     // console.log('is mounted:', this.apiurlMix)
+  },
+  destroyed () {
+    this.chooseServerPrependEl.removeEventListener('click', () => {
+      this.chooseServerVisable = false
+    }, true)
   }
 }
 </script>
