@@ -112,10 +112,12 @@ const getters = {
       const curEnv = getters.getCanvasView(canvasName).env || {}
       const envList = curEnv.list
       return envList.map(env => {
+        const title = env.title + (curEnv.inuse?.[0] === env.name ? '(当前环境)' : '')
         return {
           ...env,
           value: env.name,
-          title: env.title + (curEnv.inuse?.[0] === env.name ? '(当前环境)' : '')
+          label: title,
+          title
         }
       })
     }

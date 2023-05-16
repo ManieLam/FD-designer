@@ -73,7 +73,7 @@
       :formItemConfig="formItemConfig"
       @update="updateConfig")
   //- 查看配置文件的弹窗
-  el-dialog(
+  SmartDialog(
     title="查看配置文件"
     width="60%"
     :close-on-click-modal="false"
@@ -81,7 +81,7 @@
     //- .setting-json-wrap {{ allCanvas }}
     CodeEditor.json-codeEditor(v-if="settingJsonVisable", :value="allCanvas|filterCanvasStr", mode="ace/mode/json", :readOnly="true", @onCloseDialog="settingJsonVisable=false")
   //- 查看预览的
-  el-dialog(
+  SmartDialog(
     title="查看预览效果"
     width="60%"
     :close-on-click-modal="false"
@@ -98,7 +98,7 @@
       @onCloseDialog="previewProps.visable=false")
     //- form-component(v-if="previewProps.visable", :config="previewProps.data")
   //- 导出.vue或.html
-  el-dialog(
+  SmartDialog(
     title="选择导出的类型"
     width="50%"
     :close-on-click-modal="false"
@@ -121,6 +121,28 @@
     :actions="webServiceActions"
     @onSave="onSaveWebService"
     v-model="webserverSetting")
+  //- 发布弹窗信息补充
+  SmartDialog(
+    title="发布画布"
+    width="30%"
+    size="md"
+    v-model="publishAttr.visable")
+    AnsoDataform(ref="publishAttrForm", v-bind="publishAttr.formProp", v-model="publishAttr.data")
+      template(v-slot:env="{ data, value }")
+        .form-item-row.d-flex-1
+          .row
+            el-checkbox(v-model="data.keepEnv") 跟随当前配置
+          AnsoDataformInput(v-if="!data.keepEnv", v-model="data.envStr", placeholder="可选择画布已配置的或自填服务URL", style="width: 100%")
+            template(slot="prepend")
+              AnsoDataformSelect(
+                :options="canvasEnv"
+                v-model="data.env"
+                style="width: 180px"
+                @change="onSelectPublishEnv")
+          .secondary-text
+            span.el-icon-info.m-r-8
+            span 当前修改只会影响默认接口配置，不会影响已选自定义服务的接口
+
 </template>
 
 <script>
@@ -170,6 +192,47 @@ export default {
       /* 展示更多已发布画布 */
       moreCanvas: {
         visable: false
+      },
+      /* 发布画布 */
+      publishAttr: {
+        visable: false,
+        data: {
+          keepEnv: true
+        },
+        formProp: {
+          formFields: [
+            {
+              label: '发布名称',
+              name: 'canvasName',
+              form: {
+                tag: 'input',
+                rules: [{ pattern: /^[A-Za-z0-9]+$/, message: '请输入英文或数字' }, { required: true, message: '必填' }]
+              }
+            },
+            {
+              label: '接口服务环境',
+              name: 'env',
+              form: {
+                tag: 'input',
+                rules: [{
+                  validator: (rule, stateValue, callback) => {
+                    const { keepEnv, envStr } = this.publishAttr.data
+                    if (!keepEnv && !envStr) {
+                      callback(new Error('需要填写服务地址'))
+                    } else {
+                      callback()
+                    }
+                  }
+                }]
+              }
+            } // slot
+          ],
+          buttonAlign: 'right',
+          buttonList: [
+            { label: '取消', name: 'cancel', func: () => { this.publishAttr.visable = false } },
+            { label: '确定', name: 'submit', type: 'primary', validate: true, func: this.postPublish }
+          ]
+        }
       },
       formLabelHidden: false, // 表单字段是否隐藏
       afterLoading: false,
@@ -249,6 +312,9 @@ export default {
     },
     curCanvasEnv () {
       return this.$store.getters.getServerInuse
+    },
+    canvasEnv () {
+      return this.$store.getters.getCanvasEnv()
     }
   },
   watch: {

@@ -42,41 +42,55 @@ export default {
       const hasPublic = curCanvas?.configId
       // console.log('是否已经发布:', hasPublic)
       if (!hasPublic) {
-        this.$prompt('请赐予页面名称', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          inputPattern: /^[A-Za-z0-9]+$/,
-          inputErrorMessage: '请输入英文或数字',
-          closeOnClickModal: false,
-          closeOnPressEscape: false,
-          closeOnHashChange: false
-        }).then(({ value }) => {
-          // 上传服务端
+        this.publishAttr.visable = true
+      } else {
+        this.updateOnline(curCanvas)
+      }
+    },
+    onSelectPublishEnv (select) {
+      // this.publishAttr.data.
+      if (select) {
+        const { service } = this.$store.getters.getEnvByName(select, 'BASE')
+        this.$set(this.publishAttr.data, 'env', select)
+        this.$set(this.publishAttr.data, 'envStr', service.url)
+      } else {
+        this.$set(this.publishAttr.data, 'env', '')
+        this.$set(this.publishAttr.data, 'envStr', '')
+      }
+    },
+    postPublish ({ formData }) {
+      // 上传服务端
+      // console.log('formData:', formData)
+      const { canvasName, envStr, env } = formData
+      const curCanvas = this.allCanvas[this.canvasName]
+      this.$refs.publishAttrForm.$refs.dataform.validate(valid => {
+        if (valid) {
           this.$normalRequire({
             url: '/fileserver/ui/config/save',
             method: 'post',
             data: {
               config: JSON.stringify({
                 ...curCanvas,
+                env: envStr ? {
+                  ...curCanvas.env,
+                  inuse: [env, 'BASE', envStr]
+                } : curCanvas.env,
                 canvasTitle: '',
-                routerName: value,
-                canvasName: value // 用于计算未发布前copeied次数
+                routerName: canvasName,
+                canvasName: canvasName // 用于计算未发布前copeied次数
               }),
-              canvasName: value,
+              canvasName: canvasName,
               canvasTitle: ''
             }
           }).then(res => {
             // console.log('配置数据上传服务端后:', res)
             if (res && res.data) {
               // 创建新页面
-              this.afterPublish({ name: value, configId: res?.data?.id })
+              this.afterPublish({ name: canvasName, configId: res?.data?.id })
             }
           })
-        })
-        // console.log('curCanvas:', curCanvas)
-      } else {
-        this.updateOnline(curCanvas)
-      }
+        }
+      })
     },
     afterPublish ({ name, configId, isUpdate }) {
       // 更新画布信息 assignConfig
