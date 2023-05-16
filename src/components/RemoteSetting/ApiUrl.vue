@@ -6,6 +6,7 @@
   el-input.api-input(
     ref="chooseServerPrepend",
     :value="apiurlMix[2]"
+    :clearable="true"
     placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置"
     @input="handleInput")
     template(slot="prepend")
@@ -26,7 +27,7 @@
 </template>
 
 <script>
-// import { debounce } from 'lodash'
+import { cloneDeep } from 'lodash'
 export default {
   name: 'ApiUrl',
   props: {
@@ -77,6 +78,12 @@ export default {
     isFullInput () {
       return !this.apiurlMix[0] && !this.apiurlMix[1] && this.regex.isHttp.test(this.apiurlMix[2])
     },
+    /**
+   * apiUrlMix共有3种情况：
+   * ['', '', '/api/xxx'] -- 跟随画布默认服务的接口
+   * ['<LOCAL>', '<BASE>', '/api/xx'] -- 自定义环境服务的接口
+   * ['', '', 'http://www.xxxx'] -- 自定义带http的全路径接口
+    */
     apiurlMix: {
       get () {
         return this.strToArr(this.urlStr)
@@ -93,35 +100,30 @@ export default {
   },
   watch: {
     value: {
+      immediate: true,
       handler (value) {
         if (value !== this.urlStr) {
           this.apiurlMix = this.strToArr(this.value)
         }
       }
     },
-    apiurlMix (list) {
-      // console.info('监听apiurlMix的修改:', list)
-      const serviceList = list.slice(0, 2).map((val, index) => {
-        // const valStr = val.replace(/<|>/g, '')
-        // console.log('判断val是否跟随父类', val)
-        if (this.checkIsFollowParent(val, false, 'watch')) {
-          // console.log('1', this.curCanvasInuse.inuseNode)
-          return this.curCanvasInuse.inuseNode[index]
-        } else {
-          // console.log('2')
-          return val.replace(/<|>/g, '')
-        }
-      })
-      // console.info('apiurlMix更新带动serviceList更新:', serviceList)
-      this.serverName = ''
-      this.serverName = serviceList
+    urlStr: {
+      immediate: true,
+      handler (str) {
+        /* 监听apiurlMix，控制cascader选值范围serverName */
+        // console.log('watch str', str)
+        const isFollow = this.checkIsFollowParent(str, true, 'watch')
+        // console.log('isFollow:', isFollow)
+        this.serverName = isFollow ? this.curCanvasInuse.inuseNode.slice(0, 2) : /^<[\w-]+>\/<[\w-]+>/.test(str)
+          ? this.apiurlMix.slice(0, 2).map(e => e.replace(/<|>/g, '')) : []
+      }
     }
   },
   methods: {
     /* 判断是否跟随父级环境，不存在"<>"和http://|https://开头的，则属于跟随父级Ip和服务(只要修改了服务即可认为不同父类服务) */
     checkIsFollowParent (str, isFullTest, from) {
       // console.log('判断是不是跟随', str, 'from:', from)
-      return !((isFullTest ? /^<[\w-]+>\/<[\w-]+>/gi.test(str) : /^<[\w-]+>$/gi.test(str)) || /https?:\/\/|http?:\/\//ig.test(str))
+      return !(/https?:\/\/|http?:\/\//ig.test(str) || (isFullTest ? /^<[\w-]+>\/<[\w-]+>/gi.test(str) : /^<[\w-]+>$/gi.test(str)))
     },
     arrToStr (list = []) {
       if (!list || !Array.isArray(list)) return list
@@ -139,12 +141,11 @@ export default {
       if (typeof data === 'string') {
         const matchs = data.match(/^<([\w-]+)>\/<([\w-]+)>/)
         // console.log('matchs:', matchs)
-        if (this.regex.isHttp.test(data) && !matchs) {
-          // 自输入的链接，不做分割
-          arr = [null, null, data]
+        if (this.regex.isHttp.test(data)) {
+          // 自输入的链接，不做分割, 先自选，再填http的情况会被替换成http
+          arr = ['', '', data.replace(/<([\w-]+)>\/<([\w-]+)>/g, '')]
         } else {
           if (matchs && !this.checkIsFollowParent(matchs[0], true, 'strToArr')) {
-            // console.log('1', data)
             // 带动态服务地址
             const last = data.replace(matchs[0], '')
             arr = [`<${matchs[1]}>`, `<${matchs[2]}>`, last]
@@ -163,11 +164,12 @@ export default {
     },
     chooseServer (value) {
       const inuseEnv = this.curCanvasInuse.inuseNode
-      // console.log('选择服务:', value, inuseEnv)
+      const originUrl = cloneDeep(this.apiurlMix[2])
+      // console.log('选择服务:', value, inuseEnv, originUrl)
       this.apiurlMix = [
         value[0] === inuseEnv[0] ? '' : `<${value[0]}>`,
-        value[1] === inuseEnv[1] ? '' : `<${value[1]}>`,
-        this.apiurlMix[2]
+        value[0] === inuseEnv[0] && value[1] === inuseEnv[1] ? '' : `<${value[1]}>`,
+        originUrl
       ]
       this.serverName = [value[0], value[1]]
       // 通知修改为非跟随父类默认值
@@ -204,7 +206,7 @@ export default {
     }
   },
   created () {
-    this.apiurlMix = this.strToArr(this.value)
+    // this.apiurlMix = this.strToArr(this.value)
     // console.log('is mounted:', this.apiurlMix)
   },
   destroyed () {

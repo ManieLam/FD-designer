@@ -86,7 +86,7 @@ el-dialog.async-required-dialog(
               //- el-input(v-model="apiurlMix[2]", placeholder="请输入相对地址，无需带http(s)://前缀，以/开头，默认跟随系统配置")
               //-   template(slot="prepend")
               //-     AnsoDataformSelect(v-model="apiurlMix[0]", :options="$gbServer")
-              ApiUrl(ref="apiUrlInput", :value="apiData.url", @input="handleApiUrl", @changeInPrivate="changeInPrivate")
+              ApiUrl(:key="apiData.url", ref="apiUrlInput", :value="apiData.url", @input="handleApiUrl", @changeInPrivate="changeInPrivate")
 
             el-form-item(label="请求方式", prop="method")
               el-radio-group(v-model="apiData.method" size="mini")
