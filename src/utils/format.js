@@ -141,7 +141,8 @@ export function transUrlReadable (url, { renderDefaultService = false, canvas = 
     // 跟随默认
     const inuseNode = canvas ? canvas.env.inuse : this.$store.getters.getServerInuse?.inuseNode
     // const { inuseNode } = this.$store.getters.getServerInuse
-    const appendUrl = inuseNode[2] || ''
+    // 当inuseNode为空时，表示这是配置了相对请求地址，默认跟随部署的环境做请求
+    const appendUrl = inuseNode?.[2] || ''
     return appendUrl.charAt(appendUrl.length - 1) !== '/' && url.charAt(0) !== '/' ? `${appendUrl}/${url}` : appendUrl + url
   }
   return url.replace(/<([\w-]+)>\/<([\w-]+)>/gi, replaceStr)

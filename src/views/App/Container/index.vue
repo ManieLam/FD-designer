@@ -77,7 +77,7 @@
     title="查看配置文件"
     width="60%"
     :close-on-click-modal="false"
-    :visible.sync="settingJsonVisable")
+    v-model="settingJsonVisable")
     //- .setting-json-wrap {{ allCanvas }}
     CodeEditor.json-codeEditor(v-if="settingJsonVisable", :value="allCanvas|filterCanvasStr", mode="ace/mode/json", :readOnly="true", @onCloseDialog="settingJsonVisable=false")
   //- 查看预览的
@@ -119,26 +119,42 @@
     ref="webserverSetter"
     :canvas="actCanvas"
     :actions="webServiceActions"
+    :key="actCanvas.routerName"
     @onSave="onSaveWebService"
-    v-model="webserverSetting")
+    v-if="webserverSettingVisable"
+    v-model="webserverSettingVisable")
   //- 发布弹窗信息补充
   SmartDialog(
     title="发布画布"
     width="30%"
     size="md"
     v-model="publishAttr.visable")
-    AnsoDataform(ref="publishAttrForm", v-bind="publishAttr.formProp", v-model="publishAttr.data")
+    AnsoDataform(ref="publishAttrForm", v-bind="publishAttr.formProp", v-model="publishAttrData")
       template(v-slot:env="{ data, value }")
         .form-item-row.d-flex-1
           .row
-            el-checkbox(v-model="data.keepEnv") 跟随当前配置
-          AnsoDataformInput(v-if="!data.keepEnv", v-model="data.envStr", placeholder="可选择画布已配置的或自填服务URL", style="width: 100%")
-            template(slot="prepend")
-              AnsoDataformSelect(
-                :options="canvasEnv"
-                v-model="data.env"
-                style="width: 180px"
-                @change="onSelectPublishEnv")
+            //- el-checkbox(key="keepEnv", v-model="publishAttrData.keepEnv") 跟随当前配置
+            //- el-checkbox(key="isNoEnv", v-model="publishAttrData.isNoEnv") 不配置
+            AnsoDataformRadio(
+              id="publishEnv"
+              v-model="publishAttrData.keepEnv"
+              :isButton="true"
+              :options="publishAttr.envTypes")
+          //- AnsoDataformInput(
+          //-   v-if="!data.keepEnv || !data.isNoEnv"
+          //-   :value="data.envURL"
+          //-   key="envURL"
+          //-   placeholder="可选择画布已配置的或自填服务URL"
+          //-   style="width: 100%"
+          //-   @input="validateEnvInput")
+          //-   template(slot="prepend")
+          //-     AnsoDataformSelect(
+          //-       :options="canvasEnv"
+          //-       v-model="data.env"
+          //-       key="envSelect"
+          //-       style="width: 180px"
+          //-       placeholder="可选配置服务项"
+          //-       @change="onSelectPublishEnv")
           .secondary-text
             span.el-icon-info.m-r-8
             span 当前修改只会影响默认接口配置，不会影响已选自定义服务的接口
@@ -194,11 +210,11 @@ export default {
         visable: false
       },
       /* 发布画布 */
+      publishAttrData: {
+        keepEnv: 0 // 采用相对地址，可以在多处环境使用
+      },
       publishAttr: {
         visable: false,
-        data: {
-          keepEnv: true
-        },
         formProp: {
           formFields: [
             {
@@ -206,6 +222,7 @@ export default {
               name: 'canvasName',
               form: {
                 tag: 'input',
+                bottomTip: '请输入英文或数字',
                 rules: [{ pattern: /^[A-Za-z0-9]+$/, message: '请输入英文或数字' }, { required: true, message: '必填' }]
               }
             },
@@ -213,26 +230,40 @@ export default {
               label: '接口服务环境',
               name: 'env',
               form: {
-                tag: 'input',
-                rules: [{
-                  validator: (rule, stateValue, callback) => {
-                    const { keepEnv, envStr } = this.publishAttr.data
-                    if (!keepEnv && !envStr) {
-                      callback(new Error('需要填写服务地址'))
-                    } else {
-                      callback()
-                    }
-                  }
-                }]
+                tag: 'input'
+                // rules: [{
+                //   validator: (rule, stateValue, callback) => {
+                //     const { isNoEnv, keepEnv, envURL } = this.publishAttrData
+                //     if (!isNoEnv && !keepEnv && !envURL) {
+                //       callback(new Error('需要填写服务地址'))
+                //     } else {
+                //       callback()
+                //     }
+                //   },
+                //   trigger: 'change'
+                // }]
               }
             } // slot
           ],
           buttonAlign: 'right',
           buttonList: [
             { label: '取消', name: 'cancel', func: () => { this.publishAttr.visable = false } },
-            { label: '确定', name: 'submit', type: 'primary', validate: true, func: this.postPublish }
+            {
+              label: '确定',
+              name: 'submit',
+              type: 'primary',
+              validate: true,
+              func: (datas) => {
+                const hasPublic = this.actCanvas?.configId
+                !hasPublic ? this.postPublish(datas) : this.updateOnline(this.actCanvas)
+              }
+            }
           ]
-        }
+        },
+        envTypes: [
+          { label: '跟随当前配置', value: 1 },
+          { label: '不配置', value: 0 }
+        ]
       },
       formLabelHidden: false, // 表单字段是否隐藏
       afterLoading: false,

@@ -19,7 +19,8 @@ module.exports = {
         pathRewrite: { '^/fileserver': '/api/fileserver' }
       },
       '/customize-ui': {
-        target: 'http://10.0.60.212:18090',
+        // target: 'http://10.0.60.212:18090',
+        target: 'http://10.0.60.34:18090',
         changeOrigin: true,
         pathRewrite: { '^/customize-ui': '/customize-ui' }
       }

@@ -6,7 +6,7 @@ export default {
     return {
       settingJsonVisable: false, // 查看json数据
       toggleSettingOpen: true, // 切换配置区
-      webserverSetting: false, // 查看环境
+      webserverSettingVisable: false, // 查看环境
       webServiceActions: [
         {
           label: '应用当前画布',
@@ -20,7 +20,7 @@ export default {
   methods: {
     // 查看环境
     handleCheckEnv () {
-      this.webserverSetting = !this.webserverSetting
+      this.webserverSettingVisable = !this.webserverSettingVisable
     },
     // 切换正在使用的环境
     changeEnvInuse ({ envs, selected }) {
@@ -45,13 +45,14 @@ export default {
         }
       })
       // 关闭弹窗
-      this.webserverSetting = false
+      this.webserverSettingVisable = false
     },
     // 查看配置文件
     toggleSettingJson () {
-      this.$forceUpdate()
+      // this.$forceUpdate()
       this.$nextTick(() => {
         this.settingJsonVisable = !this.settingJsonVisable
+        console.log('toggleSettingJson', this.settingJsonVisable)
       })
     },
     // 切换画布

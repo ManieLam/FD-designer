@@ -170,8 +170,9 @@ const mutations = {
   INIT_SERVER (states, { name }) {
     const curCanvas = states.canvas[name]
     // console.log('curCanvas:', curCanvas)
-    const server = { ...gbServer }
-    if (!curCanvas.env) {
+    if (curCanvas && !curCanvas.env) {
+      const server = { ...gbServer }
+      console.log('init-server 1', curCanvas.env)
       curCanvas.env = new EnvRecordModel()
       if (!curCanvas.env.list.length) {
         // 从默认的环境中，每个环境同步共同的服务数据
@@ -185,6 +186,8 @@ const mutations = {
       if (!curCanvas.env.serviceOptions?.length) {
         curCanvas.env.serviceOptions = [new ServiceModel()]
       }
+    } else {
+      console.log('init server 2')
     }
   },
   /* 更新画布中的服务，每次只更新一种属性 */

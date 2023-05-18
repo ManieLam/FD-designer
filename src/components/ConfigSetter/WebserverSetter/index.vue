@@ -155,6 +155,7 @@ export default {
         this.$store.commit('canvas/INIT_SERVER')
       }
       this.$nextTick(() => {
+        console.log('初始化env：', this.canvas?.env?.list)
         this.envList = this.canvas?.env?.list || this.$gbServer || []
         // const inuse = this.canvas?.env?.inuse
         this.envData = this.$store.getters.getServerInuse?.env || {}

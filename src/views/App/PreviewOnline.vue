@@ -41,9 +41,12 @@ export default {
     handleEdit () {
       const { hash, href } = window.location
       const { name, id } = this.$route.params || {}
-      // 编辑页面跳转
-      const newPath = href.replace(hash, `#/edit/${name}/${id}`)
-      window.location.href = newPath
+      this.$store.commit('canvas/TOGGLE', name)
+      this.$nextTick(() => {
+        // 编辑页面跳转
+        const newPath = href.replace(hash, `#/edit/${name}/${id}`)
+        window.location.href = newPath
+      })
     }
   },
   mounted () {

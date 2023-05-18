@@ -18,12 +18,12 @@
 
 <script>
 import AppContainer from './Container'
-import WebserverSetter from '@/components/ConfigSetter/WebserverSetter'
+// import WebserverSetter from '@/components/ConfigSetter/WebserverSetter'
 export default {
   name: 'AppDesigner',
   components: {
-    AppContainer,
-    WebserverSetter
+    AppContainer
+    // WebserverSetter
   },
   data () {
     return {

@@ -4,7 +4,7 @@ export default {
       let resData = {}
       if (rName && id) {
         await this.$normalRequire({
-          url: `/fileserver/ui/config/get/${id}`
+          url: this.$api.canvas.getDetail(id)
         }).then(res => {
           if (res?.data) {
             resData = {
@@ -39,46 +39,55 @@ export default {
     publishOnline () {
       /* :is="componentVM", :config="previewProps.data", :isTest="true", @onCloseDialog="previewProps.visable=false" */
       const curCanvas = this.allCanvas[this.canvasName]
-      const hasPublic = curCanvas?.configId
+      const hasPublic = !!curCanvas?.configId
       // console.log('是否已经发布:', hasPublic)
-      if (!hasPublic) {
-        this.publishAttr.visable = true
-      } else {
-        this.updateOnline(curCanvas)
+      this.publishAttrData = {
+        canvasName: curCanvas.routerName,
+        keepEnv: curCanvas.env?.keepEnv || 0
       }
+      // 已发布则禁用修改发布名称
+      this.$set(this.publishAttr.formProp.formFields[0].form, 'disabled', hasPublic)
+      this.publishAttr.visable = true
     },
     onSelectPublishEnv (select) {
-      // this.publishAttr.data.
+      // console.log('on select:', select)
       if (select) {
         const { service } = this.$store.getters.getEnvByName(select, 'BASE')
-        this.$set(this.publishAttr.data, 'env', select)
-        this.$set(this.publishAttr.data, 'envStr', service.url)
+        this.publishAttrData.env = select
+        this.publishAttrData.envURL = service.url
       } else {
-        this.$set(this.publishAttr.data, 'env', '')
-        this.$set(this.publishAttr.data, 'envStr', '')
+        this.publishAttrData.env = ''
+        this.publishAttrData.envURL = ''
       }
+    },
+    validateEnvInput (str) {
+      this.publishAttrData.envURL = str
+      this.$refs.publishAttrForm.$refs.dataform.validateField('env')
     },
     postPublish ({ formData }) {
       // 上传服务端
       // console.log('formData:', formData)
-      const { canvasName, envStr, env } = formData
+      const { canvasName, keepEnv } = formData
       const curCanvas = this.allCanvas[this.canvasName]
       this.$refs.publishAttrForm.$refs.dataform.validate(valid => {
         if (valid) {
+          const configData = {
+            ...curCanvas,
+            // env: !isNoEnv && envURL ? {
+            //   ...curCanvas.env,
+            //   inuse: [env, 'BASE', envURL]
+            // } : curCanvas.env,
+            env: { ...curCanvas.env, inuse: keepEnv ? curCanvas.env?.inuse : ['', '', ''], keepEnv }, // 跟随部署环境请求的inuse采用3位取空的数组
+            canvasTitle: '',
+            routerName: canvasName,
+            canvasName: canvasName // 用于计算未发布前copeied次数
+          }
+          console.log('提交配置:', configData)
           this.$normalRequire({
-            url: '/fileserver/ui/config/save',
+            url: this.$api.canvas.save,
             method: 'post',
             data: {
-              config: JSON.stringify({
-                ...curCanvas,
-                env: envStr ? {
-                  ...curCanvas.env,
-                  inuse: [env, 'BASE', envStr]
-                } : curCanvas.env,
-                canvasTitle: '',
-                routerName: canvasName,
-                canvasName: canvasName // 用于计算未发布前copeied次数
-              }),
+              config: JSON.stringify(configData),
               canvasName: canvasName,
               canvasTitle: ''
             }
@@ -86,23 +95,60 @@ export default {
             // console.log('配置数据上传服务端后:', res)
             if (res && res.data) {
               // 创建新页面
-              this.afterPublish({ name: canvasName, configId: res?.data?.id })
+              this.afterPublish({ name: canvasName, configId: res?.data?.id, data: configData })
             }
           })
         }
       })
     },
-    afterPublish ({ name, configId, isUpdate }) {
+    updateOnline (canvas) {
+      // console.log('更新发布:', canvas)
+      const { configId, routerName, canvasTitle } = canvas
+      // const configData = {
+      //   ...curCanvas,
+      //   // env: !isNoEnv && envURL ? {
+      //   //   ...curCanvas.env,
+      //   //   inuse: [env, 'BASE', envURL]
+      //   // } : curCanvas.env,
+      //   env: { ...curCanvas.env, inuse: keepEnv ? curCanvas.env?.inuse : ['', '', ''], keepEnv }, // 跟随部署环境请求的inuse采用3位取空的数组
+      //   canvasTitle: '',
+      //   routerName: canvasName,
+      //   canvasName: canvasName // 用于计算未发布前copeied次数
+      // }
+      this.$normalRequire({
+        url: this.$api.canvas.edit(configId),
+        method: 'POST',
+        data: {
+          config: JSON.stringify(canvas),
+          canvasName: routerName,
+          canvasTitle
+        }
+      }).then(res => {
+        // console.info('res:', res)
+        if (res.code !== -1) {
+          // this.$nextTick(() => {
+          //   this.onSave(false)
+          // })
+          this.afterPublish({ name: routerName, configId, isUpdate: true, data: canvas })
+          // this.$message.success('发布成功')
+        } else {
+          this.$message.error(res)
+        }
+      })
+    },
+    afterPublish ({ name, configId, isUpdate, data }) {
       // 更新画布信息 assignConfig
       this.$store.commit('canvas/ASSIGN_CONFIG', {
         name: this.canvasName,
         assignObj: {
           configId: configId, // 首次发布前没有configId，需要补充
-          routerName: name
+          routerName: name,
+          ...data
         }
       })
       this.$nextTick(() => {
         this.onSave(false)
+        this.publishAttr.visable = false
         this.$store.commit('canvas/TOGGLE', name)
         this.$forceUpdate()
       })
@@ -127,30 +173,6 @@ export default {
         confirmButtonText: '跳转查看'
       }).then(action => {
         window.open(newPath + '?mode=1', name)
-      })
-    },
-    updateOnline (canvas) {
-      // console.log('更新发布:', canvas)
-      const { configId, routerName, canvasTitle } = canvas
-      this.$normalRequire({
-        url: `/fileserver/ui/config/edit/${configId}`,
-        method: 'POST',
-        data: {
-          config: JSON.stringify(canvas),
-          canvasName: routerName,
-          canvasTitle
-        }
-      }).then(res => {
-        // console.info('res:', res)
-        if (res.code !== -1) {
-          // this.$nextTick(() => {
-          //   this.onSave(false)
-          // })
-          this.afterPublish({ name: routerName, configId, isUpdate: true })
-          // this.$message.success('发布成功')
-        } else {
-          this.$message.error(res)
-        }
       })
     }
   }
